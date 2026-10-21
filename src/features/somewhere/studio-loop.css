@@ -1,0 +1,46 @@
+/* Studio loop in a page head: a large rounded image with an unboxed caption. */
+.tms-loop {
+  margin: 0;
+  display: grid;
+  gap: 0.7rem;
+  align-self: end;
+  width: 100%;
+}
+.tms-loop-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--plum);
+  box-shadow: var(--shadow-card), 0 0 0 1px var(--line);
+}
+.tms-loop-frame .art {
+  position: absolute;
+  inset: 0;
+}
+/* a soft top light, like glass over the image */
+.tms-loop-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pearl) 10%, transparent), transparent 28%, transparent 70%, color-mix(in srgb, var(--night) 35%, transparent));
+}
+.tms-loop-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--t-slow) var(--ease-out);
+}
+.tms-loop[data-playing] .tms-loop-video {
+  opacity: 1;
+}
+.tms-loop-cap {
+  padding-inline: 0.25rem;
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}

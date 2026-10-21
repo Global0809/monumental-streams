@@ -1,0 +1,68 @@
+[
+  {
+    "id": "person:valid-id",
+    "slug": "valid-id",
+    "name": "Valid ID",
+    "kind": "presenter",
+    "roles": ["Inaugural presenter", "Featured artist", "Presenter — WAVEMAKERS"],
+    "summary": "Valid ID is the inaugural presenter and featured artist introducing MONUMENTAL STREAMS. He presents WAVEMAKERS, beginning with the opening chapter 'Valid ID presents WAVEMAKERS: Puerto Rico, New York to London', and his EP 'Better Late Than Never' anchors the platform's opening artist campaign. A full biography and approved imagery will be added once they are signed off.",
+    "categories": ["interest:music"],
+    "art": "art:wavemakers-lines",
+    "provisional": true
+  },
+  {
+    "id": "person:dj-kool-herc",
+    "slug": "dj-kool-herc",
+    "name": "DJ Kool Herc",
+    "kind": "historical",
+    "roles": ["DJ", "Hip hop pioneer"],
+    "summary": "Born Clive Campbell in Kingston, Jamaica, in 1955, he moved to the Bronx in 1967. On 11 August 1973 he played a back-to-school party organised by his sister Cindy Campbell in the recreation room at 1520 Sedgwick Avenue, an event widely cited as the birth of hip hop. Drawing on Jamaican sound-system practice, he used two copies of a record to extend the drum breaks that dancers loved.",
+    "places": ["place:kingston", "place:the-bronx", "place:1520-sedgwick-avenue"],
+    "movements": ["movement:sound-system-culture", "movement:hip-hop-origins"],
+    "categories": ["interest:music"]
+  },
+  {
+    "id": "person:claudia-jones",
+    "slug": "claudia-jones",
+    "name": "Claudia Jones",
+    "kind": "historical",
+    "roles": ["Journalist", "Activist", "Carnival organiser"],
+    "summary": "A Trinidad-born journalist and activist who grew up in Harlem, New York, and settled in London after being deported from the United States in 1955. In 1958 she founded the West Indian Gazette in Brixton, and in January 1959 she organised a Caribbean carnival at St Pancras Town Hall, a forerunner of the Notting Hill Carnival. She died in London in 1964.",
+    "places": ["place:london", "place:brixton", "place:manhattan"],
+    "movements": ["movement:windrush-generation", "movement:notting-hill-carnival"],
+    "categories": ["interest:culture"]
+  },
+  {
+    "id": "person:barbara-capitman",
+    "slug": "barbara-capitman",
+    "name": "Barbara Capitman",
+    "kind": "historical",
+    "roles": ["Preservationist", "Co-founder, Miami Design Preservation League"],
+    "summary": "A preservation campaigner who co-founded the Miami Design Preservation League in 1976 and led the fight to save South Beach's Art Deco buildings, which won National Register listing for the Miami Beach Architectural District in 1979.",
+    "places": ["place:miami-beach", "place:miami-beach-architectural-district"],
+    "movements": ["movement:miami-design-preservation", "movement:miami-beach-art-deco"],
+    "categories": ["interest:art", "interest:culture"]
+  },
+  {
+    "id": "person:tony-goldman",
+    "slug": "tony-goldman",
+    "name": "Tony Goldman",
+    "kind": "historical",
+    "roles": ["Developer", "Founder, Wynwood Walls"],
+    "summary": "A real-estate developer (1943–2012) known for reviving historic neighbourhoods, including New York's SoHo and Miami Beach's South Beach. In 2009 he founded Wynwood Walls, inviting artists to paint the warehouses he had bought in Wynwood.",
+    "places": ["place:wynwood", "place:south-beach", "place:manhattan"],
+    "movements": ["movement:wynwood-walls"],
+    "categories": ["interest:art"]
+  },
+  {
+    "id": "person:miguel-algarin",
+    "slug": "miguel-algarin",
+    "name": "Miguel Algarín",
+    "kind": "historical",
+    "roles": ["Poet", "Co-founder, Nuyorican Poets Café"],
+    "summary": "A poet (1941–2020) born in Santurce, San Juan, who grew up in New York. He co-founded the Nuyorican Poets Café on the Lower East Side in 1973 and, with Miguel Piñero, edited the 1975 anthology 'Nuyorican Poetry'.",
+    "places": ["place:santurce", "place:lower-east-side"],
+    "movements": ["movement:nuyorican-movement", "movement:la-gran-migracion"],
+    "categories": ["interest:art", "interest:culture"]
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "id": "video:rural-puerto-rico-1942",
+  "slug": "rural-puerto-rico-1942",
+  "title": "Democracy at Work in Rural Puerto Rico",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 5,
+  "summary": "A 1942 US government film on farm extension work in Puerto Rico's countryside.",
+  "description": "Made by the US Department of Agriculture Extension Service and directed by Chester Lindstrom, this narrated film shows rural Puerto Rico around 1941: coffee and tobacco farms in the highlands, sugar cane on the coastal plains, extension work by the University of Puerto Rico, and 4-H clubs.\n\nA public-domain US government film held by the National Archives, shown as demonstration media while original programming is produced; it is not a Monumental Original. No captions are available yet.",
+  "categories": [
+    "interest:documentary",
+    "interest:culture"
+  ],
+  "places": [
+    "place:puerto-rico"
+  ],
+  "periods": [
+    "period:1940s"
+  ],
+  "themes": [
+    "theme:community"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "setting": {
+    "from": 1941,
+    "to": 1942
+  },
+  "made": 1942,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-rural-puerto-rico-1942",
+  "art": "art:still-rural-puerto-rico-1942",
+  "credits": {
+    "licence": "Public domain (US federal government work)",
+    "attribution": "Democracy at Work in Rural Puerto Rico (1942). US Department of Agriculture Extension Service; directed by Chester Lindstrom. US National Archives, via Internet Archive.",
+    "sourceUrl": "https://archive.org/details/Democrac1940"
+  },
+  "context": "A US government film made in wartime. It frames Puerto Rico as an 'outpost of American democracy', takes a paternalistic tone toward the people it shows, and leaves Black Puerto Ricans out of the picture."
+}

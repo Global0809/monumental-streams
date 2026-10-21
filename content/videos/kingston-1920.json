@@ -1,0 +1,50 @@
+{
+  "id": "video:kingston-1920",
+  "slug": "kingston-1920",
+  "title": "Kingston Jamaica",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 3,
+  "summary": "A 1920 educational film of Kingston's harbour, docks, streets and homes.",
+  "description": "Made for the Ford Educational Library in 1920, when Jamaica was a British colony and about thirteen years after the 1907 earthquake, this silent film tours Kingston: sailing ships in the harbour, cargo on the docks, people at work and on the move, streetcars, homes, and a busy street the intertitles call Pearl Street.\n\nIt is silent, with period intertitles and no soundtrack. A public-domain film shown as demonstration media while original programming is produced; it is not a Monumental Original.",
+  "categories": [
+    "interest:documentary",
+    "interest:culture"
+  ],
+  "places": [
+    "place:kingston"
+  ],
+  "periods": [
+    "period:1920s"
+  ],
+  "themes": [
+    "theme:architecture",
+    "theme:community"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "setting": {
+    "from": 1920,
+    "to": 1920,
+    "label": "c. 1920"
+  },
+  "made": 1920,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-kingston-1920",
+  "art": "art:still-kingston-1920",
+  "credits": {
+    "licence": "Public domain",
+    "attribution": "Kingston Jamaica (1920). Ford Educational Library, Ford Motor Company. US National Archives, via Internet Archive.",
+    "sourceUrl": "https://archive.org/details/fc-fc-349"
+  },
+  "context": "Made for a US company's educational film series in 1920, when Jamaica was a British colony. Its intertitles and framing reflect the colonial attitudes of the time, for example in scenes of boys diving for coins."
+}

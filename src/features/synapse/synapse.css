@@ -1,0 +1,741 @@
+/* ═══════════════════════════════════════════════════════════════
+   THE SYNAPSE — Chrome Bloom
+   A soft web of light around one entity on the violet night.
+   Kind colours: place / story iris · route iris-2 · decade / movement frost ·
+   person / programme gold · interest / theme pearl.
+   ═══════════════════════════════════════════════════════════════ */
+
+.syn-page [data-kind] {
+  --k: var(--lilac);
+}
+.syn-page [data-kind='place'],
+.syn-page [data-kind='video'] {
+  --k: var(--iris);
+}
+.syn-page [data-kind='route'] {
+  --k: var(--iris-2);
+}
+.syn-page [data-kind='period'],
+.syn-page [data-kind='movement'] {
+  --k: var(--frost);
+}
+.syn-page [data-kind='person'],
+.syn-page [data-kind='programme'] {
+  --k: var(--gold);
+}
+.syn-page [data-kind='interest'],
+.syn-page [data-kind='theme'] {
+  --k: var(--pearl);
+}
+
+.syn-dot {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--k);
+  box-shadow: 0 0 10px var(--k);
+}
+
+/* ───────── Stage: lead + web + reading card ───────── */
+.syn-stage {
+  display: grid;
+  gap: clamp(1.75rem, 3vw, 2.5rem);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'lead' 'graph' 'card' 'details';
+}
+@media (min-width: 1100px) {
+  .syn-stage {
+    grid-template-columns: minmax(20rem, 0.8fr) minmax(0, 1.55fr);
+    grid-template-areas: 'lead graph' 'card graph' 'details graph';
+    grid-template-rows: auto auto 1fr;
+    column-gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+  }
+}
+.syn-lead {
+  grid-area: lead;
+  min-width: 0;
+}
+.syn-graph-col {
+  grid-area: graph;
+  min-width: 0;
+}
+.syn-card {
+  grid-area: card;
+  min-width: 0;
+}
+.syn-details-wrap {
+  grid-area: details;
+  min-width: 0;
+}
+.syn-details {
+  display: grid;
+  gap: 1rem;
+}
+.syn-details-title {
+  margin-bottom: -0.2rem;
+}
+
+/* ───────── Entity header ───────── */
+.syn-head {
+  display: grid;
+  gap: 1rem;
+}
+.syn-head-art {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  margin-bottom: 0.6rem;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card), 0 0 0 1px var(--line);
+}
+.syn-head-art .art {
+  position: absolute;
+  inset: 0;
+}
+.syn-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+/* Connections belong to World in the navigation: one quiet trail back */
+.syn-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.syn-crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--lilac);
+  text-decoration: none;
+  transition: color var(--t-mid);
+}
+.syn-crumbs a:hover {
+  color: var(--gold);
+}
+.syn-crumbs [aria-current] {
+  color: var(--pearl);
+}
+@media (pointer: coarse) {
+  .syn-crumbs a {
+    min-height: var(--hit);
+    min-width: var(--hit);
+  }
+}
+.syn-title {
+  font-size: clamp(2.4rem, 1.5rem + 2.6vw, 4.4rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  overflow-wrap: break-word;
+}
+.syn-title[data-long] {
+  font-size: clamp(2rem, 1.4rem + 1.6vw, 3.1rem);
+}
+.syn-lede {
+  max-width: 52ch;
+  font-size: var(--step-1);
+  line-height: 1.55;
+  color: var(--lilac);
+}
+.syn-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.syn-body {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 62ch;
+  line-height: 1.6;
+  color: var(--lilac);
+}
+.syn-facts {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0.2rem 0 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
+}
+.syn-facts > div {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: baseline;
+}
+.syn-facts dt {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--lilac-dim);
+}
+.syn-facts dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.4rem;
+  margin: 0;
+  font-size: var(--step--1);
+  color: var(--pearl);
+}
+.syn-fact-item + .syn-fact-item::before {
+  content: '·';
+  margin-right: 0.4rem;
+  color: var(--lilac-dim);
+}
+.syn-facts a:hover {
+  color: var(--iris);
+}
+.syn-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+.syn-action-note {
+  flex-basis: 100%;
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+@media (max-width: 480px) {
+  .syn-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.2rem;
+  }
+}
+
+/* ───────── The web ───────── */
+.syn-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 0.9rem 1rem;
+}
+.syn-web-title {
+  display: grid;
+  gap: 0.4rem;
+}
+.syn-web-title .serif {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+.syn-toolbar .segmented button {
+  min-height: var(--hit);
+}
+.syn-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1.2rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--step--1);
+  color: var(--lilac);
+}
+.syn-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.syn-legend-n {
+  color: var(--lilac-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.syn-graph {
+  position: relative;
+  margin-top: 1.1rem;
+  min-height: 260px;
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--iris) 14%, transparent), transparent 72%),
+    radial-gradient(90% 80% at 50% 0%, color-mix(in oklab, var(--iris-deep) 26%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in oklab, var(--night-2) 70%, transparent), color-mix(in oklab, var(--night) 85%, transparent));
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+}
+.syn-graph .empty {
+  margin: 1rem;
+}
+.syn-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.syn-svg-skeleton {
+  aspect-ratio: 10 / 7;
+}
+.syn-orbits ellipse {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+/* Axons */
+.syn-axon {
+  transition: opacity var(--t-mid);
+}
+.syn-axon[data-dim] {
+  opacity: 0.16;
+}
+.syn-edge {
+  fill: none;
+  stroke: color-mix(in oklab, var(--iris) 34%, transparent);
+  stroke-linecap: round;
+  transition: stroke var(--t-mid);
+}
+.syn-axon[data-cross] .syn-edge {
+  stroke: color-mix(in oklab, var(--frost) 32%, transparent);
+  stroke-dasharray: 3 6;
+}
+.syn-axon[data-on] .syn-edge {
+  stroke: color-mix(in oklab, var(--iris) 85%, var(--pearl));
+  filter: drop-shadow(0 0 5px var(--iris-glow));
+}
+.syn-axon[data-on][data-cross] .syn-edge {
+  stroke: var(--frost);
+}
+/* a soft bead of light travelling along each link */
+.syn-pulse {
+  fill: none;
+  stroke: var(--pearl);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 2.5 97.5;
+  stroke-dashoffset: 100;
+  opacity: 0.6;
+  animation-name: syn-travel;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  pointer-events: none;
+}
+.syn-axon[data-cross] .syn-pulse {
+  stroke: var(--frost);
+}
+.syn-axon[data-on] .syn-pulse {
+  opacity: 0.95;
+}
+.syn-axon[data-dim] .syn-pulse {
+  opacity: 0;
+}
+.syn-graph:not([data-visible]) .syn-pulse {
+  animation-play-state: paused;
+}
+:root[data-motion='reduce'] .syn-pulse {
+  display: none;
+}
+@keyframes syn-travel {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.syn-edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+  pointer-events: stroke;
+}
+
+/* Centre */
+.syn-centre-halo {
+  fill: none;
+  stroke: var(--k);
+  stroke-width: 1;
+  opacity: 0.35;
+}
+.syn-centre-core {
+  fill: color-mix(in oklab, var(--k) 22%, var(--plum-2));
+}
+.syn-centre-nucleus {
+  fill: var(--pearl);
+  filter: drop-shadow(0 0 10px var(--k));
+}
+.syn-centre-ring {
+  fill: none;
+  stroke: var(--pearl);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 12px var(--k));
+}
+
+/* Nodes */
+.syn-node {
+  cursor: pointer;
+  transition: opacity var(--t-mid);
+}
+.syn-node:focus,
+.syn-node:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.syn-node[data-dim] {
+  opacity: 0.32;
+}
+.syn-node-hit {
+  fill: transparent;
+}
+.syn-node-glow {
+  fill: none;
+  stroke: var(--k);
+  stroke-width: 2;
+  opacity: 0;
+  transition: opacity var(--t-mid);
+}
+.syn-node:hover .syn-node-glow,
+.syn-node[data-on] .syn-node-glow {
+  opacity: 0.55;
+}
+.syn-node:focus-visible .syn-node-glow {
+  opacity: 1;
+  stroke: var(--iris);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 6px var(--iris-glow));
+}
+.syn-node-core {
+  fill: color-mix(in oklab, var(--k) 22%, var(--plum));
+}
+.syn-node-nucleus {
+  fill: var(--k);
+}
+.syn-node-ring {
+  fill: none;
+  stroke: var(--k);
+  stroke-width: 1.5;
+}
+.syn-node[data-kind='video'] .syn-node-ring {
+  stroke: var(--pearl);
+  stroke-opacity: 0.7;
+  stroke-width: 1.6;
+}
+.syn-node[data-depth='2'] .syn-node-ring {
+  stroke-width: 1;
+}
+
+/* Labels */
+.syn-label {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 500;
+  fill: var(--lilac);
+  paint-order: stroke;
+  stroke: var(--night);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  pointer-events: none;
+  transition: opacity var(--t-mid), fill var(--t-mid);
+}
+.syn-svg[data-compact] .syn-label {
+  font-size: 10.5px;
+  stroke-width: 3px;
+}
+.syn-label[data-depth='2'] {
+  font-size: 11.5px;
+}
+.syn-label[data-on] {
+  fill: var(--pearl);
+  font-weight: 600;
+}
+.syn-label[data-dim] {
+  opacity: 0.3;
+}
+.syn-label-centre {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  fill: var(--pearl);
+}
+.syn-svg[data-compact] .syn-label-centre {
+  font-size: 14px;
+}
+
+.syn-hint {
+  margin-top: 0.8rem;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  color: var(--lilac-dim);
+}
+
+/* Reading card */
+.syn-card-body {
+  display: grid;
+  gap: 0.8rem;
+}
+.syn-card .kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.syn-card-title {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  overflow-wrap: break-word;
+}
+.syn-card-join {
+  color: var(--iris);
+}
+.syn-card-ties {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.syn-card-pair {
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--lilac-dim);
+}
+.syn-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+/* ───────── Why these are connected ───────── */
+.syn-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+.syn-group {
+  padding: 1.4rem 1.5rem 0.6rem;
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(80% 50% at 0% 0%, color-mix(in oklab, var(--k) 9%, transparent), transparent 70%),
+    var(--glass);
+}
+.syn-group-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.syn-group-count {
+  margin-left: auto;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--lilac-dim);
+}
+.syn-links {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.syn-link {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.7rem 0 0.9rem;
+  border-top: 1px solid var(--line);
+}
+.syn-link:first-child {
+  border-top: 0;
+}
+.syn-link-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.syn-link-name {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hit);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--pearl);
+  text-decoration: none;
+  transition: color var(--t-mid);
+}
+.syn-link-name:hover {
+  color: var(--iris);
+}
+.syn-link-syn {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--hit);
+  height: var(--hit);
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  background: var(--glass);
+  color: var(--lilac);
+  transition: color var(--t-mid), border-color var(--t-mid), background var(--t-mid);
+}
+.syn-link-syn:hover {
+  color: var(--pearl);
+  background: var(--glass-2);
+  border-color: color-mix(in oklab, var(--iris) 55%, transparent);
+}
+.syn-link-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--lilac-dim);
+}
+.syn-strength {
+  flex: 0 0 64px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+.syn-strength span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--k);
+}
+
+.syn-unknown-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Pointer reading inside the web */
+.syn-tip {
+  --tx: -50%;
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  gap: 0.25rem;
+  width: max-content;
+  max-width: min(280px, 70%);
+  padding: 0.75rem 0.95rem 0.8rem;
+  border-radius: 18px;
+  border: 1px solid var(--line-2);
+  background: var(--glass-strong);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-float);
+  pointer-events: none;
+  transform: translate(var(--tx), calc(-100% - var(--off) - 12px));
+  animation: rise var(--t-fast) var(--ease-out);
+}
+.syn-tip[data-below] {
+  transform: translate(var(--tx), calc(var(--off) + 12px));
+}
+.syn-tip[data-align='start'] {
+  --tx: -14%;
+}
+.syn-tip[data-align='end'] {
+  --tx: -86%;
+}
+.syn-tip-kind {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--iris);
+}
+.syn-tip-title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+.syn-tip ul {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--lilac);
+}
+.syn-tip li::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 0.5em;
+  border-radius: 50%;
+  vertical-align: middle;
+  background: var(--iris);
+}
+
+/* Provisional art is always labelled in the header (not only on hover). */
+.syn-head-art .art-provisional {
+  opacity: 1;
+}
+
+.syn-more {
+  margin: 0.3rem 0 0.8rem;
+}
+.syn-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: var(--hit);
+  padding: 0 1.05rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-2);
+  background: var(--glass);
+  color: var(--lilac);
+  font-size: var(--step--1);
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--t-mid), border-color var(--t-mid);
+}
+.syn-more > summary::-webkit-details-marker {
+  display: none;
+}
+.syn-more > summary:hover {
+  color: var(--pearl);
+  border-color: color-mix(in oklab, var(--iris) 45%, transparent);
+}
+.syn-more[open] > summary svg {
+  transform: rotate(45deg);
+}
+.syn-more > .syn-links {
+  margin-top: 0.5rem;
+}
+
+.syn-hint-touch {
+  display: none;
+}
+@media (hover: none) {
+  .syn-hint-fine {
+    display: none;
+  }
+  .syn-hint-touch {
+    display: inline;
+  }
+}
+
+/* Touch: short names ("Bow", "Plena") still get a 44px-wide target. */
+@media (pointer: coarse) {
+  .syn-link-name {
+    min-width: var(--hit);
+  }
+}

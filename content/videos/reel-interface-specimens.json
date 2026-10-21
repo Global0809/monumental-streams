@@ -1,0 +1,35 @@
+{
+  "id": "video:reel-interface-specimens",
+  "slug": "reel-interface-specimens",
+  "title": "Interface Specimens",
+  "kind": "reel",
+  "programme": "programme:studio-specimens",
+  "order": 4,
+  "summary": "Studio motion concepts for the screens you use: catalogue and player, membership vault, interest cards and search.",
+  "description": "Specimens from Monumental's interface studio: a neon catalogue and player, a membership vault that opens from free to premium, bright Bauhaus cards for each interest, and search with combined filters, narrowed all the way down to an empty result and back again.\n\nIllustrative design concepts assembled as a demonstration, not programme footage; titles and counts on screen are placeholders. The Premium label on this reel shows how premium gating works; the access level is an example, not a business decision.",
+  "categories": [
+    "interest:art"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:design"
+  ],
+  "moods": [
+    "lively",
+    "curious"
+  ],
+  "setting": null,
+  "published": "2026-10-20",
+  "access": "premium",
+  "availability": {
+    "status": "available",
+    "note": "Demonstration of premium gating — the access level is an example, not a business decision."
+  },
+  "footage": [
+    "illustrative"
+  ],
+  "provenance": "studio-concept",
+  "media": "media:reel-interface-specimens",
+  "art": "art:catalogue-player"
+}

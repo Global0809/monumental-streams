@@ -1,0 +1,9 @@
+{
+  "tierName": "Fixture Premium",
+  "plans": [
+    { "id": "monthly", "label": "Monthly", "interval": "month", "displayPrice": null, "provisional": true, "stripePriceEnv": "STRIPE_PRICE_MONTHLY" },
+    { "id": "yearly", "label": "Yearly", "interval": "year", "displayPrice": null, "provisional": true, "stripePriceEnv": "STRIPE_PRICE_YEARLY" }
+  ],
+  "benefits": [{ "id": "premium-catalogue", "title": "Premium videos", "detail": "Watch premium fixtures.", "live": true }],
+  "note": "Fixture membership."
+}

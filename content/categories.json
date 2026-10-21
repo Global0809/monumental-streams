@@ -1,0 +1,74 @@
+[
+  {
+    "id": "interest:music",
+    "slug": "music",
+    "name": "Music",
+    "summary": "Sounds, scenes and the artists who carry them across borders."
+  },
+  {
+    "id": "interest:film",
+    "slug": "film",
+    "name": "Film",
+    "summary": "Cinema in every form, from early reels to new storytelling."
+  },
+  {
+    "id": "interest:documentary",
+    "slug": "documentary",
+    "name": "Documentary",
+    "summary": "True stories of people, places and the moments that changed them."
+  },
+  {
+    "id": "interest:art",
+    "slug": "art",
+    "name": "Art",
+    "summary": "Painting, murals, design and the places where art is made and seen."
+  },
+  {
+    "id": "interest:fashion",
+    "slug": "fashion",
+    "name": "Fashion",
+    "summary": "What people wear, who makes it and what it says about where they come from."
+  },
+  {
+    "id": "interest:food",
+    "slug": "food",
+    "name": "Food",
+    "summary": "Kitchens, markets and the recipes that travel with people."
+  },
+  {
+    "id": "interest:culture",
+    "slug": "culture",
+    "name": "Culture",
+    "summary": "Communities, traditions and the everyday life of places."
+  },
+  {
+    "id": "interest:sport",
+    "slug": "sport",
+    "name": "Sport",
+    "summary": "Games, athletes and the neighbourhoods that raise them."
+  },
+  {
+    "id": "interest:gaming",
+    "slug": "gaming",
+    "name": "Gaming",
+    "summary": "Play, virtual worlds and the people who build them."
+  },
+  {
+    "id": "interest:lifestyle",
+    "slug": "lifestyle",
+    "name": "Lifestyle",
+    "summary": "How people live, gather and spend their time."
+  },
+  {
+    "id": "interest:news",
+    "slug": "news",
+    "name": "News",
+    "summary": "Reports, newsreels and current affairs — always dated and sourced."
+  },
+  {
+    "id": "interest:kids",
+    "slug": "kids",
+    "name": "Kids",
+    "summary": "Animation and stories made specifically for younger viewers."
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "programme:fixture-series",
+    "slug": "fixture-series",
+    "title": "Fixture Series",
+    "kind": "demonstration-series",
+    "status": "available",
+    "original": false,
+    "tagline": "Server test fixtures.",
+    "description": "A tiny catalogue used by the server tests.",
+    "places": ["place:miami"],
+    "periods": ["period:1970s"],
+    "categories": ["interest:film"],
+    "themes": ["theme:diaspora"],
+    "art": "art:listed",
+    "statusNote": "Fixture data only."
+  }
+]

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "person:fixture-presenter",
+    "slug": "fixture-presenter",
+    "name": "Fixture Presenter",
+    "kind": "presenter",
+    "roles": ["Presenter"],
+    "summary": "Fixture person.",
+    "places": ["place:miami"],
+    "provisional": true
+  }
+]

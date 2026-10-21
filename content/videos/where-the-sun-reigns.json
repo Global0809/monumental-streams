@@ -1,0 +1,53 @@
+{
+  "id": "video:where-the-sun-reigns",
+  "slug": "where-the-sun-reigns",
+  "title": "Where the Sun Reigns",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 7,
+  "summary": "A mid-century booster film selling Greater Miami as a land without winter.",
+  "description": "Made around 1955 by Reela Films for the Greater Miami Development Board and the Dade County Commission, this narrated promotional film sells Greater Miami to visitors and newcomers. It moves from Miami and Miami Beach across the Biscayne Bay causeways to Miami International Airport, Lincoln Road, the Miracle Mile in Coral Gables, the University of Miami, the Orange Bowl, the farms of the Redland and a Seminole attraction in the Everglades.\n\nA public-domain film from the Prelinger Archives, shown as demonstration media while original programming is produced; it is not a Monumental Original. The English captions are machine-generated and have not been reviewed, so they contain errors.",
+  "categories": [
+    "interest:documentary",
+    "interest:culture"
+  ],
+  "places": [
+    "place:miami",
+    "place:miami-beach",
+    "place:coral-gables",
+    "place:miami-dade-county"
+  ],
+  "periods": [
+    "period:1950s"
+  ],
+  "themes": [
+    "theme:architecture",
+    "theme:identity"
+  ],
+  "moods": [
+    "curious",
+    "chill"
+  ],
+  "setting": {
+    "from": 1954,
+    "to": 1956,
+    "label": "c. 1955"
+  },
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-where-the-sun-reigns",
+  "art": "art:still-where-the-sun-reigns",
+  "credits": {
+    "licence": "Public domain",
+    "attribution": "Where the Sun Reigns (c. 1955). Reela Films for the Greater Miami Development Board and Dade County Commission. Prelinger Archives, via Internet Archive.",
+    "sourceUrl": "https://archive.org/details/Wherethe1955"
+  },
+  "context": "A mid-century tourism booster film. It presents Seminole people as an exotic attraction and shows only white visitors; the racial segregation of Jim Crow-era Miami goes unmentioned."
+}

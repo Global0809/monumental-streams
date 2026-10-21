@@ -1,0 +1,40 @@
+{
+  "id": "video:reel-stories-in-time",
+  "slug": "reel-stories-in-time",
+  "title": "Stories in Time",
+  "kind": "reel",
+  "programme": "programme:studio-specimens",
+  "order": 2,
+  "summary": "Studio motion concepts for travelling through decades, seeing why stories connect, and the title art of two planned originals.",
+  "description": "A golden dial clicks through the decades and the library re-sorts by era; a thread of connections shows the reason behind every recommendation; then title art for the two planned Monumental Originals: THE STORY BEHIND THE STORY in torn paper, and WAVEMAKERS in rippling lines of light.\n\nIllustrative concept art throughout. The decade cards are artwork, not archival footage, and the title sequences are motion design, not footage from either series, neither of which has published episodes yet.",
+  "categories": [
+    "interest:art",
+    "interest:culture"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:design"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "people": [
+    {
+      "person": "person:valid-id",
+      "role": "Named in title card"
+    }
+  ],
+  "setting": null,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "illustrative"
+  ],
+  "provenance": "studio-concept",
+  "media": "media:reel-stories-in-time",
+  "art": "art:time-machine"
+}

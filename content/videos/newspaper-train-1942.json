@@ -1,0 +1,50 @@
+{
+  "id": "video:newspaper-train-1942",
+  "slug": "newspaper-train-1942",
+  "title": "Newspaper Train",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 4,
+  "summary": "Len Lye's 1942 wartime film about getting London's newspapers out through the Blitz.",
+  "description": "Made by the artist and filmmaker Len Lye at the Realist Film Unit for the UK Ministry of Information, this short follows the distribution of London's newspapers during the Blitz of 1940–41, through Blackfriars, Holborn, Cannon Street, London Bridge and Victoria stations and out by train to Ramsgate in Kent.\n\nA film whose Crown copyright has expired, shown as demonstration media while original programming is produced; it is not a Monumental Original. The English captions are human-made, from Wikimedia Commons.",
+  "categories": [
+    "interest:documentary",
+    "interest:film"
+  ],
+  "places": [
+    "place:london"
+  ],
+  "periods": [
+    "period:1940s"
+  ],
+  "themes": [
+    "theme:community",
+    "theme:setbacks"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "setting": {
+    "from": 1940,
+    "to": 1941,
+    "label": "The Blitz, 1940–41"
+  },
+  "made": 1942,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-newspaper-train-1942",
+  "art": "art:still-newspaper-train-1942",
+  "credits": {
+    "licence": "Public domain (UK Crown copyright expired)",
+    "attribution": "Newspaper Train (1942). Len Lye, Realist Film Unit, for the UK Ministry of Information. Via Wikimedia Commons.",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:NEWSPAPER_TRAIN_(1942).webm"
+  },
+  "context": "Wartime propaganda made for the UK Ministry of Information. It includes bomb damage and an air attack on a train."
+}

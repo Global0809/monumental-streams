@@ -1,0 +1,39 @@
+{
+  "id": "video:minetest-first-minutes",
+  "slug": "minetest-first-minutes",
+  "title": "Minetest — the first minutes of a new world",
+  "kind": "short",
+  "programme": "programme:open-play",
+  "order": 2,
+  "summary": "A calm screen recording of the opening minutes in Minetest (now Luanti), the open-source block-building game.",
+  "description": "A 2022 gameplay recording of Minetest 5.6.1 — the free, open-source voxel game now called Luanti — showing the first minutes of a fresh world: arriving, exploring and opening the inventory. In-game sound only, no commentary.\n\nCreative Commons (BY-SA) demonstration media, shown unaltered; not a Monumental Original.",
+  "categories": [
+    "interest:gaming"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:design"
+  ],
+  "moods": [
+    "chill"
+  ],
+  "setting": null,
+  "made": 2022,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "contemporary"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:open-play-minetest-first-minutes",
+  "art": "art:still-minetest-first-minutes",
+  "credits": {
+    "licence": "CC BY-SA 3.0 (game media); recording on Wikimedia Commons",
+    "attribution": "Minetest gameplay recording by PantheraLeo1359531 (Wikimedia Commons); game media © The Minetest Team (Perttu Ahola et al.), CC BY-SA 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Minetest_5.6.1_2022.12.27_-_18.35.07.05,_erste_8_Minuten,_Teil_1_von_2.webm"
+  }
+}

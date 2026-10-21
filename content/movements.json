@@ -1,0 +1,287 @@
+[
+  {
+    "id": "movement:bomba",
+    "slug": "bomba",
+    "name": "Bomba",
+    "start": 1600,
+    "end": null,
+    "places": ["place:loiza", "place:puerto-rico"],
+    "categories": ["interest:music", "interest:culture"],
+    "themes": ["theme:rhythm", "theme:diaspora", "theme:identity", "theme:preservation"],
+    "summary": "One of Puerto Rico's oldest living traditions, an Afro-Puerto Rican music and dance with roots traced to the 17th century among enslaved Africans on the island's coastal plantations. Dancers and lead drummers hold a conversation: the dancer's moves call, the drum answers. Loíza remains one of its strongest centres.",
+    "facts": [
+      { "label": "Instruments", "value": "Barriles (barrel drums), maracas and the cuá (sticks played on wood)", "source": "Instituto de Cultura Puertorriqueña" }
+    ]
+  },
+  {
+    "id": "movement:plena",
+    "slug": "plena",
+    "name": "Plena",
+    "start": 1900,
+    "end": null,
+    "places": ["place:ponce", "place:puerto-rico"],
+    "categories": ["interest:music", "interest:culture"],
+    "themes": ["theme:rhythm", "theme:community", "theme:identity"],
+    "influences": ["movement:bomba"],
+    "summary": "A Puerto Rican song form that took shape in Ponce around 1900, carried on hand-held frame drums called panderos. Its verses told the news of the day, earning it the name 'el periódico cantado', the sung newspaper."
+  },
+  {
+    "id": "movement:la-gran-migracion",
+    "slug": "la-gran-migracion",
+    "name": "La Gran Migración",
+    "start": 1946,
+    "end": 1964,
+    "places": ["place:san-juan", "place:puerto-rico", "place:new-york-city", "place:east-harlem", "place:lower-east-side", "place:the-bronx"],
+    "categories": ["interest:culture"],
+    "themes": ["theme:migration", "theme:diaspora", "theme:community", "theme:identity"],
+    "summary": "After the Second World War, hundreds of thousands of Puerto Ricans, US citizens since 1917, moved to the mainland, most of them to New York City. Cheap flights from San Juan made it one of the first large migrations by air. They built communities in East Harlem, the Lower East Side and the Bronx that shaped the city's music, politics and language."
+  },
+  {
+    "id": "movement:salsa-new-york",
+    "slug": "salsa-new-york",
+    "name": "New York salsa",
+    "start": 1964,
+    "end": null,
+    "places": ["place:new-york-city", "place:east-harlem", "place:the-bronx"],
+    "categories": ["interest:music", "interest:culture"],
+    "themes": ["theme:rhythm", "theme:diaspora", "theme:identity", "theme:celebration"],
+    "influences": ["movement:bomba", "movement:plena", "movement:la-gran-migracion"],
+    "summary": "Built in New York by Puerto Rican and Cuban musicians from Cuban son and mambo, with Puerto Rican rhythms woven in. Fania Records, founded in 1964 by Johnny Pacheco and Jerry Masucci, became the sound's best-known label.",
+    "facts": [
+      { "label": "Fania Records", "value": "Founded in New York in 1964 by Johnny Pacheco and Jerry Masucci", "source": "Fania Records" }
+    ]
+  },
+  {
+    "id": "movement:nuyorican-movement",
+    "slug": "nuyorican-movement",
+    "name": "Nuyorican movement",
+    "start": 1969,
+    "end": null,
+    "places": ["place:lower-east-side", "place:east-harlem", "place:new-york-city"],
+    "categories": ["interest:art", "interest:culture"],
+    "themes": ["theme:identity", "theme:diaspora", "theme:community", "theme:street-culture"],
+    "influences": ["movement:la-gran-migracion"],
+    "summary": "From the late 1960s, poets, playwrights and artists of Puerto Rican descent in New York claimed the word 'Nuyorican' and wrote in English, Spanish and the mix between them. The Nuyorican Poets Café, begun in 1973 on the Lower East Side, became the movement's home.",
+    "facts": [
+      { "label": "Nuyorican Poets Café", "value": "Begun in 1973 by poets including Miguel Algarín, Miguel Piñero and Pedro Pietri; now at 236 East 3rd Street", "source": "Nuyorican Poets Café" },
+      { "label": "Anthology", "value": "'Nuyorican Poetry', edited by Miguel Algarín and Miguel Piñero, published 1975", "source": "Library of Congress catalogue" }
+    ]
+  },
+  {
+    "id": "movement:sound-system-culture",
+    "slug": "sound-system-culture",
+    "name": "Sound-system culture",
+    "start": 1950,
+    "end": null,
+    "places": ["place:kingston", "place:london"],
+    "categories": ["interest:music", "interest:culture"],
+    "themes": ["theme:sound-systems", "theme:community", "theme:street-culture", "theme:rhythm"],
+    "summary": "In 1950s Kingston, operators such as Duke Reid and Clement 'Coxsone' Dodd built mobile sound systems — towering speakers, a selector and a deejay talking over the records — that turned yards and street corners into dances. The practice fed ska, reggae and dub, and travelled with Jamaican migrants to London and New York."
+  },
+  {
+    "id": "movement:hip-hop-origins",
+    "slug": "hip-hop-origins",
+    "name": "Hip hop's origins",
+    "start": 1973,
+    "end": 1979,
+    "places": ["place:the-bronx", "place:1520-sedgwick-avenue"],
+    "categories": ["interest:music", "interest:culture", "interest:art"],
+    "themes": ["theme:street-culture", "theme:community", "theme:sound-systems", "theme:rhythm", "theme:turning-points"],
+    "influences": ["movement:sound-system-culture"],
+    "summary": "Hip hop grew out of block parties and community-centre dances in the Bronx in the 1970s. DJ Kool Herc, who had moved from Kingston, extended the drum breaks of funk records on two turntables, and MCs, b-boys and b-girls and graffiti writers built a culture around them. By 1979, the Sugarhill Gang's 'Rapper's Delight' had carried rap onto the charts.",
+    "facts": [
+      { "label": "11 August 1973", "value": "Back-to-school party thrown by Cindy Campbell, with her brother DJ Kool Herc on the decks, at 1520 Sedgwick Avenue", "source": "Smithsonian National Museum of African American History and Culture" },
+      { "label": "1979", "value": "The Sugarhill Gang release 'Rapper's Delight', rap's first US Top 40 hit", "source": "Billboard" }
+    ]
+  },
+  {
+    "id": "movement:windrush-generation",
+    "slug": "windrush-generation",
+    "name": "Windrush generation",
+    "start": 1948,
+    "end": 1971,
+    "places": ["place:kingston", "place:london", "place:brixton", "place:notting-hill"],
+    "categories": ["interest:culture"],
+    "themes": ["theme:migration", "theme:diaspora", "theme:community", "theme:identity"],
+    "summary": "The name given to people who came to Britain from Caribbean countries between 1948 and 1971, after the HMT Empire Windrush brought passengers from Jamaica and other islands to Tilbury in June 1948. They and their children helped rebuild post-war Britain and changed its music, food and language.",
+    "facts": [
+      { "label": "June 1948", "value": "The Empire Windrush docks at Tilbury, Essex, with passengers from the Caribbean", "source": "The National Archives (UK)" },
+      { "label": "1971", "value": "The Immigration Act 1971 marks the commonly used end date of the Windrush generation", "source": "UK Home Office" }
+    ]
+  },
+  {
+    "id": "movement:notting-hill-carnival",
+    "slug": "notting-hill-carnival",
+    "name": "Notting Hill Carnival",
+    "start": 1966,
+    "end": null,
+    "places": ["place:notting-hill", "place:london"],
+    "categories": ["interest:music", "interest:culture", "interest:fashion", "interest:food"],
+    "themes": ["theme:celebration", "theme:community", "theme:diaspora", "theme:street-culture", "theme:rhythm"],
+    "influences": ["movement:windrush-generation", "movement:sound-system-culture"],
+    "summary": "A street carnival first held in Notting Hill in 1966 and now staged every August bank holiday weekend, with steel bands, masquerade costume bands and static sound systems. Its roots include the indoor Caribbean carnival that Claudia Jones organised at St Pancras Town Hall in January 1959, after the Notting Hill race riots of 1958.",
+    "facts": [
+      { "label": "1959", "value": "Caribbean carnival organised by Claudia Jones at St Pancras Town Hall", "source": "Black Cultural Archives" },
+      { "label": "1966", "value": "First outdoor event, a neighbourhood fayre widely credited to community worker Rhaune Laslett", "source": "Notting Hill Carnival" }
+    ]
+  },
+  {
+    "id": "movement:lovers-rock",
+    "slug": "lovers-rock",
+    "name": "Lovers rock",
+    "start": 1975,
+    "end": null,
+    "places": ["place:london"],
+    "categories": ["interest:music"],
+    "themes": ["theme:relationships", "theme:sound-systems", "theme:identity", "theme:rhythm"],
+    "influences": ["movement:sound-system-culture"],
+    "summary": "A romantic, soul-inflected style of reggae made in South London from the mid-1970s, often sung by young Black British women and played at house parties and sound-system dances. Louisa Mark's 'Caught You in a Lie' (1975) is widely cited as an early landmark."
+  },
+  {
+    "id": "movement:grime",
+    "slug": "grime",
+    "name": "Grime",
+    "start": 2002,
+    "end": null,
+    "places": ["place:bow", "place:tottenham", "place:london"],
+    "categories": ["interest:music", "interest:culture"],
+    "themes": ["theme:street-culture", "theme:identity", "theme:rhythm", "theme:sound-systems"],
+    "influences": ["movement:sound-system-culture", "movement:hip-hop-origins"],
+    "summary": "A fast, hard-edged London sound of around 140 beats per minute that emerged in East London in the early 2000s, spread through pirate radio, raves and clashes. Bow produced two of its defining artists, Wiley and Dizzee Rascal, and Tottenham crews brought Skepta and JME.",
+    "facts": [
+      { "label": "2003", "value": "Dizzee Rascal wins the Mercury Prize for 'Boy in da Corner'", "source": "Mercury Prize" }
+    ]
+  },
+  {
+    "id": "movement:reggaeton",
+    "slug": "reggaeton",
+    "name": "Reggaeton",
+    "start": 1990,
+    "end": null,
+    "places": ["place:san-juan", "place:puerto-rico"],
+    "categories": ["interest:music", "interest:culture"],
+    "themes": ["theme:rhythm", "theme:street-culture", "theme:identity", "theme:reinvention"],
+    "influences": ["movement:hip-hop-origins", "movement:sound-system-culture"],
+    "summary": "Grew out of San Juan's 1990s underground, where DJs and MCs mixed hip hop with Jamaican dancehall and Spanish-language reggae from Panama on cassette mixtapes. Daddy Yankee's 'Gasolina' (2004) carried it to a worldwide audience.",
+    "facts": [
+      { "label": "2004", "value": "Daddy Yankee releases 'Gasolina', an international breakthrough for the genre", "source": "Billboard" }
+    ]
+  },
+  {
+    "id": "movement:miami-beach-art-deco",
+    "slug": "miami-beach-art-deco",
+    "name": "Miami Beach Art Deco",
+    "start": 1923,
+    "end": 1943,
+    "places": ["place:miami-beach-architectural-district", "place:south-beach", "place:miami-beach"],
+    "categories": ["interest:art", "interest:culture"],
+    "themes": ["theme:architecture", "theme:design"],
+    "summary": "Between the early 1920s and the early 1940s, and above all in the 1930s, hundreds of small hotels and apartment buildings went up in South Beach in a tropical take on Art Deco and Streamline Moderne. Pastel colours, porthole windows, 'eyebrow' sunshades and nautical motifs became the look of Miami Beach."
+  },
+  {
+    "id": "movement:miami-design-preservation",
+    "slug": "miami-design-preservation",
+    "name": "Miami Design Preservation League",
+    "start": 1976,
+    "end": null,
+    "places": ["place:miami-beach-architectural-district", "place:miami-beach"],
+    "categories": ["interest:art", "interest:culture"],
+    "themes": ["theme:preservation", "theme:architecture", "theme:community", "theme:design"],
+    "influences": ["movement:miami-beach-art-deco"],
+    "summary": "Founded in 1976 by Barbara Capitman, Leonard Horowitz and fellow campaigners to save South Beach's Art Deco buildings from demolition. Their campaign won National Register listing for the Miami Beach Architectural District in 1979.",
+    "facts": [
+      { "label": "Founded", "value": "1976", "source": "Miami Design Preservation League" },
+      { "label": "Listed", "value": "Miami Beach Architectural District added to the National Register of Historic Places, 1979", "source": "US National Register of Historic Places" }
+    ]
+  },
+  {
+    "id": "movement:overtown-golden-era",
+    "slug": "overtown-golden-era",
+    "name": "Overtown's golden era",
+    "start": 1920,
+    "end": 1959,
+    "places": ["place:overtown"],
+    "categories": ["interest:music", "interest:culture"],
+    "themes": ["theme:community", "theme:celebration", "theme:setbacks", "theme:rhythm"],
+    "summary": "From the 1920s to the 1950s, Overtown's theatres, clubs and hotels made it a centre of Black entertainment in the segregated South, nicknamed the 'Harlem of the South'. Touring Black stars who played Miami Beach but were barred from staying there often lodged and performed after hours in Overtown. Interstate construction in the 1960s broke the neighbourhood apart."
+  },
+  {
+    "id": "movement:cuban-exile-miami",
+    "slug": "cuban-exile-miami",
+    "name": "Cuban exile in Miami",
+    "start": 1959,
+    "end": null,
+    "places": ["place:little-havana", "place:miami", "place:havana"],
+    "categories": ["interest:culture", "interest:food", "interest:music"],
+    "themes": ["theme:migration", "theme:diaspora", "theme:community", "theme:identity"],
+    "summary": "After the Cuban Revolution of 1959, successive waves of Cubans left for Miami, turning Little Havana into the centre of exile life. Their arrival reshaped the city's language, food, music, business and politics.",
+    "facts": [
+      { "label": "Operation Pedro Pan", "value": "1960–1962: more than 14,000 unaccompanied Cuban children flown to the United States", "source": "HistoryMiami Museum" },
+      { "label": "Freedom Flights", "value": "1965–1973: an airlift that brought hundreds of thousands of Cubans to Miami", "source": "HistoryMiami Museum" }
+    ]
+  },
+  {
+    "id": "movement:mariel-boatlift",
+    "slug": "mariel-boatlift",
+    "name": "Mariel boatlift",
+    "start": 1980,
+    "end": 1980,
+    "places": ["place:mariel", "place:miami"],
+    "categories": ["interest:culture"],
+    "themes": ["theme:migration", "theme:turning-points", "theme:diaspora"],
+    "influences": ["movement:cuban-exile-miami"],
+    "summary": "Between April and October 1980, about 125,000 Cubans crossed from the port of Mariel to South Florida in a flotilla of boats, many sent by relatives in Miami. The arrivals, later called Marielitos, changed the city once more."
+  },
+  {
+    "id": "movement:haitian-miami",
+    "slug": "haitian-miami",
+    "name": "Haitian Miami",
+    "start": 1970,
+    "end": null,
+    "places": ["place:little-haiti", "place:miami", "place:port-au-prince"],
+    "categories": ["interest:culture", "interest:music", "interest:food", "interest:art"],
+    "themes": ["theme:migration", "theme:diaspora", "theme:community", "theme:identity"],
+    "summary": "From the 1970s, Haitians fleeing dictatorship and poverty settled in Miami, many arriving by boat. The community built Little Haiti, with its churches, botanicas, markets and the sound of kompa and Haitian Creole on the street."
+  },
+  {
+    "id": "movement:miami-bass",
+    "slug": "miami-bass",
+    "name": "Miami bass",
+    "start": 1985,
+    "end": null,
+    "places": ["place:miami"],
+    "categories": ["interest:music"],
+    "themes": ["theme:rhythm", "theme:street-culture", "theme:celebration", "theme:sound-systems"],
+    "influences": ["movement:hip-hop-origins"],
+    "summary": "A Miami offshoot of hip hop from the mid-1980s, built on the booming kick drum of the Roland TR-808, fast tempos and call-and-response chants made for car stereos and parties. 2 Live Crew made it known across the United States."
+  },
+  {
+    "id": "movement:art-basel-miami-beach",
+    "slug": "art-basel-miami-beach",
+    "name": "Art Basel Miami Beach",
+    "start": 2002,
+    "end": null,
+    "places": ["place:miami-beach"],
+    "categories": ["interest:art", "interest:culture"],
+    "themes": ["theme:celebration", "theme:design", "theme:community"],
+    "summary": "The American edition of the Swiss art fair, held at the Miami Beach Convention Center each December since 2002. The week of satellite fairs and events around it spreads across Miami, including Wynwood and the Design District.",
+    "facts": [
+      { "label": "First edition", "value": "December 2002", "source": "Art Basel" }
+    ]
+  },
+  {
+    "id": "movement:wynwood-walls",
+    "slug": "wynwood-walls",
+    "name": "Wynwood Walls",
+    "start": 2009,
+    "end": null,
+    "places": ["place:wynwood"],
+    "categories": ["interest:art", "interest:culture"],
+    "themes": ["theme:street-culture", "theme:reinvention", "theme:design", "theme:community"],
+    "influences": ["movement:hip-hop-origins"],
+    "summary": "An outdoor mural project founded in 2009 by developer Tony Goldman, who invited graffiti and street artists to paint the walls of Wynwood's warehouses. It helped turn the district into an international destination for street art, a lineage that runs back to the graffiti writers of 1970s New York.",
+    "facts": [
+      { "label": "Founded", "value": "2009, by Tony Goldman", "source": "Wynwood Walls" }
+    ]
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "id": "video:senators-world-series-1924",
+  "slug": "senators-world-series-1924",
+  "title": "Senators Win World Series (1924)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 9,
+  "summary": "A silent Kinograms newsreel of the Washington Senators beating the New York Giants in the 1924 World Series.",
+  "description": "Kinograms’ silent newsreel of the deciding game of the 1924 World Series at Griffith Stadium in Washington, D.C. Its intertitles follow Walter Johnson pitching the last four innings to close out his first World Series, the president in the stands, and the home crowd swarming onto the field.\n\nPublic-domain demonstration media; not a Monumental Original.",
+  "categories": [
+    "interest:sport",
+    "interest:news"
+  ],
+  "places": [
+    "place:griffith-stadium"
+  ],
+  "periods": [
+    "period:1920s"
+  ],
+  "themes": [
+    "theme:celebration",
+    "theme:community"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": {
+    "from": 1924,
+    "to": 1924
+  },
+  "made": 1924,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-senators-world-series-1924",
+  "art": "art:still-senators-world-series-1924",
+  "credits": {
+    "licence": "Public domain (US, published before 1930)",
+    "attribution": "Senators Win World Series (Kinograms Publishing Corp., 1924). Library of Congress Motion Picture, Broadcasting & Recorded Sound Division. Public domain.",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senators_Win_World_Series_(1924).webm"
+  }
+}

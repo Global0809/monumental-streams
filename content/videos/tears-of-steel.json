@@ -1,0 +1,43 @@
+{
+  "id": "video:tears-of-steel",
+  "slug": "tears-of-steel",
+  "title": "Tears of Steel",
+  "kind": "short",
+  "programme": "programme:open-cinema",
+  "order": 2,
+  "summary": "The Blender Foundation's 2012 live-action science-fiction short, shot in Amsterdam.",
+  "description": "In a near-future Amsterdam, a group of warriors and scientists gather at the Oude Kerk to restage a crucial moment from the past, in a desperate attempt to save the world from destructive robots. The Blender Foundation made it in 2012 as an open movie, combining live action shot in Amsterdam with visual effects made in Blender.\n\nShown under a Creative Commons Attribution 3.0 licence as demonstration media while original programming is produced; it is not a Monumental Original. Contains mild language and science-fiction violence. The Premium label demonstrates premium gating; the access level is an example, not a business decision.",
+  "categories": [
+    "interest:film"
+  ],
+  "places": [
+    "place:amsterdam"
+  ],
+  "periods": [],
+  "themes": [
+    "theme:relationships"
+  ],
+  "moods": [
+    "late",
+    "lively"
+  ],
+  "setting": null,
+  "made": 2012,
+  "published": "2026-10-20",
+  "access": "premium",
+  "availability": {
+    "status": "available",
+    "note": "Demonstration of premium gating with a full-length film — access level is an example, not a business decision."
+  },
+  "footage": [
+    "fiction"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:open-cinema-tears-of-steel",
+  "art": "art:still-tears-of-steel",
+  "credits": {
+    "licence": "CC BY 3.0",
+    "attribution": "Tears of Steel – (CC) Blender Foundation | mango.blender.org – CC BY 3.0",
+    "sourceUrl": "https://studio.blender.org/films/tears-of-steel/"
+  }
+}

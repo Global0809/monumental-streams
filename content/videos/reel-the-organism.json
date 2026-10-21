@@ -1,0 +1,38 @@
+{
+  "id": "video:reel-the-organism",
+  "slug": "reel-the-organism",
+  "title": "The Organism: Sound, Touch & Chrome",
+  "kind": "reel",
+  "programme": "programme:studio-specimens",
+  "order": 3,
+  "summary": "Studio motion concepts for the parts of Monumental that respond to you: chrome, membrane, sound, cursor and touch.",
+  "description": "The Monumental wordmark in polished chrome, a tunnel of pale jointed rings that pulses like a living spine, a visual preview of the tones designed for every action, a cursor that changes shape with context, and the app built for touch.\n\nStudio motion concepts, shown as a demonstration of the platform's sensory design rather than programme footage; the sound you hear is an ambient score, not the interface tones themselves. This reel also demonstrates an early-access window: premium members can watch it now, and it opens to everyone on 1 December 2026.",
+  "categories": [
+    "interest:art",
+    "interest:music"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:design",
+    "theme:rhythm"
+  ],
+  "moods": [
+    "late",
+    "chill"
+  ],
+  "setting": null,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "early-access",
+    "publicFrom": "2026-12-01",
+    "note": "Demonstration of an early-access window: premium members now, everyone from 1 Dec 2026. Example only — not a business decision."
+  },
+  "footage": [
+    "illustrative"
+  ],
+  "provenance": "studio-concept",
+  "media": "media:reel-the-organism",
+  "art": "art:living-membrane"
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "id": "activity:current-screening",
+    "kind": "event",
+    "title": "Fixture screening",
+    "place": "place:wynwood",
+    "starts": "2026-01-01",
+    "ends": "2999-12-31",
+    "summary": "Still in date.",
+    "source": "Fixture editor",
+    "verifiedAt": "2026-01-01"
+  },
+  {
+    "id": "activity:past-screening",
+    "kind": "event",
+    "title": "Old screening",
+    "starts": "2001-01-01",
+    "ends": "2001-01-02",
+    "summary": "Long over.",
+    "source": "Fixture editor",
+    "verifiedAt": "2001-01-01"
+  }
+]

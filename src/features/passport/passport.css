@@ -1,0 +1,988 @@
+/*
+ * CULTURE PASSPORT — in Chrome Bloom.
+ * An elegant booklet on glass: a route map in violet, iris and pearl on the left page, and a
+ * page of soft chrome seals on the right that turn gold when earned. Below, stops with their
+ * stories, image-led ready-made journeys, the builder on glass, and saved journeys.
+ */
+.pp-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ───────────── Page head ───────────── */
+.pp-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 440px);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: end;
+  margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+}
+.pp-head-text {
+  display: grid;
+  gap: 1rem;
+}
+/* the hero statement: large and light, like World's */
+.pp-head .page-title {
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+/* Passport lives inside World: say so, and give one tap back */
+.pp-crumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.pp-crumbs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  color: var(--lilac);
+  text-decoration: none;
+  transition: color var(--t-mid);
+}
+.pp-crumbs a:hover {
+  color: var(--gold);
+}
+.pp-crumbs [aria-current] {
+  color: var(--pearl);
+}
+@media (pointer: coarse) {
+  .pp-crumbs a {
+    min-height: var(--hit);
+    min-width: var(--hit);
+  }
+}
+@media (max-width: 899px) {
+  .pp-head {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+  }
+}
+@media (max-width: 767px) {
+  .pp-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pp-head-loop {
+    display: none;
+  }
+  .pp-head .page-title {
+    font-size: var(--step-4);
+  }
+  .pp-head .page-lede {
+    font-size: var(--step-0);
+  }
+}
+
+/* ───────────── The booklet ───────────── */
+.pp-booklet-wrap {
+  scroll-margin-top: calc(var(--topbar-h) + 16px);
+}
+.pp-booklet {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+  padding: clamp(0.4rem, 0.8vw, 0.65rem);
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(60% 80% at 22% 0%, color-mix(in srgb, var(--iris-2) 13%, transparent), transparent 70%),
+    radial-gradient(50% 70% at 90% 100%, color-mix(in srgb, var(--gold) 5%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--plum-2) 80%, transparent), color-mix(in srgb, var(--night-2) 86%, transparent));
+  box-shadow: var(--shadow-float), 0 0 160px -70px var(--iris-glow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+.pp-page {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+  min-width: 0;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+/* Each page darkens softly toward the fold. */
+.pp-page-map {
+  border-radius: calc(var(--radius-panel) - 8px) 0 0 calc(var(--radius-panel) - 8px);
+  background: linear-gradient(90deg, transparent 78%, color-mix(in srgb, var(--night) 32%, transparent));
+}
+.pp-page-stamps {
+  border-radius: 0 calc(var(--radius-panel) - 8px) calc(var(--radius-panel) - 8px) 0;
+  background: linear-gradient(270deg, transparent 78%, color-mix(in srgb, var(--night) 32%, transparent));
+}
+.pp-spine {
+  background: linear-gradient(180deg, transparent, var(--line-2) 10%, var(--line-2) 90%, transparent);
+}
+.pp-journey-title,
+.pp-stamps-title {
+  font-family: var(--font-display);
+  font-size: var(--step-3);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--pearl);
+  overflow-wrap: break-word;
+}
+.pp-map {
+  width: 100%;
+  height: auto;
+  margin-top: 0.4rem;
+}
+.pp-map-foot {
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+
+@media (max-width: 899px) {
+  .pp-booklet {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1px auto;
+  }
+  .pp-page-map {
+    border-radius: calc(var(--radius-panel) - 8px) calc(var(--radius-panel) - 8px) 0 0;
+    background: linear-gradient(180deg, transparent 82%, color-mix(in srgb, var(--night) 30%, transparent));
+  }
+  .pp-page-stamps {
+    border-radius: 0 0 calc(var(--radius-panel) - 8px) calc(var(--radius-panel) - 8px);
+    background: linear-gradient(0deg, transparent 82%, color-mix(in srgb, var(--night) 30%, transparent));
+  }
+  .pp-spine {
+    background: linear-gradient(90deg, transparent, var(--line-2) 10%, var(--line-2) 90%, transparent);
+  }
+}
+
+/* ───────────── Route map (SVG) ───────────── */
+.pp-map-sea-hi {
+  stop-color: color-mix(in oklab, var(--iris-deep) 62%, var(--night-2));
+}
+.pp-map-sea-lo {
+  stop-color: var(--night);
+}
+.pp-map-grid line {
+  stroke: color-mix(in srgb, var(--lilac) 9%, transparent);
+  stroke-width: 0.6;
+}
+.pp-map-land {
+  fill: color-mix(in srgb, var(--lilac) 7%, transparent);
+  stroke: color-mix(in srgb, var(--lilac) 26%, transparent);
+  stroke-width: 0.8;
+}
+.pp-seg-glow {
+  fill: none;
+  stroke: var(--iris-glow);
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0;
+}
+/* A route not yet travelled is a quiet pearl dotted line; a travelled one turns iris. */
+.pp-seg-line {
+  fill: none;
+  stroke: color-mix(in srgb, var(--pearl) 62%, transparent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 6;
+}
+.pp-seg[data-done] .pp-seg-glow {
+  opacity: 1;
+}
+.pp-seg[data-done] .pp-seg-line {
+  stroke: var(--iris);
+  stroke-width: 2.6;
+  stroke-dasharray: none;
+}
+.pp-mark-halo {
+  fill: color-mix(in srgb, var(--lilac) 12%, transparent);
+}
+.pp-mark-dot {
+  fill: var(--night);
+  stroke: var(--pearl);
+  stroke-width: 1.5;
+}
+.pp-mark-n {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--pearl);
+}
+.pp-mark[data-on] .pp-mark-halo {
+  fill: var(--iris-glow);
+}
+.pp-mark[data-on] .pp-mark-dot {
+  fill: var(--iris);
+  stroke: var(--pearl);
+}
+.pp-mark[data-on] .pp-mark-n {
+  fill: var(--on-pearl);
+}
+.pp-mark-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--pearl);
+  paint-order: stroke;
+  stroke: var(--night);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.pp-map-frame {
+  fill: none;
+  stroke: var(--line-2);
+}
+/* The map scales down on phones; keep its words readable. */
+@media (max-width: 599px) {
+  .pp-mark-label {
+    font-size: 18px;
+    stroke-width: 5px;
+  }
+  .pp-mark-n {
+    font-size: 13px;
+  }
+}
+.pp-map-empty {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  fill: var(--lilac);
+}
+
+/* ───────────── Seals ───────────── */
+.pp-progress {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0.1rem 0 0.5rem;
+}
+.pp-progress-label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35em;
+  font-size: var(--step-0);
+  color: var(--lilac);
+}
+.pp-progress-n {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--pearl);
+}
+.pp-progress-track {
+  display: flex;
+  gap: 4px;
+}
+.pp-progress-track span {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--glass-2);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.pp-progress-track span[data-on] {
+  background: linear-gradient(90deg, var(--iris-2), var(--iris));
+  box-shadow: 0 0 10px var(--iris-glow);
+}
+.pp-complete {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.95rem 1.1rem;
+  border-radius: var(--radius-control);
+  border: 1px solid color-mix(in srgb, var(--gold) 42%, transparent);
+  background: radial-gradient(120% 160% at 0% 0%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 70%);
+  color: var(--pearl);
+  animation: rise var(--t-slow) var(--ease-out) both;
+}
+.pp-complete svg {
+  flex: none;
+  color: var(--gold);
+  filter: drop-shadow(0 0 8px var(--gold-glow));
+}
+.pp-complete strong {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.pp-stamps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(140px, 42%), 1fr));
+  gap: 1.6rem 1rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pp-stamps-empty {
+  font-size: var(--step-1);
+  color: var(--lilac);
+}
+.pp-stamp {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.6rem;
+  text-align: center;
+  min-width: 0;
+}
+.pp-stamp-svg {
+  width: 100%;
+  max-width: 168px;
+  height: auto;
+  aspect-ratio: 1;
+  overflow: visible;
+  color: var(--gold);
+  transform: rotate(var(--pp-tilt, 0deg));
+}
+/* Unearned: a soft lavender chrome disc. */
+.pp-seal-chrome-hi {
+  stop-color: var(--pearl);
+  stop-opacity: 0.24;
+}
+.pp-seal-chrome-mid {
+  stop-color: var(--lilac);
+  stop-opacity: 0.05;
+}
+.pp-seal-chrome-lo {
+  stop-color: var(--lilac);
+  stop-opacity: 0.14;
+}
+/* Earned: a gold seal. */
+.pp-seal-gold-hi {
+  stop-color: var(--gold);
+  stop-opacity: 0.42;
+}
+.pp-seal-gold-mid {
+  stop-color: var(--gold);
+  stop-opacity: 0.1;
+}
+.pp-seal-gold-lo {
+  stop-color: var(--gold);
+  stop-opacity: 0.26;
+}
+.pp-stamp-empty .pp-seal-disc {
+  fill: url(#pp-seal-chrome);
+  stroke: color-mix(in srgb, var(--lilac) 32%, transparent);
+  stroke-width: 1.2;
+}
+.pp-stamp-empty .pp-stamp-empty-in {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.pp-stamp-empty text {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  fill: var(--lilac-dim);
+}
+.pp-seal-on .pp-seal-disc {
+  fill: url(#pp-seal-gold);
+}
+.pp-stamp[data-on] .pp-stamp-svg {
+  filter: drop-shadow(0 0 14px var(--gold-glow));
+}
+.pp-stamp-rim {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+.pp-stamp-ring {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  opacity: 0.8;
+}
+.pp-stamp-arc {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  fill: currentColor;
+}
+.pp-stamp-arc-sm {
+  font-size: 7px;
+  letter-spacing: 0.24em;
+  opacity: 0.85;
+}
+.pp-stamp-n,
+.pp-stamp-date {
+  font-family: var(--font-body);
+  font-size: 7px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  fill: currentColor;
+}
+.pp-stamp-cc {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  fill: currentColor;
+}
+.pp-stamp-rule {
+  stroke: currentColor;
+  stroke-width: 0.8;
+  opacity: 0.7;
+}
+.pp-stamp[data-fresh] .pp-stamp-svg {
+  animation: pp-seal-in 900ms var(--ease-out) both;
+}
+@keyframes pp-seal-in {
+  0% { transform: rotate(var(--pp-tilt, 0deg)) scale(1.18); opacity: 0; }
+  100% { transform: rotate(var(--pp-tilt, 0deg)) scale(1); opacity: 1; }
+}
+.pp-stamp-cap {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.pp-stamp-name {
+  font-size: var(--step--1);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--pearl);
+  overflow-wrap: anywhere;
+}
+.pp-stamp-status {
+  font-size: var(--step--2);
+  color: var(--lilac-dim);
+}
+.pp-stamp[data-on] .pp-stamp-status {
+  color: var(--gold);
+}
+
+.pp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+/* ───────────── Stops and stories ───────────── */
+.pp-stoplist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr));
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pp-stop {
+  display: grid;
+  align-content: start;
+  gap: 1.25rem;
+  padding: clamp(1.1rem, 2.4vw, 1.6rem);
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--plum-2) 70%, transparent), color-mix(in srgb, var(--night-2) 78%, transparent));
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.pp-stop[data-on] {
+  border-color: color-mix(in srgb, var(--gold) 30%, transparent);
+}
+.pp-stop-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.5rem 0.9rem;
+  align-items: center;
+}
+.pp-stop-num {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  background: radial-gradient(circle at 34% 26%, color-mix(in srgb, var(--pearl) 26%, transparent), color-mix(in srgb, var(--lilac) 6%, transparent) 70%);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--pearl);
+}
+.pp-stop[data-on] .pp-stop-num {
+  border-color: color-mix(in srgb, var(--gold) 60%, transparent);
+  background: radial-gradient(circle at 34% 26%, color-mix(in srgb, var(--gold) 40%, transparent), color-mix(in srgb, var(--gold) 8%, transparent) 70%);
+  color: var(--gold);
+  box-shadow: 0 0 18px -4px var(--gold-glow);
+}
+.pp-stop-id {
+  min-width: 0;
+}
+.pp-stop-name {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+.pp-stop-name a {
+  text-decoration: none;
+}
+.pp-stop-name a:hover {
+  text-decoration: underline;
+}
+.pp-stop-trail {
+  margin-top: 0.15rem;
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.pp-stop-status {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--step--1);
+  color: var(--lilac);
+}
+.pp-stop-status[data-on] {
+  color: var(--gold);
+}
+.pp-stop-empty {
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.pp-stop-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: var(--hit);
+  font-size: var(--step--1);
+  color: var(--lilac);
+}
+.pp-stop-more:hover {
+  color: var(--pearl);
+}
+.pp-stories {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pp-story {
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+}
+.pp-story-art {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  box-shadow: 0 12px 28px -16px color-mix(in srgb, var(--night) 90%, transparent), 0 0 0 1px var(--line);
+  transition: transform var(--t-mid) var(--ease-out);
+}
+.pp-story:hover .pp-story-art {
+  transform: translateY(-2px);
+}
+.pp-story-art .art {
+  position: absolute;
+  inset: 0;
+}
+.pp-story-body {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.pp-story-title {
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--pearl);
+  text-decoration: none;
+}
+.pp-story-title:hover {
+  text-decoration: underline;
+}
+.pp-story-meta {
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.pp-story-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+.pp-story-stamped {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--step--2);
+  font-weight: 600;
+  color: var(--gold);
+}
+.pp-story-go {
+  min-height: var(--hit);
+}
+@media (max-width: 559px) {
+  .pp-story {
+    grid-template-columns: 104px minmax(0, 1fr);
+  }
+  .pp-story-go {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+/* ───────────── Ready-made journeys: image cards with unboxed captions ───────────── */
+.pp-group + .pp-group {
+  margin-top: clamp(2.5rem, 4.5vw, 3.75rem);
+}
+.pp-group-title {
+  margin-bottom: 1.1rem;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--pearl);
+}
+.pp-jcards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 2.25rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pp-jcard {
+  display: grid;
+  grid-template-rows: auto auto auto auto 1fr auto;
+  align-content: start;
+  gap: 0.45rem;
+  min-width: 0;
+}
+.pp-jcard:has(.pp-jcard-note) {
+  grid-template-rows: auto auto auto auto auto 1fr auto;
+}
+.pp-jcard-art {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  margin-bottom: 0.65rem;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background:
+    radial-gradient(80% 90% at 30% 20%, color-mix(in srgb, var(--iris-2) 38%, transparent), transparent 70%),
+    radial-gradient(70% 80% at 85% 90%, color-mix(in srgb, var(--frost) 16%, transparent), transparent 70%),
+    var(--plum-2);
+  box-shadow: var(--shadow-card), 0 0 0 1px var(--line);
+  transition:
+    transform var(--t-mid) var(--ease-out),
+    box-shadow var(--t-mid) var(--ease-out);
+}
+.pp-jcard-art .art {
+  position: absolute;
+  inset: 0;
+}
+.pp-jcard-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--night) 60%, transparent));
+}
+.pp-jcard:hover .pp-jcard-art,
+.pp-jcard:focus-within .pp-jcard-art {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 70px -30px color-mix(in srgb, var(--iris-2) 60%, transparent), 0 0 0 1px var(--line-2);
+}
+.pp-jcard[data-current] .pp-jcard-art {
+  box-shadow: var(--shadow-card), 0 0 0 2px var(--iris), 0 0 40px -10px var(--iris-glow);
+}
+.pp-jcard-count {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 1;
+  padding: 4px 11px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--night) 62%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: var(--step--2);
+  font-weight: 600;
+  color: var(--pearl);
+}
+.pp-jcard-count[data-done] {
+  color: var(--gold);
+  border-color: color-mix(in srgb, var(--gold) 50%, transparent);
+}
+.pp-jcard-meta {
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.pp-jcard-title {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: var(--pearl);
+}
+.pp-jcard-path {
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--iris);
+}
+.pp-jcard-sum {
+  font-size: var(--step--1);
+  color: var(--lilac);
+}
+.pp-jcard-note {
+  display: flex;
+  gap: 0.45rem;
+  align-items: flex-start;
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.pp-jcard-note svg {
+  flex: none;
+  margin-top: 3px;
+  color: var(--frost);
+}
+.pp-jcard-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.pp-jcard-foot .btn {
+  min-height: var(--hit);
+}
+
+/* ───────────── Builder ───────────── */
+.pp-build {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(1.5rem, 3.5vw, 3rem);
+  align-items: start;
+}
+.pp-build-form {
+  display: grid;
+  gap: 1.25rem;
+}
+.pp-build-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.pp-build-list {
+  display: grid;
+  gap: 0.75rem;
+}
+.pp-build-sub {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--pearl);
+}
+.pp-edit {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.pp-edit-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.pp-edit-n {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  background: var(--glass);
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 700;
+  color: var(--pearl);
+}
+.pp-edit-name {
+  display: grid;
+  min-width: 0;
+}
+.pp-edit-name strong {
+  font-weight: 600;
+  color: var(--pearl);
+}
+.pp-edit-name small {
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.pp-edit-btns {
+  display: flex;
+  gap: 2px;
+}
+.pp-edit-btns .icon-btn-sm {
+  width: var(--hit);
+  height: var(--hit);
+}
+@media (max-width: 899px) {
+  .pp-build {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 479px) {
+  .pp-edit-row {
+    grid-template-columns: 32px minmax(0, 1fr);
+  }
+  .pp-edit-btns {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
+/* Combobox */
+.pp-combo {
+  display: grid;
+  gap: 0.35rem;
+}
+.pp-combo-label {
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+.pp-combo-field {
+  position: relative;
+}
+.pp-combo-field > svg {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+  color: var(--lilac-dim);
+  pointer-events: none;
+}
+.pp-combo-input {
+  padding-left: 2.7rem;
+}
+.pp-combo-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: calc(var(--z-content) + 9);
+  max-height: min(380px, 60vh);
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line-2);
+  background: var(--plum-2);
+  box-shadow: 0 30px 60px -24px color-mix(in srgb, var(--night) 95%, transparent);
+}
+.pp-combo-list[hidden] {
+  display: none;
+}
+.pp-combo-opt {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 0.75rem;
+  min-height: var(--hit);
+  padding: 0.55rem 0.8rem;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.pp-combo-opt[aria-selected='true'] {
+  background: color-mix(in srgb, var(--iris) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--iris) 35%, transparent);
+}
+.pp-combo-name {
+  font-weight: 600;
+  color: var(--pearl);
+}
+.pp-combo-trail {
+  grid-column: 1;
+  font-size: var(--step--2);
+  color: var(--lilac);
+}
+.pp-combo-status {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: var(--step--2);
+  color: var(--lilac-dim);
+  white-space: nowrap;
+}
+.pp-combo-status.is-live {
+  color: var(--iris);
+}
+.pp-combo-none {
+  padding: 0.75rem;
+  color: var(--lilac);
+  font-size: var(--step--1);
+}
+
+/* ───────────── Saved journeys ───────────── */
+.pp-saved-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.pp-saved {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 1rem 0.25rem;
+  border-bottom: 1px solid var(--line);
+}
+.pp-saved-text {
+  min-width: 0;
+}
+.pp-saved-title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--pearl);
+}
+.pp-saved[data-current] .pp-saved-title {
+  color: var(--iris);
+}
+.pp-saved-meta {
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.pp-saved-act {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.pp-saved-act .btn,
+.pp-saved-act .icon-btn-sm {
+  min-height: var(--hit);
+}
+.pp-saved-act .icon-btn-sm {
+  width: var(--hit);
+}
+
+/* ═════════════ Touch targets (pointer: coarse) ═════════════
+ * Title links keep their typographic size; --tap-pad grows the tap box to >= 44px and the
+ * matching negative margin keeps the layout exactly where it was. */
+@media (pointer: coarse) {
+  .pp-story-title {
+    display: inline-block;
+    padding-block: var(--tap-pad);
+    margin-block: calc(var(--tap-pad) * -1);
+  }
+  .pp-stop-name a {
+    display: inline-block;
+    padding-block: var(--tap-pad);
+    margin-block: calc(var(--tap-pad) * -1);
+  }
+}

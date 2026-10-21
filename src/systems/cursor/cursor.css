@@ -1,0 +1,267 @@
+/* The nucleus cursor — champagne gold for things you act on, iris for things you open. */
+.cursor {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-cursor);
+  contain: strict;
+}
+:root:not([data-cursor='on']) .cursor {
+  opacity: 0;
+}
+.cursor-nucleus,
+.cursor-membrane,
+.cursor-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+
+/* ── Nucleus: the exact hotspot ── */
+.cursor-nucleus {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--pearl);
+  box-shadow: 0 0 0 1.5px rgb(10 8 17 / 0.85), 0 0 10px var(--iris-glow);
+  transition: background var(--t-fast), scale var(--t-fast) var(--ease-out), opacity var(--t-fast);
+}
+.cursor-nucleus:is([data-mode='view'], [data-mode='play'], [data-mode='save']) {
+  background: var(--gold);
+  box-shadow: 0 0 0 1.5px rgb(10 8 17 / 0.85), 0 0 12px var(--gold-glow);
+}
+.cursor-nucleus[data-mode='wrap'] {
+  scale: 0.66;
+}
+.cursor-nucleus.is-pressed {
+  scale: 0.7;
+}
+.cursor-nucleus[data-mode='text'],
+.cursor-nucleus[data-mode='hide'] {
+  opacity: 0;
+}
+
+/* ── Membrane: the following shape ── */
+.cursor-membrane {
+  --w: 34px;
+  --h: 34px;
+  --r: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  border: 1.5px solid rgb(232 224 255 / 0.55);
+  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.35), inset 0 0 12px rgb(179 163 255 / 0.12);
+  transition:
+    width var(--t-mid) var(--ease-out),
+    height var(--t-mid) var(--ease-out),
+    margin var(--t-mid) var(--ease-out),
+    border-color var(--t-mid),
+    border-radius var(--t-mid) var(--ease-out),
+    background-color var(--t-mid),
+    box-shadow var(--t-mid),
+    opacity var(--t-fast);
+}
+/* the heartbeat: a faint pulse of the membrane wall */
+.cursor-membrane::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: inherit;
+  border: 1px solid rgb(179 163 255 / 0.3);
+  animation: breathe var(--beat-dur) infinite;
+}
+.cursor-membrane[data-mode='open'] {
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-color: var(--iris);
+  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.35), 0 0 22px -4px var(--iris-glow);
+}
+
+/* view: a wide gold orbit with a satellite riding it */
+.cursor-membrane[data-mode='view'] {
+  width: 78px;
+  height: 78px;
+  margin: -39px 0 0 -39px;
+  border-color: rgb(242 214 162 / 0.85);
+  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.3), 0 0 34px -6px var(--gold-glow), inset 0 0 22px rgb(242 214 162 / 0.12);
+}
+.cursor-membrane[data-mode='view']::after {
+  inset: -9px;
+  border-color: rgb(242 214 162 / 0.22);
+}
+.cursor-membrane[data-mode='view'] .cursor-glyph {
+  animation: cursor-orbit 3.2s linear infinite;
+}
+.cursor-membrane[data-mode='view'] .cursor-glyph::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
+}
+
+/* play: a gold ring with a play notch on its edge, never over the hotspot */
+.cursor-membrane[data-mode='play'] {
+  width: 64px;
+  height: 64px;
+  margin: -32px 0 0 -32px;
+  border-color: var(--gold);
+  border-width: 2px;
+  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.3), 0 0 30px -6px var(--gold-glow);
+}
+.cursor-membrane[data-mode='play'] .cursor-glyph::before {
+  content: '';
+  width: 0;
+  height: 0;
+  transform: translateX(26px);
+  border-left: 7px solid var(--gold);
+  border-top: 4.5px solid transparent;
+  border-bottom: 4.5px solid transparent;
+}
+
+/* save: a gold rounded square */
+.cursor-membrane[data-mode='save'] {
+  width: 42px;
+  height: 42px;
+  margin: -21px 0 0 -21px;
+  border-radius: 13px;
+  border-color: var(--gold);
+}
+
+/* drag: a capsule with chevrons that grips (narrows, turns gold) when pressed */
+.cursor-membrane[data-mode='drag'] {
+  width: 62px;
+  height: 34px;
+  margin: -17px 0 0 -31px;
+  border-radius: 17px;
+  border-color: var(--iris);
+  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.35), 0 0 20px -6px var(--iris-glow);
+}
+.cursor-membrane[data-mode='drag'] .cursor-glyph::before,
+.cursor-membrane[data-mode='drag'] .cursor-glyph::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border: solid var(--iris);
+  border-width: 0 0 1.6px 1.6px;
+  transition: translate var(--t-mid) var(--ease-out), border-color var(--t-mid);
+}
+.cursor-membrane[data-mode='drag'] .cursor-glyph::before {
+  left: -14px;
+  rotate: 45deg;
+}
+.cursor-membrane[data-mode='drag'] .cursor-glyph::after {
+  right: -14px;
+  rotate: -135deg;
+}
+.cursor-membrane[data-mode='drag'].is-pressed {
+  width: 44px;
+  margin-left: -22px;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.35), 0 0 24px -4px var(--gold-glow);
+}
+.cursor-membrane[data-mode='drag'].is-pressed .cursor-glyph::before {
+  translate: -5px 0;
+  border-color: var(--gold);
+}
+.cursor-membrane[data-mode='drag'].is-pressed .cursor-glyph::after {
+  translate: 5px 0;
+  border-color: var(--gold);
+}
+
+/* wrap: the membrane leaves the pointer and wraps the control under it */
+.cursor-membrane[data-mode='wrap'] {
+  width: var(--w);
+  height: var(--h);
+  margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2);
+  border-radius: var(--r);
+  border-color: rgb(255 240 214 / 0.62);
+  background-color: rgb(242 214 162 / 0.05);
+  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.3), 0 0 26px -8px var(--gold-glow);
+}
+.cursor-membrane[data-mode='wrap']::after {
+  display: none;
+}
+
+/* text: the native I-beam leads; a faint iris caret halo marks the field */
+.cursor-membrane[data-mode='text'] {
+  width: 10px;
+  height: 30px;
+  margin: -15px 0 0 -5px;
+  border-radius: 5px;
+  border-color: rgb(179 163 255 / 0.4);
+  box-shadow: 0 0 18px -4px var(--iris-glow);
+}
+.cursor-membrane[data-mode='text']::after,
+.cursor-membrane[data-mode='hide'] {
+  opacity: 0;
+}
+
+.cursor-membrane.is-pressed:not([data-mode='drag']):not([data-mode='wrap']) {
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+}
+.cursor-membrane[data-mode='wrap'].is-pressed {
+  border-color: var(--gold);
+  background-color: rgb(242 214 162 / 0.1);
+}
+.cursor-glyph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* ── Label pill ── */
+.cursor-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px 5px 9px;
+  border-radius: var(--radius-pill);
+  background: rgb(10 8 17 / 0.84);
+  border: 1px solid rgb(242 214 162 / 0.4);
+  box-shadow: 0 10px 30px -12px #000;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--pearl);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+.cursor-label::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+.cursor-label[data-show='true'] {
+  opacity: 1;
+}
+
+@keyframes cursor-orbit {
+  to {
+    rotate: 360deg;
+  }
+}
+:root[data-motion='reduce'] .cursor-membrane .cursor-glyph,
+:root[data-motion='reduce'] .cursor-membrane::after {
+  animation: none;
+}

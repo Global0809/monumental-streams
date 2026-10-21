@@ -1,0 +1,169 @@
+/*
+ * MONUMENTAL STREAMS — CHROME BLOOM · GOLD
+ * Design tokens. Deep violet night, glossy lavender chrome bloom, champagne-gold metal for
+ * the marque, active states and the one primary action per view.
+ * Biomechanical forms (the living membrane, the chrome logotype) carried by large imagery,
+ * big confident type and calm glass surfaces — cinematic first, never a dashboard.
+ *
+ * The semantic names below are the system. The older anatomical names at the bottom are
+ * aliases kept so every component re-skins from one place.
+ */
+@import '@fontsource-variable/archivo/index.css';
+@import '@fontsource-variable/jetbrains-mono/index.css';
+
+/* One family, two widths: Archivo Expanded (wdth 125) for display, Archivo (wdth 100) for text.
+   The expanded face pins the variable font's width axis through its font-stretch descriptor,
+   so any element using --font-display gets the expanded cut with no extra rules. */
+@font-face {
+  font-family: 'Archivo Expanded';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  font-stretch: 125%;
+  src: url('./fonts/archivo-latin-wdth-normal.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Archivo Expanded';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  font-stretch: 125%;
+  src: url('./fonts/archivo-latin-ext-wdth-normal.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  color-scheme: dark;
+
+  /* Night — surfaces */
+  --night: #0a0811;
+  --night-2: #100c1a;
+  --plum: #17121f;
+  --plum-2: #1e1829;
+  --plum-3: #2a2238;
+  --glass: rgb(255 255 255 / 0.055);
+  --glass-2: rgb(255 255 255 / 0.09);
+  --glass-strong: rgb(24 18 34 / 0.72);
+  --line: rgb(232 224 255 / 0.12);
+  --line-2: rgb(232 224 255 / 0.22);
+
+  /* Pearl — text */
+  --pearl: #f3effc;
+  --lilac: #cdc5e4; /* 11.6:1 on night */
+  --lilac-dim: #a79dc4; /* 7.3:1 on night — smallest permitted for text */
+
+  /* Light — accents */
+  --iris: #b3a3ff; /* primary accent: focus, progress, links, free */
+  --iris-2: #8f7bff;
+  --iris-deep: #3a2a86;
+  --iris-glow: rgb(160 140 255 / 0.38);
+  --frost: #9fdcff; /* time, history, eras */
+  --frost-glow: rgb(159 220 255 / 0.3);
+  --gold: #f2d6a2; /* premium */
+  --gold-glow: rgb(242 214 162 / 0.3);
+  --rose: #ff9fc8; /* live, warnings, attention */
+  --danger: #ff7a8f;
+
+  --chrome: linear-gradient(180deg, #ffffff 0%, #ebe6f7 36%, #8a82a1 49%, #2b2539 52%, #b9b1cd 70%, #ffffff 100%);
+  --chrome-soft: linear-gradient(180deg, #ffffff, #d9d0f2);
+  --gold-chrome: linear-gradient(180deg, #fff8e6 0%, #f4dcae 30%, #c9a062 47%, #5a3d17 51%, #b88f52 66%, #f6e2b8 86%, #fff6df 100%);
+  --gold-fill: linear-gradient(180deg, #fff5dc 0%, #f2d6a2 55%, #d8b072 100%);
+  --on-gold: #251804;
+  --pearl-fill: linear-gradient(180deg, #ffffff 0%, #e6dffa 100%);
+  --on-pearl: #170f25;
+
+  /* Typography */
+  --font-display: 'Archivo Expanded', 'Archivo Variable', system-ui, sans-serif;
+  --font-body: 'Archivo Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-code: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', monospace;
+
+  --step--2: clamp(0.72rem, 0.7rem + 0.08vw, 0.78rem);
+  --step--1: clamp(0.84rem, 0.81rem + 0.13vw, 0.92rem);
+  --step-0: clamp(0.98rem, 0.95rem + 0.16vw, 1.08rem);
+  --step-1: clamp(1.15rem, 1.09rem + 0.3vw, 1.34rem);
+  --step-2: clamp(1.38rem, 1.26rem + 0.55vw, 1.75rem);
+  --step-3: clamp(1.7rem, 1.48rem + 1vw, 2.4rem);
+  --step-4: clamp(2.1rem, 1.7rem + 1.9vw, 3.5rem);
+  --step-5: clamp(2.7rem, 1.9rem + 3.6vw, 5.6rem);
+  --step-6: clamp(3.2rem, 1.8rem + 6.4vw, 8.4rem);
+
+  /* Shape */
+  --nav-h: 76px;
+  --tabbar-h: 0px;
+  --gutter: clamp(16px, 3.4vw, 56px);
+  --radius-card: 26px;
+  --radius-panel: 28px;
+  --radius-control: 16px;
+  --radius-pill: 999px;
+  --hit: 44px;
+  /* vertical padding that grows a one-line text link to a >= 44px tap box (pair with the
+     negative margin so layout does not move): resolved per element, so 1lh is its own line */
+  --tap-pad: max(0px, (var(--hit) + 2px - 1lh) / 2);
+
+  /* Motion */
+  --beat-dur: 1s;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --t-fast: 160ms;
+  --t-mid: 320ms;
+  --t-slow: 700ms;
+
+  --shadow-card: 0 30px 70px -36px rgb(0 0 0 / 0.9);
+  --shadow-float: 0 20px 60px -20px rgb(5 2 15 / 0.85), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --focus-ring: 0 0 0 2px var(--night), 0 0 0 4px var(--iris), 0 0 22px 2px var(--iris-glow);
+
+  --z-content: 1;
+  --z-chrome: 20;
+  --z-player: 40;
+  --z-overlay: 60;
+  --z-dialog: 80;
+  --z-cursor: 100;
+
+  /* ── Aliases (legacy anatomical names → Chrome Bloom) ── */
+  --abyss: var(--night);
+  --abyss-2: var(--night-2);
+  --tissue: var(--plum);
+  --tissue-2: var(--plum-2);
+  --tissue-3: var(--plum-3);
+  --membrane: var(--glass);
+  --membrane-2: var(--glass-2);
+  --scar: var(--line);
+  --scar-2: var(--line-2);
+  --bone: var(--pearl);
+  --bone-dim: var(--lilac);
+  --bone-faint: var(--lilac-dim);
+  --ichor: var(--iris);
+  --ichor-2: var(--iris-2);
+  --ichor-deep: var(--iris-deep);
+  --ichor-glow: var(--iris-glow);
+  --plasma: var(--frost);
+  --plasma-glow: var(--frost-glow);
+  --aurum: var(--gold);
+  --aurum-glow: var(--gold-glow);
+  --ember: var(--rose);
+  --haem: var(--danger);
+  --font-serif: var(--font-display);
+  --font-mono: var(--font-body); /* labels read as clean small caps, not terminal text */
+  --radius-pod: var(--radius-card);
+  --radius-joint: var(--radius-control);
+  --topbar-h: var(--nav-h);
+  --spine-w: 0px;
+  --ease-tendon: var(--ease-out);
+  --ease-valve: var(--ease-inout);
+  --shadow-pod: var(--shadow-card);
+}
+
+@media (max-width: 767px) {
+  :root {
+    --nav-h: 60px;
+    --tabbar-h: 72px;
+    --radius-card: 22px;
+  }
+}
+
+:root[data-motion='reduce'] {
+  --t-fast: 1ms;
+  --t-mid: 1ms;
+  --t-slow: 1ms;
+}

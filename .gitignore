@@ -1,0 +1,11 @@
+node_modules
+dist
+media/
+data/*.sqlite*
+.env
+test-results
+playwright-report
+sources/archive/
+sources/
+shots/
+data/

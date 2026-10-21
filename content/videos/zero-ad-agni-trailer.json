@@ -1,0 +1,40 @@
+{
+  "id": "video:zero-ad-agni-trailer",
+  "slug": "zero-ad-agni-trailer",
+  "title": "0 A.D. — Alpha 27 “Agni” trailer",
+  "kind": "teaser",
+  "programme": "programme:open-play",
+  "order": 1,
+  "summary": "The release trailer for a free, open-source strategy game of ancient civilisations.",
+  "description": "Wildfire Games’ trailer for Alpha 27 “Agni” of 0 A.D. Empires Ascendant, a free and open-source real-time strategy game about ancient civilisations. It walks through new features, maps and game modes, with stylised ancient-warfare battle scenes (no gore).\n\nCreative Commons (BY-SA) demonstration media, shown unaltered; not a Monumental Original.",
+  "categories": [
+    "interest:gaming"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:design",
+    "theme:community"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": null,
+  "made": 2025,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "fiction"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:open-play-zero-ad-agni",
+  "art": "art:still-zero-ad-agni-trailer",
+  "credits": {
+    "licence": "CC BY-SA 3.0",
+    "attribution": "0 A.D. Alpha 27 'Agni' trailer © Wildfire Games (wildfiregames.com), CC BY-SA 3.0; music 'Ammon-Ra' by Omri Lahav & Sam Gossner, CC BY-SA 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:0_A._D._Empires_Ascendant_%E2%80%94_Alpha_27_Agni_Trailer.webm"
+  }
+}

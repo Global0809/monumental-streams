@@ -1,0 +1,49 @@
+{
+  "id": "video:fashions-rome-1964",
+  "slug": "fashions-rome-1964",
+  "title": "Fashions in Rome (1964)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 15,
+  "summary": "American wool fashions modelled among Rome’s monuments, in colour.",
+  "description": "Universal Newsreel from 26 October 1964, in colour: American wool fashions are modelled at the Trevi Fountain and the Roman Forum — a promotional fashion segment of its time.\n\nPublic-domain demonstration media; captions are machine-generated and unreviewed. Not a Monumental Original.",
+  "categories": [
+    "interest:fashion",
+    "interest:news"
+  ],
+  "places": [
+    "place:rome"
+  ],
+  "periods": [
+    "period:1960s"
+  ],
+  "themes": [
+    "theme:design",
+    "theme:identity"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": {
+    "from": 1964,
+    "to": 1964
+  },
+  "made": 1964,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-fashions-rome-1964",
+  "art": "art:still-fashions-rome-1964",
+  "credits": {
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 26 Oct 1964 — public domain",
+    "sourceUrl": "https://archive.org/details/1964-10-26_Fashions"
+  },
+  "context": "A 1964 promotional segment whose narration addresses women in dated terms (for example, dressing “to attract that certain man”)."
+}

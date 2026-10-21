@@ -1,0 +1,346 @@
+[
+  {
+    "id": "art:living-atlas",
+    "stem": "01-living-atlas",
+    "alt": "A glowing dotted globe turns inside a glass orbital ring on a deep navy field, circled by floating translucent cards for art, music, film and food, beside the line 'Explore what you love. Discover where it lives.'",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:time-machine",
+    "stem": "02-time-machine",
+    "alt": "A brass clockwork dial glows amber as its ring of decades turns, beside the heading 'Step into any decade.' and illustrated cards of Miami sunsets, palms and sound bars labelled by decade.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:connections",
+    "stem": "03-connections",
+    "alt": "On pale paper, a thin blue line links round icons for a featured artist, the WAVEMAKERS programme, Miami, the Art Deco movement and an untitled film, under the heading 'Every story has a reason.'",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:catalogue-player",
+    "stem": "04-catalogue-player",
+    "alt": "A neon purple and pink catalogue: a player window labelled 'Preview feature · Miami Nights' shows a synthwave sunset behind a city skyline, surrounded by rows of tiles for music, film, sport, food and art marked Free or Premium, with search filters for Miami, Music and Free.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:premium-vault",
+    "stem": "05-premium-vault",
+    "alt": "A circular vault door with an iris-like core glows teal at the centre of a dark interface, flanked by panels for saved items, journeys and continue watching; the access label below changes between Free and Premium.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:deco-atlas",
+    "stem": "06-deco-atlas",
+    "alt": "Pastel line-art cities inside an arched frame: London with a clock tower, terraced houses and a red bus, and Miami with an Art Deco hotel, palm trees and waves, each with its coordinates, 'What's here' cards for music, film and fashion, and a world-map strip below.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:bauhaus-categories",
+    "stem": "07-bauhaus-categories",
+    "alt": "Bold Bauhaus-style geometry on bright yellow: the words 'ART' and 'FILM' in heavy black type beside a painter's palette and brush, a film reel and a red play triangle, with three abstract poster cards.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:culture-passport",
+    "stem": "08-culture-passport",
+    "alt": "A navy 'Culture Passport' with a gold compass emblem opens to a hand-drawn map with a dotted trail between Miami and San Juan, and a page of circular travel stamps, Miami and San Juan stamped and two slots still empty.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:brand-chrome",
+    "stem": "09-brand-chrome",
+    "alt": "The words 'MONUMENTAL STREAMS' in polished chrome serif letters catch passing glints of light on black, mirrored below, with the line 'Explore what you love. Discover where it lives.'",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:living-membrane",
+    "stem": "10-living-membrane",
+    "alt": "A biomechanical tunnel of ribbed, pearl-grey rings spirals toward a soft glowing centre, with a segmented spine running along its lilac floor.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:sound-aurora",
+    "stem": "11-sound-aurora",
+    "alt": "Ribbons of aurora light drift behind a sound panel titled 'Sound: designed tones for every action', with a sound-on switch, a master level slider, output meters and six waveform tiles labelled Activate, Select, Save, Transition, Time tick and Error.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:cursor-language",
+    "stem": "12-cursor-language",
+    "alt": "A dark grid of six panels demonstrates cursor states (Explore, Play, Drag, Save, Open and Orbit), each a different small shape, above the line 'Cursor adapts to context. Native cursor remains as fallback.'",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:mobile-app",
+    "stem": "13-mobile-app",
+    "alt": "Three phone screens of the Monumental Streams app on a terracotta background (a home feed, a browse view and a player) beside the heading 'Built for touch.' and the line 'Swipe, save, and resume where you left off.'",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:search-filters",
+    "stem": "14-search-filters",
+    "alt": "A pastel search screen with 'miami' typed in the search bar and filter chips for place, interest, access and duration; the results move between a grid of colourful geometric tiles and an empty state reading 'Nothing here yet. Try removing a filter.'",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:miami-isometric",
+    "stem": "15-miami-isometric",
+    "alt": "An isometric illustration of a Miami-area waterfront, with beach, palms, low-rise Deco buildings, glass towers, boats and a low sun, and map pins for South Beach, Wynwood, Little Havana and Brickell, under the heading 'Miami, up close.' and the note 'Illustrative map, not to scale'.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:story-paper",
+    "stem": "16-story-paper",
+    "alt": "Cut-paper letters spell 'THE STORY BEHIND THE STORY' above four pinned paper cards with simple symbols: The Decision (a forked path), The Relationship (two overlapping circles), The Setback (a broken step) and The Turning Point (a bending arrow).",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:wavemakers-lines",
+    "stem": "17-wavemakers-lines",
+    "alt": "Flowing blue lines of light ripple like water across black beneath the title 'VALID ID PRESENTS WAVEMAKERS', with 'Puerto Rico, New York to London' along the bottom and an 'In development' tag.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:take-me-somewhere",
+    "stem": "18-take-me-somewhere",
+    "alt": "A cream retro console labelled 'Take Me Somewhere', with a small screen listing a short itinerary, mood buttons for Chill, Lively, Culture and Late, dials for interest, time and destination, and a large red GO button.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:placeholder",
+    "stem": "10-living-membrane",
+    "alt": "Placeholder artwork: a biomechanical tunnel of ribbed, pearl-grey rings spiralling toward a soft glowing centre.",
+    "kind": "studio-loop",
+    "provisional": true,
+    "credit": "Monumental studio motion concept (preview loop)"
+  },
+  {
+    "id": "art:still-nyc-subway-1905",
+    "stem": "still-nyc-subway-1905",
+    "alt": "A subway train’s lights at the end of a dark tunnel beneath Manhattan, 1905",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Interior N.Y. Subway, 14th St. to 42nd St. (1905). American Mutoscope & Biograph Co.; camera G. W. \"Billy\" Bitzer. Library of Congress, via Wikimedia Commons."
+  },
+  {
+    "id": "art:still-coney-island-1905",
+    "stem": "still-coney-island-1905",
+    "alt": "Coney Island’s towers outlined in electric light at night, 1905",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Coney Island at Night (1905). Edwin S. Porter, Edison Manufacturing Company. Library of Congress, via Wikimedia Commons."
+  },
+  {
+    "id": "art:still-kingston-1920",
+    "stem": "still-kingston-1920",
+    "alt": "A Kingston street with a streetcar and pedestrians, c. 1920",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Kingston Jamaica (1920). Ford Educational Library, Ford Motor Company. US National Archives, via Internet Archive."
+  },
+  {
+    "id": "art:still-newspaper-train-1942",
+    "stem": "still-newspaper-train-1942",
+    "alt": "A helmeted air-raid warden in wartime London",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Newspaper Train (1942). Len Lye, Realist Film Unit, for the UK Ministry of Information. Via Wikimedia Commons."
+  },
+  {
+    "id": "art:still-rural-puerto-rico-1942",
+    "stem": "still-rural-puerto-rico-1942",
+    "alt": "A farmer in a wide-brimmed hat working the ground in rural Puerto Rico, c. 1941",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Democracy at Work in Rural Puerto Rico (1942). US Department of Agriculture Extension Service; directed by Chester Lindstrom. US National Archives, via Internet Archive."
+  },
+  {
+    "id": "art:still-roads-to-romance",
+    "stem": "still-roads-to-romance",
+    "alt": "The palm-fringed Venetian Pool in Coral Gables, in colour, 1950",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Roads to Romance: Coral Gables (1950). The Jam Handy Organization for Chevrolet. Via Internet Archive."
+  },
+  {
+    "id": "art:still-where-the-sun-reigns",
+    "stem": "still-where-the-sun-reigns",
+    "alt": "A packed Orange Bowl crowd above a marching-band formation, mid-1950s Miami",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Where the Sun Reigns (c. 1955). Reela Films for the Greater Miami Development Board and Dade County Commission. Prelinger Archives, via Internet Archive."
+  },
+  {
+    "id": "art:still-apollo-11-1969",
+    "stem": "still-apollo-11-1969",
+    "alt": "Exhaust billowing around the launch tower as Apollo 11 lifts off, 1969",
+    "kind": "still",
+    "provisional": false,
+    "credit": "NASA/Kennedy Space Center"
+  },
+  {
+    "id": "art:still-tears-of-steel",
+    "stem": "still-tears-of-steel",
+    "alt": "Characters crossing an Amsterdam street in Tears of Steel",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Tears of Steel – (CC) Blender Foundation | mango.blender.org – CC BY 3.0"
+  },
+  {
+    "id": "art:still-sintel",
+    "stem": "still-sintel",
+    "alt": "Sintel, the film’s red-haired heroine, in close-up",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Sintel – © copyright Blender Foundation | www.sintel.org – CC BY 3.0"
+  },
+  {
+    "id": "art:still-big-buck-bunny",
+    "stem": "still-big-buck-bunny",
+    "alt": "Frame from Big Buck Bunny",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Big Buck Bunny (c) copyright 2008 Blender Foundation | www.bigbuckbunny.org — CC BY 3.0"
+  },
+  {
+    "id": "art:still-caminandes-llama-drama",
+    "stem": "still-caminandes-llama-drama",
+    "alt": "Frame from Caminandes: Llama Drama",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Caminandes: Llama Drama — Pablo Vazquez, Beorn Leonard, Francesco Siddi; music and sound: Jan Morgenstern (Blender Foundation) — CC BY 3.0"
+  },
+  {
+    "id": "art:still-caminandes-llamigos",
+    "stem": "still-caminandes-llamigos",
+    "alt": "Frame from Caminandes: Llamigos",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Caminandes 3: Llamigos — Blender Foundation (Blender Animation Studio) — CC BY 3.0"
+  },
+  {
+    "id": "art:still-zero-ad-agni-trailer",
+    "stem": "still-zero-ad-agni-trailer",
+    "alt": "Frame from 0 A.D. — Alpha 27 “Agni” trailer",
+    "kind": "still",
+    "provisional": false,
+    "credit": "0 A.D. Alpha 27 'Agni' trailer © Wildfire Games (wildfiregames.com), CC BY-SA 3.0; music 'Ammon-Ra' by Omri Lahav & Sam Gossner, CC BY-SA 3.0"
+  },
+  {
+    "id": "art:still-minetest-first-minutes",
+    "stem": "still-minetest-first-minutes",
+    "alt": "Frame from Minetest — the first minutes of a new world",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Minetest gameplay recording by PantheraLeo1359531 (Wikimedia Commons); game media © The Minetest Team (Perttu Ahola et al.), CC BY-SA 3.0"
+  },
+  {
+    "id": "art:still-senators-world-series-1924",
+    "stem": "still-senators-world-series-1924",
+    "alt": "Frame from Senators Win World Series (1924)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Senators Win World Series (Kinograms Publishing Corp., 1924). Library of Congress Motion Picture, Broadcasting & Recorded Sound Division. Public domain."
+  },
+  {
+    "id": "art:still-veldloop-1922",
+    "stem": "still-veldloop-1922",
+    "alt": "Frame from Cross-country day in the dunes (1922)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL"
+  },
+  {
+    "id": "art:still-world-series-1959",
+    "stem": "still-world-series-1959",
+    "alt": "Frame from West Coast Hails First World Series (1959)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Universal Newsreel, 5 Oct 1959 — public domain (via National Archives / Internet Archive)"
+  },
+  {
+    "id": "art:still-worlds-fair-1964",
+    "stem": "still-worlds-fair-1964",
+    "alt": "Frame from New York World’s Fair (1964)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Universal Newsreel, 2 Mar 1964 — public domain"
+  },
+  {
+    "id": "art:still-royal-tour-1939",
+    "stem": "still-royal-tour-1939",
+    "alt": "Frame from King and Queen Leave Britain on American Tour (1939)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Universal Newsreel, 15 May 1939 — public domain"
+  },
+  {
+    "id": "art:still-courier-satellite-1960",
+    "stem": "still-courier-satellite-1960",
+    "alt": "Frame from Courier Satellite Launch, Florida (1960)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Universal Newsreel, 6 Oct 1960 — public domain"
+  },
+  {
+    "id": "art:still-fashions-rome-1964",
+    "stem": "still-fashions-rome-1964",
+    "alt": "Frame from Fashions in Rome (1964)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Universal Newsreel, 26 Oct 1964 — public domain"
+  },
+  {
+    "id": "art:still-fashion-week-1951",
+    "stem": "still-fashion-week-1951",
+    "alt": "Frame from Amsterdam Fashion Week (1951)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL"
+  },
+  {
+    "id": "art:still-cotton-fashion-1958",
+    "stem": "still-cotton-fashion-1958",
+    "alt": "Frame from Dutch Cotton Fashion (1958)",
+    "kind": "still",
+    "provisional": false,
+    "credit": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL"
+  }
+]

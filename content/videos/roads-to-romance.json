@@ -1,0 +1,51 @@
+{
+  "id": "video:roads-to-romance",
+  "slug": "roads-to-romance",
+  "title": "Roads to Romance: Coral Gables",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 6,
+  "summary": "A 1950 Chevrolet promotional film touring Coral Gables and Key Biscayne in Technicolor.",
+  "description": "Made in 1950 by the Jam Handy Organization for Chevrolet, this short colour film drives a Chevrolet convertible through Coral Gables, past the new University of Miami campus and the Venetian Pool, across the Rickenbacker Causeway to Crandon Park and Cape Florida on Key Biscayne, and on to Parrot Jungle.\n\nIt is an advertisement, and it ends by sending you to your local Chevrolet dealer. A public-domain film shown as demonstration media while original programming is produced; it is not a Monumental Original. The English captions are machine-generated and have not been reviewed.",
+  "categories": [
+    "interest:film",
+    "interest:lifestyle"
+  ],
+  "places": [
+    "place:coral-gables",
+    "place:key-biscayne"
+  ],
+  "periods": [
+    "period:1950s"
+  ],
+  "themes": [
+    "theme:architecture",
+    "theme:design"
+  ],
+  "moods": [
+    "chill",
+    "lively"
+  ],
+  "setting": {
+    "from": 1950,
+    "to": 1950
+  },
+  "made": 1950,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-roads-to-romance",
+  "art": "art:still-roads-to-romance",
+  "credits": {
+    "licence": "Public domain",
+    "attribution": "Roads to Romance: Coral Gables (1950). The Jam Handy Organization for Chevrolet. Via Internet Archive.",
+    "sourceUrl": "https://archive.org/details/RoadstoR1950"
+  },
+  "context": "This is a Chevrolet advertisement: the company's cars appear throughout as product placement."
+}

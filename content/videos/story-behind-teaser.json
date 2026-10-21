@@ -1,0 +1,37 @@
+{
+  "id": "video:story-behind-teaser",
+  "slug": "story-behind-teaser",
+  "title": "THE STORY BEHIND THE STORY — motion teaser",
+  "kind": "teaser",
+  "programme": "programme:story-behind-the-story",
+  "order": 0,
+  "summary": "An illustrative motion concept for the planned original series.",
+  "description": "Torn-paper letters spell THE STORY BEHIND THE STORY, and four cards hang on a grey board naming what the series looks for: the decision, the relationship, the setback and the turning point.\n\nThis is an illustrative motion concept made by Monumental's studio. It is not footage from the series, which is planned and has no episodes, subjects or release dates announced yet.",
+  "categories": [
+    "interest:documentary",
+    "interest:culture"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:decisions",
+    "theme:relationships",
+    "theme:setbacks",
+    "theme:turning-points"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "setting": null,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "illustrative"
+  ],
+  "provenance": "studio-concept",
+  "media": "media:teaser-story-behind",
+  "art": "art:story-paper"
+}

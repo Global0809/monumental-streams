@@ -1,0 +1,40 @@
+{
+  "id": "video:big-buck-bunny",
+  "slug": "big-buck-bunny",
+  "title": "Big Buck Bunny",
+  "kind": "short",
+  "programme": "programme:open-cinema",
+  "order": 3,
+  "summary": "A gentle giant rabbit gets even with three woodland bullies — the Blender Foundation’s classic open movie.",
+  "description": "Blender Foundation’s 2008 animated short: a big, good-natured rabbit whose peaceful morning is spoiled by three bullying rodents, until he sets about some elaborate payback. Slapstick throughout and no dialogue, so it plays for every age.\n\nCreative Commons demonstration media, shown while original programming is produced; it is not a Monumental Original.",
+  "categories": [
+    "interest:kids",
+    "interest:film"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:relationships"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": null,
+  "made": 2008,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "fiction"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:open-cinema-big-buck-bunny",
+  "art": "art:still-big-buck-bunny",
+  "credits": {
+    "licence": "CC BY 3.0",
+    "attribution": "Big Buck Bunny (c) copyright 2008 Blender Foundation | www.bigbuckbunny.org — CC BY 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Big_Buck_Bunny_4K.webm"
+  }
+}

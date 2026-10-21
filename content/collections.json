@@ -1,0 +1,67 @@
+[
+  {
+    "id": "collection:miami-gateway",
+    "slug": "miami-gateway",
+    "title": "Miami: The Gateway",
+    "description": "Start where Monumental starts. Everything set in Miami-Dade County, from the City of Miami and its neighbourhoods to the separate City of Miami Beach, gathered here automatically as new stories arrive.",
+    "rule": { "places": ["place:miami-dade-county"] },
+    "featured": true,
+    "art": "art:miami-isometric"
+  },
+  {
+    "id": "collection:free-to-watch",
+    "slug": "free-to-watch",
+    "title": "Free to Watch",
+    "description": "Everything you can press play on right now, no membership needed.",
+    "rule": { "access": "free", "playableOnly": true },
+    "art": "art:catalogue-player"
+  },
+  {
+    "id": "collection:wavemakers-route",
+    "slug": "wavemakers-route",
+    "title": "The WAVEMAKERS Route",
+    "description": "Puerto Rico, New York, London: everything in the catalogue set along the journey of the opening WAVEMAKERS chapter.",
+    "rule": { "places": ["place:puerto-rico", "place:new-york-city", "place:london"] },
+    "art": "art:wavemakers-lines"
+  },
+  {
+    "id": "collection:open-archive",
+    "slug": "open-archive",
+    "title": "Open Archive",
+    "description": "Public-domain films from libraries and archives, from a 1905 subway ride under Manhattan to Apollo 11's launch, each credited with its source and shown for what it is.",
+    "rule": { "provenance": ["archive"] },
+    "art": "art:time-machine"
+  },
+  {
+    "id": "collection:open-cinema",
+    "slug": "open-cinema",
+    "title": "Open Cinema",
+    "description": "Open movies released under Creative Commons licences, credited exactly as their makers ask.",
+    "rule": { "provenance": ["open-cinema"] },
+    "art": "art:bauhaus-categories"
+  },
+  {
+    "id": "collection:studio-specimens",
+    "slug": "studio-specimens",
+    "title": "Studio Specimens",
+    "description": "Motion concepts from Monumental's studio: reels and teasers that show how the platform looks, sounds and moves. Illustrative design work, not programme footage.",
+    "rule": { "provenance": ["studio"] },
+    "art": "art:living-membrane"
+  },
+  {
+    "id": "collection:before-1950",
+    "slug": "before-1950",
+    "title": "Before 1950",
+    "description": "Stories set in the first half of the twentieth century, matched by when they take place, not when they were made.",
+    "rule": { "periods": ["period:1900s", "period:1910s", "period:1920s", "period:1930s", "period:1940s"] },
+    "art": "art:deco-atlas"
+  },
+  {
+    "id": "collection:monumental-originals",
+    "slug": "monumental-originals",
+    "title": "Monumental Originals",
+    "description": "Original programming from Monumental Streams, starting with WAVEMAKERS, and the motion teasers made for it. Original episodes will appear here as they are published.",
+    "rule": { "provenance": ["original"] },
+    "art": "art:brand-chrome"
+  }
+]

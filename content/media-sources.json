@@ -1,0 +1,515 @@
+[
+  {
+    "id": "media:reel-living-atlas",
+    "type": "reel",
+    "title": "The Living Atlas",
+    "loops": [
+      "01-living-atlas",
+      "15-miami-isometric",
+      "06-deco-atlas",
+      "08-culture-passport",
+      "18-take-me-somewhere"
+    ],
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (captions)",
+        "kind": "captions",
+        "src": "content/captions/reel-living-atlas.en.vtt",
+        "default": true
+      }
+    ],
+    "chapters": true,
+    "score": {
+      "seed": 1101,
+      "root": "D",
+      "mood": "bright"
+    },
+    "provenance": "studio-concept",
+    "notes": "Studio concept reel about place: the globe, Miami up close, the Deco atlas of launch cities, the Culture Passport and the Take Me Somewhere instrument. Illustrative motion design only — no location footage. Provisional until approved programming replaces it."
+  },
+  {
+    "id": "media:reel-stories-in-time",
+    "type": "reel",
+    "title": "Stories in Time",
+    "loops": [
+      "02-time-machine",
+      "03-connections",
+      "16-story-paper",
+      "17-wavemakers-lines"
+    ],
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (captions)",
+        "kind": "captions",
+        "src": "content/captions/reel-stories-in-time.en.vtt",
+        "default": true
+      }
+    ],
+    "chapters": true,
+    "score": {
+      "seed": 2207,
+      "root": "A",
+      "mood": "dark"
+    },
+    "provenance": "studio-concept",
+    "notes": "Studio concept reel about time and narrative: the decade dial, explainable connections, THE STORY BEHIND THE STORY and WAVEMAKERS title art. Illustrative artwork, not archival footage. Provisional."
+  },
+  {
+    "id": "media:reel-the-organism",
+    "type": "reel",
+    "title": "The Organism: Sound, Touch & Chrome",
+    "loops": [
+      "09-brand-chrome",
+      "10-living-membrane",
+      "11-sound-aurora",
+      "12-cursor-language",
+      "13-mobile-app"
+    ],
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (captions)",
+        "kind": "captions",
+        "src": "content/captions/reel-the-organism.en.vtt",
+        "default": true
+      }
+    ],
+    "chapters": true,
+    "score": {
+      "seed": 3301,
+      "root": "E",
+      "mood": "dark"
+    },
+    "provenance": "studio-concept",
+    "notes": "Studio concept reel about the platform's sensory identity: chrome logotype, living membrane, sound design preview, cursor language and touch. The sound-design loop is a visual preview; the reel's audio is the generated ambient score. Provisional."
+  },
+  {
+    "id": "media:reel-interface-specimens",
+    "type": "reel",
+    "title": "Interface Specimens",
+    "loops": [
+      "04-catalogue-player",
+      "05-premium-vault",
+      "07-bauhaus-categories",
+      "14-search-filters"
+    ],
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (captions)",
+        "kind": "captions",
+        "src": "content/captions/reel-interface-specimens.en.vtt",
+        "default": true
+      }
+    ],
+    "chapters": true,
+    "score": {
+      "seed": 4409,
+      "root": "C",
+      "mood": "bright"
+    },
+    "provenance": "studio-concept",
+    "notes": "Studio concept reel of interface specimens: catalogue and player, membership vault, Bauhaus interest categories and search with combined filters. Illustrative UI artwork; titles and counts on screen are placeholders. Provisional."
+  },
+  {
+    "id": "media:teaser-wavemakers",
+    "type": "reel",
+    "title": "WAVEMAKERS — Teaser",
+    "loops": [
+      "17-wavemakers-lines"
+    ],
+    "repeat": 2,
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (captions)",
+        "kind": "captions",
+        "src": "content/captions/teaser-wavemakers.en.vtt",
+        "default": true
+      }
+    ],
+    "chapters": true,
+    "score": {
+      "seed": 5501,
+      "root": "F",
+      "mood": "dark"
+    },
+    "provenance": "studio-concept",
+    "notes": "Title-art teaser for the planned original series WAVEMAKERS (Puerto Rico, New York to London). Motion design only; the series is in development and no episode footage exists yet."
+  },
+  {
+    "id": "media:teaser-story-behind",
+    "type": "reel",
+    "title": "The Story Behind the Story — Teaser",
+    "loops": [
+      "16-story-paper"
+    ],
+    "repeat": 2,
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (captions)",
+        "kind": "captions",
+        "src": "content/captions/teaser-story-behind.en.vtt",
+        "default": true
+      }
+    ],
+    "chapters": true,
+    "score": {
+      "seed": 6607,
+      "root": "G",
+      "mood": "dark"
+    },
+    "provenance": "studio-concept",
+    "notes": "Title-art teaser for the planned original series THE STORY BEHIND THE STORY. Illustrative collage motion design; no episode footage exists yet."
+  },
+  {
+    "id": "media:archive-nyc-subway-1905",
+    "type": "file",
+    "title": "Interior N.Y. Subway, 14th St. to 42nd St. (1905)",
+    "source": "sources/archive/nyc-subway-1905/source-silent.mp4",
+    "licence": "Public domain (US, published before 1930)",
+    "attribution": "Interior N.Y. Subway, 14th St. to 42nd St. (1905). American Mutoscope & Biograph Co.; camera G. W. \"Billy\" Bitzer. Library of Congress, via Wikimedia Commons.",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:New_York_Subway_(1905)_-_G.W._Bitzer_-_Interior_NYC_From_14th_to_42nd_Street.webm",
+    "provenance": "public-domain",
+    "notes": "Silent actuality film shot 21 May 1905 on the IRT subway, 14th St–Union Square to the original Grand Central (42nd St). National Film Registry. Library of Congress record: https://www.loc.gov/item/00694394. The downloaded copy carried an added audio track of unknown origin (measured silent, about -91 dB); it was removed with ffmpeg (-an, video stream copied) into source-silent.mp4. No captions: the film has no intertitles."
+  },
+  {
+    "id": "media:archive-coney-island-1905",
+    "type": "file",
+    "title": "Coney Island at Night (1905)",
+    "source": "sources/archive/coney-island-1905/source.webm",
+    "licence": "Public domain (US, published before 1930)",
+    "attribution": "Coney Island at Night (1905). Edwin S. Porter, Edison Manufacturing Company. Library of Congress, via Wikimedia Commons.",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Coney_Island_at_Night_(Edwin_S._Porter,_1905).webm",
+    "provenance": "public-domain",
+    "notes": "Silent film (no audio track) of Coney Island amusement parks lit at night; on-screen titles name Luna Park and Dreamland. No caption file."
+  },
+  {
+    "id": "media:archive-kingston-1920",
+    "type": "file",
+    "title": "Kingston Jamaica (1920)",
+    "source": "sources/archive/kingston-1920/source-silent.mp4",
+    "licence": "Public domain",
+    "attribution": "Kingston Jamaica (1920). Ford Educational Library, Ford Motor Company. US National Archives, via Internet Archive.",
+    "sourceUrl": "https://archive.org/details/fc-fc-349",
+    "provenance": "public-domain",
+    "notes": "Silent film with intertitles. National Archives catalogue: https://catalog.archives.gov/id/91026. The downloaded copy carried an empty audio track (measured about -90 dB mean, -73 dB peak); it was removed with ffmpeg (-an, video stream copied) into source-silent.mp4 so the asset is reported as silent. Source is 720x480 with no aspect-ratio flag. No caption file: the intertitles are on screen."
+  },
+  {
+    "id": "media:archive-newspaper-train-1942",
+    "type": "file",
+    "title": "Newspaper Train (1942)",
+    "source": "sources/archive/newspaper-train-1942/source.webm",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (captions)",
+        "kind": "captions",
+        "src": "sources/archive/newspaper-train-1942/captions.en.vtt",
+        "default": true
+      }
+    ],
+    "licence": "Public domain (UK Crown copyright expired)",
+    "attribution": "Newspaper Train (1942). Len Lye, Realist Film Unit, for the UK Ministry of Information. Via Wikimedia Commons.",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:NEWSPAPER_TRAIN_(1942).webm",
+    "provenance": "public-domain",
+    "notes": "Narrated wartime film about London newspaper distribution during the Blitz, 1940–41. Captions are human-made, from the Wikimedia Commons TimedText page for this file."
+  },
+  {
+    "id": "media:archive-rural-puerto-rico-1942",
+    "type": "file",
+    "title": "Democracy at Work in Rural Puerto Rico (1942)",
+    "source": "sources/archive/rural-puerto-rico-1942/source.mp4",
+    "licence": "Public domain (US federal government work)",
+    "attribution": "Democracy at Work in Rural Puerto Rico (1942). US Department of Agriculture Extension Service; directed by Chester Lindstrom. US National Archives, via Internet Archive.",
+    "sourceUrl": "https://archive.org/details/Democrac1940",
+    "provenance": "public-domain",
+    "notes": "Narrated US government film depicting rural Puerto Rico around 1941. National Archives catalogue: https://catalog.archives.gov/id/47946. No usable captions exist yet."
+  },
+  {
+    "id": "media:archive-roads-to-romance",
+    "type": "file",
+    "title": "Roads to Romance: Coral Gables (1950)",
+    "source": "sources/archive/roads-to-romance/source.mp4",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (auto-generated, unreviewed)",
+        "kind": "captions",
+        "src": "sources/archive/roads-to-romance/auto.en.vtt"
+      }
+    ],
+    "licence": "Public domain",
+    "attribution": "Roads to Romance: Coral Gables (1950). The Jam Handy Organization for Chevrolet. Via Internet Archive.",
+    "sourceUrl": "https://archive.org/details/RoadstoR1950",
+    "provenance": "public-domain",
+    "notes": "Narrated colour promotional film (a Chevrolet advertisement). Captions are machine-generated and have not been reviewed."
+  },
+  {
+    "id": "media:archive-where-the-sun-reigns",
+    "type": "file",
+    "title": "Where the Sun Reigns (c. 1955)",
+    "source": "sources/archive/where-the-sun-reigns/source.mp4",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (auto-generated, unreviewed)",
+        "kind": "captions",
+        "src": "sources/archive/where-the-sun-reigns/auto.en.vtt"
+      }
+    ],
+    "licence": "Public domain",
+    "attribution": "Where the Sun Reigns (c. 1955). Reela Films for the Greater Miami Development Board and Dade County Commission. Prelinger Archives, via Internet Archive.",
+    "sourceUrl": "https://archive.org/details/Wherethe1955",
+    "provenance": "public-domain",
+    "notes": "Narrated tourism booster film. Production year is approximately 1955; the exact year is unverified. Captions are machine-generated and have not been reviewed (for example, they mishear the title as \"rains\")."
+  },
+  {
+    "id": "media:archive-apollo-11-1969",
+    "type": "file",
+    "title": "Apollo 11 launch — engines at 500 fps (camera E-8)",
+    "source": "sources/archive/apollo-11-1969/source.webm",
+    "licence": "Public domain (NASA)",
+    "attribution": "NASA/Kennedy Space Center",
+    "provenance": "public-domain",
+    "notes": "Silent slow-motion engineering film of the Apollo 11 launch, 16 July 1969, Launch Complex 39A, Kennedy Space Center, Merritt Island, Brevard County, Florida. Use of NASA material does not imply NASA endorsement."
+  },
+  {
+    "id": "media:open-cinema-sintel",
+    "type": "file",
+    "title": "Sintel (2010)",
+    "source": "sources/archive/sintel/source.webm",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (official subtitles)",
+        "kind": "subtitles",
+        "src": "sources/archive/sintel/captions.en.srt",
+        "default": true
+      }
+    ],
+    "licence": "CC BY 3.0",
+    "attribution": "Sintel – © copyright Blender Foundation | www.sintel.org – CC BY 3.0",
+    "sourceUrl": "https://studio.blender.org/films/sintel/",
+    "provenance": "creative-commons",
+    "notes": "Open movie by the Blender Foundation under Creative Commons Attribution 3.0; the attribution text is required verbatim. Subtitles are the official English subtitle file."
+  },
+  {
+    "id": "media:open-cinema-tears-of-steel",
+    "type": "file",
+    "title": "Tears of Steel (2012)",
+    "source": "sources/archive/tears-of-steel/source.webm",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (official subtitles)",
+        "kind": "subtitles",
+        "src": "sources/archive/tears-of-steel/captions.en.srt",
+        "default": true
+      }
+    ],
+    "licence": "CC BY 3.0",
+    "attribution": "Tears of Steel – (CC) Blender Foundation | mango.blender.org – CC BY 3.0",
+    "sourceUrl": "https://studio.blender.org/films/tears-of-steel/",
+    "provenance": "creative-commons",
+    "notes": "Open movie by the Blender Foundation (live action shot in Amsterdam) under Creative Commons Attribution 3.0; the attribution text is required verbatim. Subtitles are the official English subtitle file."
+  },
+  {
+    "id": "media:open-cinema-big-buck-bunny",
+    "type": "file",
+    "title": "Big Buck Bunny",
+    "source": "sources/archive/big-buck-bunny/source.webm",
+    "licence": "CC BY 3.0",
+    "attribution": "Big Buck Bunny (c) copyright 2008 Blender Foundation | www.bigbuckbunny.org — CC BY 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Big_Buck_Bunny_4K.webm",
+    "provenance": "creative-commons",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only.",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (captions)",
+        "kind": "captions",
+        "src": "sources/archive/big-buck-bunny/captions.en.vtt",
+        "default": false
+      }
+    ]
+  },
+  {
+    "id": "media:open-cinema-caminandes-llama-drama",
+    "type": "file",
+    "title": "Caminandes: Llama Drama",
+    "source": "sources/archive/caminandes-llama-drama/source.webm",
+    "licence": "CC BY 3.0",
+    "attribution": "Caminandes: Llama Drama — Pablo Vazquez, Beorn Leonard, Francesco Siddi; music and sound: Jan Morgenstern (Blender Foundation) — CC BY 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caminandes-_Llama_Drama_-_Short_Movie.ogv",
+    "provenance": "creative-commons",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  },
+  {
+    "id": "media:open-cinema-caminandes-llamigos",
+    "type": "file",
+    "title": "Caminandes: Llamigos",
+    "source": "sources/archive/caminandes-llamigos/source.webm",
+    "licence": "CC BY 3.0",
+    "attribution": "Caminandes 3: Llamigos — Blender Foundation (Blender Animation Studio) — CC BY 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caminandes_3_-_Llamigos_-_Blender_Animated_Short.webm",
+    "provenance": "creative-commons",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  },
+  {
+    "id": "media:open-play-zero-ad-agni",
+    "type": "file",
+    "title": "0 A.D. — Alpha 27 “Agni” trailer",
+    "source": "sources/archive/zero-ad-agni-trailer/source.webm",
+    "licence": "CC BY-SA 3.0",
+    "attribution": "0 A.D. Alpha 27 'Agni' trailer © Wildfire Games (wildfiregames.com), CC BY-SA 3.0; music 'Ammon-Ra' by Omri Lahav & Sam Gossner, CC BY-SA 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:0_A._D._Empires_Ascendant_%E2%80%94_Alpha_27_Agni_Trailer.webm",
+    "provenance": "creative-commons",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  },
+  {
+    "id": "media:open-play-minetest-first-minutes",
+    "type": "file",
+    "title": "Minetest — the first minutes of a new world",
+    "source": "sources/archive/minetest-first-minutes/source.webm",
+    "licence": "CC BY-SA 3.0 (game media); recording on Wikimedia Commons",
+    "attribution": "Minetest gameplay recording by PantheraLeo1359531 (Wikimedia Commons); game media © The Minetest Team (Perttu Ahola et al.), CC BY-SA 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Minetest_5.6.1_2022.12.27_-_18.35.07.05,_erste_8_Minuten,_Teil_1_von_2.webm",
+    "provenance": "creative-commons",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  },
+  {
+    "id": "media:archive-senators-world-series-1924",
+    "type": "file",
+    "title": "Senators Win World Series (1924)",
+    "source": "sources/archive/senators-world-series-1924/source.webm",
+    "licence": "Public domain (US, published before 1930)",
+    "attribution": "Senators Win World Series (Kinograms Publishing Corp., 1924). Library of Congress Motion Picture, Broadcasting & Recorded Sound Division. Public domain.",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Senators_Win_World_Series_(1924).webm",
+    "provenance": "public-domain",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  },
+  {
+    "id": "media:archive-veldloop-1922",
+    "type": "file",
+    "title": "Cross-country day in the dunes (1922)",
+    "source": "sources/archive/veldloop-1922/source.webm",
+    "licence": "CC BY-SA 3.0 NL (Open Beelden)",
+    "attribution": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eerste(%3F)_veldloopdag_in_Nederland-515982.ogv",
+    "provenance": "creative-commons",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  },
+  {
+    "id": "media:archive-world-series-1959",
+    "type": "file",
+    "title": "West Coast Hails First World Series (1959)",
+    "source": "sources/archive/world-series-1959/source.mp4",
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 5 Oct 1959 — public domain (via National Archives / Internet Archive)",
+    "sourceUrl": "https://archive.org/details/1959-10-05_West_Coast_Hails_First_World_Series",
+    "provenance": "public-domain",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  },
+  {
+    "id": "media:archive-worlds-fair-1964",
+    "type": "file",
+    "title": "New York World’s Fair (1964)",
+    "source": "sources/archive/worlds-fair-1964/source.mp4",
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 2 Mar 1964 — public domain",
+    "sourceUrl": "https://archive.org/details/1964-03-02_New_York_Worlds_Fair",
+    "provenance": "public-domain",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only.",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (auto-generated, unreviewed)",
+        "kind": "captions",
+        "src": "sources/archive/worlds-fair-1964/auto.en.vtt"
+      }
+    ]
+  },
+  {
+    "id": "media:archive-royal-tour-1939",
+    "type": "file",
+    "title": "King and Queen Leave Britain on American Tour (1939)",
+    "source": "sources/archive/royal-tour-1939/source.mp4",
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 15 May 1939 — public domain",
+    "sourceUrl": "https://archive.org/details/1939-05-15_King_and_Queen_Leave_For_American_Tour",
+    "provenance": "public-domain",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only.",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (auto-generated, unreviewed)",
+        "kind": "captions",
+        "src": "sources/archive/royal-tour-1939/auto.en.vtt"
+      }
+    ]
+  },
+  {
+    "id": "media:archive-courier-satellite-1960",
+    "type": "file",
+    "title": "Courier Satellite Launch, Florida (1960)",
+    "source": "sources/archive/courier-satellite-1960/source.mp4",
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 6 Oct 1960 — public domain",
+    "sourceUrl": "https://archive.org/details/1960-10-06_Florida",
+    "provenance": "public-domain",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only.",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (auto-generated, unreviewed)",
+        "kind": "captions",
+        "src": "sources/archive/courier-satellite-1960/auto.en.vtt"
+      }
+    ]
+  },
+  {
+    "id": "media:archive-fashions-rome-1964",
+    "type": "file",
+    "title": "Fashions in Rome (1964)",
+    "source": "sources/archive/fashions-rome-1964/source.mp4",
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 26 Oct 1964 — public domain",
+    "sourceUrl": "https://archive.org/details/1964-10-26_Fashions",
+    "provenance": "public-domain",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only.",
+    "captions": [
+      {
+        "lang": "en",
+        "label": "English (auto-generated, unreviewed)",
+        "kind": "captions",
+        "src": "sources/archive/fashions-rome-1964/auto.en.vtt"
+      }
+    ]
+  },
+  {
+    "id": "media:archive-fashion-week-1951",
+    "type": "file",
+    "title": "Amsterdam Fashion Week (1951)",
+    "source": "sources/archive/fashion-week-1951/source.webm",
+    "licence": "CC BY-SA 3.0 NL (Open Beelden)",
+    "attribution": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fashion_week_1951-525408.ogv",
+    "provenance": "creative-commons",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  },
+  {
+    "id": "media:archive-cotton-fashion-1958",
+    "type": "file",
+    "title": "Dutch Cotton Fashion (1958)",
+    "source": "sources/archive/cotton-fashion-1958/source.webm",
+    "licence": "CC BY-SA 3.0 NL (Open Beelden)",
+    "attribution": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mode_van_de_Nederlandse_katoenindustrie_Weeknummer_58-05_-_Open_Beelden_-_72177.ogv",
+    "provenance": "creative-commons",
+    "notes": "Owner-approved demonstration media for the category pages; downloaded unaltered and transcoded only."
+  }
+]

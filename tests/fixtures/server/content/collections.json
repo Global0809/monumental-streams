@@ -1,0 +1,10 @@
+[
+  {
+    "id": "collection:free-picks",
+    "slug": "free-picks",
+    "title": "Free picks",
+    "description": "Every free video.",
+    "rule": { "access": "free" },
+    "featured": true
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "id": "video:cotton-fashion-1958",
+  "slug": "cotton-fashion-1958",
+  "title": "Dutch Cotton Fashion (1958)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 17,
+  "summary": "A 1958 Amsterdam show of Dutch cotton designs by Cees Terleth and Dick Holthaus.",
+  "description": "Dutch Polygoon newsreel from January 1958: a fashion show in Amsterdam for the Dutch cotton industry, with designs by Cees Terleth and Dick Holthaus and a glimpse of models being dressed backstage.\n\nCreative Commons demonstration media from the Netherlands Institute for Sound & Vision; not a Monumental Original.",
+  "categories": [
+    "interest:fashion",
+    "interest:news"
+  ],
+  "places": [
+    "place:amsterdam"
+  ],
+  "periods": [
+    "period:1950s"
+  ],
+  "themes": [
+    "theme:design"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": {
+    "from": 1958,
+    "to": 1958
+  },
+  "made": 1958,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:archive-cotton-fashion-1958",
+  "art": "art:still-cotton-fashion-1958",
+  "credits": {
+    "licence": "CC BY-SA 3.0 NL (Open Beelden)",
+    "attribution": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Mode_van_de_Nederlandse_katoenindustrie_Weeknummer_58-05_-_Open_Beelden_-_72177.ogv"
+  }
+}

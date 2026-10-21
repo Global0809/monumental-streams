@@ -1,0 +1,4 @@
+[
+  { "id": "interest:music", "slug": "music", "name": "Music", "summary": "Fixture interest." },
+  { "id": "interest:film", "slug": "film", "name": "Film", "summary": "Fixture interest." }
+]

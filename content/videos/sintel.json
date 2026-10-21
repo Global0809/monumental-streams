@@ -1,0 +1,41 @@
+{
+  "id": "video:sintel",
+  "slug": "sintel",
+  "title": "Sintel",
+  "kind": "short",
+  "programme": "programme:open-cinema",
+  "order": 1,
+  "summary": "The Blender Foundation's 2010 animated fantasy about a young woman searching for a dragon.",
+  "description": "A lone young woman, Sintel, crosses a harsh fantasy world in search of the baby dragon she once rescued and raised. The Blender Foundation made it in 2010 as an open movie, produced with free and open-source software.\n\nShown under a Creative Commons Attribution 3.0 licence as demonstration media while original programming is produced; it is not a Monumental Original. Contains fantasy violence.",
+  "categories": [
+    "interest:film"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:relationships",
+    "theme:setbacks"
+  ],
+  "moods": [
+    "late",
+    "curious"
+  ],
+  "setting": null,
+  "made": 2010,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "fiction"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:open-cinema-sintel",
+  "art": "art:still-sintel",
+  "credits": {
+    "licence": "CC BY 3.0",
+    "attribution": "Sintel – © copyright Blender Foundation | www.sintel.org – CC BY 3.0",
+    "sourceUrl": "https://studio.blender.org/films/sintel/"
+  }
+}

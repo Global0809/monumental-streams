@@ -1,0 +1,5 @@
+[
+  { "id": "art:listed", "stem": "listed", "alt": "Listed in media/art.json", "kind": "studio-loop", "provisional": false },
+  { "id": "art:conventional", "stem": "conventional", "alt": "Found by file convention", "kind": "studio-loop", "provisional": false },
+  { "id": "art:missing", "stem": "no-such-files", "alt": "Has no files at all", "kind": "still", "provisional": false }
+]

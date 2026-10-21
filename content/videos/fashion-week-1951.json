@@ -1,0 +1,47 @@
+{
+  "id": "video:fashion-week-1951",
+  "slug": "fashion-week-1951",
+  "title": "Amsterdam Fashion Week (1951)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 16,
+  "summary": "A Polygoon newsreel of Amsterdam’s 1951 fashion week, shown outdoors in the Vondelpark.",
+  "description": "Dutch Polygoon newsreel from 1 November 1951: models present the season’s suits, coats and hats outdoors in Amsterdam’s Vondelpark during the city’s fashion week.\n\nCreative Commons demonstration media from the Netherlands Institute for Sound & Vision; not a Monumental Original.",
+  "categories": [
+    "interest:fashion",
+    "interest:news"
+  ],
+  "places": [
+    "place:vondelpark"
+  ],
+  "periods": [
+    "period:1950s"
+  ],
+  "themes": [
+    "theme:design"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": {
+    "from": 1951,
+    "to": 1951
+  },
+  "made": 1951,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:archive-fashion-week-1951",
+  "art": "art:still-fashion-week-1951",
+  "credits": {
+    "licence": "CC BY-SA 3.0 NL (Open Beelden)",
+    "attribution": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fashion_week_1951-525408.ogv"
+  }
+}

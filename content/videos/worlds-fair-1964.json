@@ -1,0 +1,49 @@
+{
+  "id": "video:worlds-fair-1964",
+  "slug": "worlds-fair-1964",
+  "title": "New York World’s Fair (1964)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 12,
+  "summary": "The 1964 World’s Fair takes shape in Queens — then Hayley Mills at Grauman’s Chinese Theatre.",
+  "description": "Universal Newsreel from 2 March 1964: construction of the New York World’s Fair in Flushing Meadows, Queens, weeks before opening, followed by a Hollywood item in which the actress Hayley Mills leaves her handprints at Grauman’s Chinese Theatre.\n\nPublic-domain demonstration media; captions are machine-generated and unreviewed. Not a Monumental Original.",
+  "categories": [
+    "interest:news",
+    "interest:documentary"
+  ],
+  "places": [
+    "place:flushing-meadows",
+    "place:hollywood"
+  ],
+  "periods": [
+    "period:1960s"
+  ],
+  "themes": [
+    "theme:design",
+    "theme:celebration"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "setting": {
+    "from": 1964,
+    "to": 1964
+  },
+  "made": 1964,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-worlds-fair-1964",
+  "art": "art:still-worlds-fair-1964",
+  "credits": {
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 2 Mar 1964 — public domain",
+    "sourceUrl": "https://archive.org/details/1964-03-02_New_York_Worlds_Fair"
+  }
+}

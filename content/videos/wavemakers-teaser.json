@@ -1,0 +1,46 @@
+{
+  "id": "video:wavemakers-teaser",
+  "slug": "wavemakers-teaser",
+  "title": "WAVEMAKERS — motion teaser",
+  "kind": "teaser",
+  "programme": "programme:wavemakers-pr-ny-london",
+  "order": 0,
+  "summary": "An illustrative motion concept for the opening WAVEMAKERS chapter.",
+  "description": "Lines of blue light ripple like open water beneath the title card 'Valid ID presents WAVEMAKERS', and a pink thread traces the route of the opening chapter as New York, then London, light up: Puerto Rico, New York to London.\n\nThis is an illustrative motion concept made by Monumental's studio. It is not footage from the programme and contains no filmed material; the chapter itself is in development with no release date announced.",
+  "categories": [
+    "interest:music",
+    "interest:culture"
+  ],
+  "places": [
+    "place:san-juan",
+    "place:new-york-city",
+    "place:london"
+  ],
+  "periods": [],
+  "themes": [
+    "theme:diaspora",
+    "theme:migration"
+  ],
+  "moods": [
+    "curious",
+    "late"
+  ],
+  "people": [
+    {
+      "person": "person:valid-id",
+      "role": "Named in title card"
+    }
+  ],
+  "setting": null,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "illustrative"
+  ],
+  "provenance": "studio-concept",
+  "media": "media:teaser-wavemakers",
+  "art": "art:wavemakers-lines"
+}

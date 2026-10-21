@@ -1,0 +1,50 @@
+{
+  "id": "video:nyc-subway-1905",
+  "slug": "nyc-subway-1905",
+  "title": "Interior N.Y. Subway, 14th St. to 42nd St.",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 1,
+  "summary": "In 1905 a camera rides New York's brand-new IRT subway uptown under Manhattan.",
+  "description": "On 21 May 1905, seven months after New York's first subway line opened, Biograph cameraman G. W. 'Billy' Bitzer filmed the run through the tunnel from 14th Street–Union Square to the original Grand Central station at 42nd Street. The camera follows another train through the dim tunnel and past stations, and arrives on a crowded platform. The film is in the US National Film Registry.\n\nIt is a silent actuality film with no intertitles, and this copy has no soundtrack. A public-domain film shown as demonstration media while original programming is produced; it is not a Monumental Original.",
+  "categories": [
+    "interest:film",
+    "interest:documentary"
+  ],
+  "places": [
+    "place:manhattan"
+  ],
+  "periods": [
+    "period:1900s"
+  ],
+  "themes": [
+    "theme:architecture",
+    "theme:design"
+  ],
+  "moods": [
+    "curious",
+    "chill"
+  ],
+  "setting": {
+    "from": 1905,
+    "to": 1905,
+    "label": "21 May 1905"
+  },
+  "made": 1905,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-nyc-subway-1905",
+  "art": "art:still-nyc-subway-1905",
+  "credits": {
+    "licence": "Public domain (US, published before 1930)",
+    "attribution": "Interior N.Y. Subway, 14th St. to 42nd St. (1905). American Mutoscope & Biograph Co.; camera G. W. \"Billy\" Bitzer. Library of Congress, via Wikimedia Commons.",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:New_York_Subway_(1905)_-_G.W._Bitzer_-_Interior_NYC_From_14th_to_42nd_Street.webm"
+  }
+}

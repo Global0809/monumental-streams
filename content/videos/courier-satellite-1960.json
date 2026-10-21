@@ -1,0 +1,47 @@
+{
+  "id": "video:courier-satellite-1960",
+  "slug": "courier-satellite-1960",
+  "title": "Courier Satellite Launch, Florida (1960)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 14,
+  "summary": "A one-minute newsreel of the Courier communications satellite lifting off from Cape Canaveral.",
+  "description": "Universal Newsreel from 6 October 1960: the Courier communications satellite launches on a Thor-Ablestar rocket from Cape Canaveral, Florida — on the Atlantic coast, a few hours’ drive north of Miami.\n\nPublic-domain demonstration media; captions are machine-generated and unreviewed. Not a Monumental Original.",
+  "categories": [
+    "interest:news",
+    "interest:documentary"
+  ],
+  "places": [
+    "place:cape-canaveral"
+  ],
+  "periods": [
+    "period:1960s"
+  ],
+  "themes": [
+    "theme:turning-points"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "setting": {
+    "from": 1960,
+    "to": 1960
+  },
+  "made": 1960,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-courier-satellite-1960",
+  "art": "art:still-courier-satellite-1960",
+  "credits": {
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 6 Oct 1960 — public domain",
+    "sourceUrl": "https://archive.org/details/1960-10-06_Florida"
+  }
+}

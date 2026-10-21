@@ -1,0 +1,106 @@
+[
+  {
+    "id": "period:1900s",
+    "slug": "1900s",
+    "label": "1900s",
+    "start": 1900,
+    "end": 1909,
+    "summary": "Plena takes shape in Ponce, Puerto Rico, around the turn of the century. Miami, incorporated in 1896, is a young railway town at the end of Henry Flagler's Florida East Coast line."
+  },
+  {
+    "id": "period:1910s",
+    "slug": "1910s",
+    "label": "1910s",
+    "start": 1910,
+    "end": 1919,
+    "summary": "Overtown's Lyric Theater opens in 1913 and Miami Beach is incorporated as its own city in 1915. The Jones–Shafroth Act of 1917 makes Puerto Ricans US citizens, the legal basis for later migration to the mainland."
+  },
+  {
+    "id": "period:1920s",
+    "slug": "1920s",
+    "label": "1920s",
+    "start": 1920,
+    "end": 1929,
+    "summary": "Florida's land boom drives rapid building in Miami and Miami Beach until the 1926 hurricane. Under segregation, Overtown grows into a busy centre of Black business and entertainment."
+  },
+  {
+    "id": "period:1930s",
+    "slug": "1930s",
+    "label": "1930s",
+    "start": 1930,
+    "end": 1939,
+    "summary": "Most of Miami Beach's Art Deco hotels and apartment buildings go up in this decade, giving South Beach its pastel, streamlined look. Overtown's nightlife thrives."
+  },
+  {
+    "id": "period:1940s",
+    "slug": "1940s",
+    "label": "1940s",
+    "start": 1940,
+    "end": 1949,
+    "summary": "After the Second World War, Puerto Ricans begin moving to New York in large numbers, and in 1948 the Empire Windrush brings Caribbean migrants to Britain. In Miami, Overtown's clubs host touring Black stars who are barred from staying in segregated Miami Beach."
+  },
+  {
+    "id": "period:1950s",
+    "slug": "1950s",
+    "label": "1950s",
+    "start": 1950,
+    "end": 1959,
+    "summary": "Sound systems take hold in Kingston, and Claudia Jones founds the West Indian Gazette in London in 1958 and stages a Caribbean carnival there in 1959. The Cuban Revolution of 1959 begins the exile that remakes Miami's Little Havana."
+  },
+  {
+    "id": "period:1960s",
+    "slug": "1960s",
+    "label": "1960s",
+    "start": 1960,
+    "end": 1969,
+    "summary": "Fania Records is founded in New York in 1964, and the first Notting Hill street carnival is held in 1966. In Miami, interstate construction cuts through Overtown and displaces much of its historic community."
+  },
+  {
+    "id": "period:1970s",
+    "slug": "1970s",
+    "label": "1970s",
+    "start": 1970,
+    "end": 1979,
+    "summary": "On 11 August 1973, DJ Kool Herc's party at 1520 Sedgwick Avenue in the Bronx becomes hip hop's most widely cited starting point, and the Nuyorican Poets Café begins the same year. The Miami Design Preservation League forms in 1976, and the Miami Beach Architectural District is listed on the National Register in 1979."
+  },
+  {
+    "id": "period:1980s",
+    "slug": "1980s",
+    "label": "1980s",
+    "start": 1980,
+    "end": 1989,
+    "summary": "The 1980 Mariel boatlift brings about 125,000 Cubans to South Florida. Miami bass takes off in the middle of the decade as hip hop spreads from New York to London and beyond."
+  },
+  {
+    "id": "period:1990s",
+    "slug": "1990s",
+    "label": "1990s",
+    "start": 1990,
+    "end": 1999,
+    "summary": "Reggaeton takes shape in San Juan's underground, mixing hip hop with Jamaican dancehall and Spanish-language reggae. South Beach's preserved Art Deco district becomes the backdrop to its revival."
+  },
+  {
+    "id": "period:2000s",
+    "slug": "2000s",
+    "label": "2000s",
+    "start": 2000,
+    "end": 2009,
+    "summary": "Grime emerges in East London, Art Basel holds its first Miami Beach edition in December 2002, and reggaeton reaches a worldwide audience. Wynwood Walls opens in Miami in 2009."
+  },
+  {
+    "id": "period:2010s",
+    "slug": "2010s",
+    "label": "2010s",
+    "start": 2010,
+    "end": 2019,
+    "summary": "Wynwood becomes an international street-art destination, and the Black Cultural Archives open on Brixton's Windrush Square in 2014. Hurricane Maria devastates Puerto Rico in 2017, the same year Puerto Rican artists top charts worldwide with 'Despacito'."
+  },
+  {
+    "id": "period:2020s",
+    "slug": "2020s",
+    "label": "2020s",
+    "start": 2020,
+    "end": 2029,
+    "summary": "Hip hop marks fifty years in 2023, counted from the Sedgwick Avenue party, and the Windrush generation marks seventy-five years since the ship's arrival. Monumental Streams opens in this decade, with Miami as its gateway."
+  }
+]

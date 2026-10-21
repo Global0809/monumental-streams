@@ -1,0 +1,48 @@
+{
+  "tierName": "Monumental Premium",
+  "plans": [
+    {
+      "id": "monthly",
+      "label": "Monthly",
+      "interval": "month",
+      "displayPrice": "$7.99 / month",
+      "provisional": true,
+      "stripePriceEnv": "STRIPE_PRICE_MONTHLY"
+    },
+    {
+      "id": "yearly",
+      "label": "Yearly",
+      "interval": "year",
+      "displayPrice": "$79 / year",
+      "provisional": true,
+      "stripePriceEnv": "STRIPE_PRICE_YEARLY"
+    }
+  ],
+  "benefits": [
+    {
+      "id": "premium-items",
+      "title": "Unlock Premium items",
+      "detail": "Play everything in the catalogue marked Premium. Today these are demonstration items, such as the Interface Specimens reel.",
+      "live": true
+    },
+    {
+      "id": "early-access-windows",
+      "title": "Early-access windows",
+      "detail": "Watch items before they open to everyone, wherever an early-access window is set. Today this applies to demonstration items only.",
+      "live": true
+    },
+    {
+      "id": "originals-early-access",
+      "title": "Early access to Monumental Originals",
+      "detail": "Planned: early access to Monumental Originals such as WAVEMAKERS once episodes are published. Not available yet.",
+      "live": false
+    },
+    {
+      "id": "premium-collections",
+      "title": "Premium collections",
+      "detail": "Planned: curated collections for members. Not available yet.",
+      "live": false
+    }
+  ],
+  "note": "Pricing and final benefits are awaiting approval. The prices shown are development examples, not approved offers, and only the benefits marked as available today are live."
+}

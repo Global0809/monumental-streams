@@ -1,0 +1,41 @@
+{
+  "id": "video:reel-living-atlas",
+  "slug": "reel-living-atlas",
+  "title": "The Living Atlas",
+  "kind": "reel",
+  "programme": "programme:studio-specimens",
+  "order": 1,
+  "summary": "Studio motion concepts for finding culture by place: a globe of light, an isometric Miami, drawn cities, a stamped passport and a discovery instrument.",
+  "description": "How Monumental maps the world: a glass globe of light ringed with stories, Miami picked out neighbourhood by neighbourhood in an isometric city, Deco line drawings of cities from Miami to London, a culture passport stamped stop by stop, and the Take Me Somewhere instrument printing a ticket for a thirty-minute trip.\n\nEverything here is illustrative concept art from Monumental's studio, assembled as a demonstration of how the platform plays, saves and connects content. It is not programme footage; the maps are not to scale, and the routes, stamps and labels on screen are design placeholders.",
+  "categories": [
+    "interest:art",
+    "interest:culture"
+  ],
+  "places": [
+    "place:miami",
+    "place:miami-beach",
+    "place:london",
+    "place:san-juan"
+  ],
+  "periods": [],
+  "themes": [
+    "theme:design",
+    "theme:architecture"
+  ],
+  "moods": [
+    "curious",
+    "chill"
+  ],
+  "setting": null,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "illustrative"
+  ],
+  "provenance": "studio-concept",
+  "media": "media:reel-living-atlas",
+  "art": "art:living-atlas"
+}

@@ -1,0 +1,40 @@
+{
+  "id": "video:caminandes-llamigos",
+  "slug": "caminandes-llamigos",
+  "title": "Caminandes: Llamigos",
+  "kind": "short",
+  "programme": "programme:open-cinema",
+  "order": 5,
+  "summary": "A llama and a penguin squabble over the last berry of winter.",
+  "description": "The third Caminandes short (2016): in a snowy, stylised Patagonia, Koro the llama meets Oti the penguin and the two fight over a single berry before working out that they get further together.\n\nCreative Commons demonstration media; not a Monumental Original.",
+  "categories": [
+    "interest:kids",
+    "interest:film"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:relationships"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": null,
+  "made": 2016,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "fiction"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:open-cinema-caminandes-llamigos",
+  "art": "art:still-caminandes-llamigos",
+  "credits": {
+    "licence": "CC BY 3.0",
+    "attribution": "Caminandes 3: Llamigos — Blender Foundation (Blender Animation Studio) — CC BY 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caminandes_3_-_Llamigos_-_Blender_Animated_Short.webm"
+  }
+}

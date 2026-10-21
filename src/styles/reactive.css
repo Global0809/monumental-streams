@@ -1,0 +1,212 @@
+/* Reactive layer styles — paired with src/systems/reactive.ts. */
+
+:root {
+  /* A press squeezes fast and springs back with a little overshoot. */
+  --press-scale: 0.955;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --t-press: 90ms;
+  --t-release: 420ms;
+}
+
+/* ───────────── Specular chrome light + tilt on image cards ───────────── */
+.pod-specimen {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+  transition:
+    transform 500ms var(--ease-out),
+    box-shadow var(--t-mid) var(--ease-out);
+}
+.pod-specimen[data-lit] {
+  transition: transform 120ms linear, box-shadow var(--t-mid) var(--ease-out);
+}
+.pod-specimen::after,
+[data-react~='light']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--px, 50%) var(--py, 0%), rgb(255 248 230 / 0.2), transparent 45%);
+  opacity: 0;
+  transition: opacity var(--t-mid);
+  mix-blend-mode: screen;
+  z-index: 3;
+}
+/* a 1px chrome rim that brightens on the edge nearest the pointer — living metal, not a border */
+.pod-specimen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  padding: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(240px circle at var(--px, 50%) var(--py, 0%), rgb(255 240 210 / 0.85), rgb(179 163 255 / 0.25) 45%, transparent 70%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--t-mid);
+}
+.pod-specimen[data-lit]::after,
+.pod-specimen[data-lit]::before,
+[data-react~='light'][data-lit]::after {
+  opacity: 1;
+}
+
+/* ───────────── Magnetic controls (the press rules below keep translate in their list) ───────────── */
+[data-react~='magnet'] {
+  translate: var(--mx-px, 0) var(--my-px, 0);
+  transition: translate 420ms var(--ease-out);
+}
+
+/* ───────────── Press physics: squeeze on press, spring back on release ─────────────
+   Uses the independent `scale` property so it composes with any transform a component
+   already sets (lifts, tilts, translate-based magnetism). */
+:is(.btn, .chip, .icon-btn, .pl-btn, .pod-save, .segmented button, .tabs [role='tab'], [data-react~='press']) {
+  transition-property: scale, background, background-color, border-color, color, box-shadow, opacity, transform, translate;
+  transition-duration: var(--t-release), var(--t-mid), var(--t-mid), var(--t-mid), var(--t-mid), var(--t-mid), var(--t-mid), var(--t-mid), 420ms;
+  transition-timing-function: var(--ease-spring), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out), var(--ease-out);
+}
+:is(.btn, .chip, .icon-btn, .pl-btn, .pod-save, .segmented button, .tabs [role='tab'], [data-react~='press'])[data-pressing],
+:is(.btn, .chip, .icon-btn, .pl-btn, .pod-save, .segmented button, .tabs [role='tab'], [data-react~='press']):active:not(:disabled) {
+  scale: var(--press-scale);
+  transition-duration: var(--t-press);
+  transition-timing-function: var(--ease-out);
+}
+/* the ui.css / player transforms used before the press system existed */
+.btn:active,
+.icon-btn:active {
+  transform: none;
+}
+
+/* ───────────── Crafted focus: the ring draws itself in ───────────── */
+:is(.btn, .chip, .icon-btn, .pl-btn, .pod-save, .segmented button, .tabs [role='tab'], .cat-entity, .cat-relax, .watch-tag):focus-visible {
+  animation: focus-in 360ms var(--ease-out);
+}
+@keyframes focus-in {
+  from {
+    outline-offset: 9px;
+    outline-color: transparent;
+  }
+}
+
+/* ───────────── Ripple from the exact point of contact ───────────── */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgb(255 246 226 / 0.34), rgb(255 246 226 / 0.1) 38%, rgb(255 246 226 / 0) 62%);
+  transform: scale(0);
+  animation: ripple 720ms var(--ease-out) forwards;
+  z-index: 0;
+}
+.btn-primary .ripple,
+.chip[aria-pressed='true'] .ripple {
+  background: radial-gradient(circle, rgb(255 255 255 / 0.6), rgb(255 255 255 / 0) 60%);
+}
+@keyframes ripple {
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* ───────────── Reveal on first scroll into view ───────────── */
+html.reactive [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  translate: 0 28px;
+}
+html.reactive [data-reveal] {
+  transition:
+    opacity 900ms var(--ease-out),
+    translate 900ms var(--ease-out);
+}
+html.reactive [data-reveal][data-revealed] {
+  opacity: 1;
+  translate: 0 0;
+}
+:root[data-motion='reduce'] [data-reveal] {
+  opacity: 1 !important;
+  translate: none !important;
+}
+
+/* ───────────── Save flight: a gold orb with a short comet tail ───────────── */
+.save-orb {
+  position: fixed;
+  z-index: var(--z-cursor);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle at 35% 30%, #fffaf0, var(--gold) 52%, #a7782e);
+  box-shadow:
+    0 0 0 1px rgb(255 246 226 / 0.6),
+    0 0 22px 6px var(--gold-glow),
+    0 0 46px 10px rgb(179 163 255 / 0.25);
+  will-change: transform, opacity;
+}
+.save-orb-trail {
+  background: radial-gradient(circle, rgb(255 246 226 / 0.9), rgb(242 214 162 / 0.4) 60%, transparent);
+  box-shadow: 0 0 16px 4px var(--gold-glow);
+}
+.is-receiving {
+  animation: receive 900ms var(--ease-out);
+}
+@keyframes receive {
+  0% { box-shadow: 0 0 0 0 rgb(242 214 162 / 0.6); }
+  35% { box-shadow: 0 0 0 10px rgb(242 214 162 / 0.15), 0 0 30px 6px var(--gold-glow); }
+  100% { box-shadow: 0 0 0 16px rgb(242 214 162 / 0); }
+}
+
+/* ───────────── Route changes: a soft cross-dissolve with depth (View Transitions) ───────────── */
+::view-transition-old(root) {
+  animation: vt-out 260ms var(--ease-inout) both;
+}
+::view-transition-new(root) {
+  animation: vt-in 420ms var(--ease-out) both;
+}
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    transform: scale(0.985);
+    filter: blur(4px);
+  }
+}
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+    filter: blur(6px);
+  }
+}
+:root[data-motion='reduce']::view-transition-old(root),
+:root[data-motion='reduce']::view-transition-new(root) {
+  animation: none;
+}
+
+/* ───────────── Reduced motion + low-tier devices ───────────── */
+:root[data-motion='reduce'] :is(.btn, .chip, .icon-btn, .pl-btn, .pod-save, .segmented button, .tabs [role='tab'], [data-react~='press']) {
+  scale: none !important;
+}
+:root[data-motion='reduce'] .pod-specimen {
+  transform: none;
+}
+/* Low tier: no specular light, no tilt, no heavy glass blur on cards and controls. */
+html.fx-low .pod-specimen {
+  transform: none;
+}
+html.fx-low .pod-specimen::after,
+html.fx-low .pod-specimen::before,
+html.fx-low [data-react~='light']::after {
+  display: none;
+}
+html.fx-low :is(.btn, .chip, .badge, .pod-save, .pod-runtime, .toast) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}

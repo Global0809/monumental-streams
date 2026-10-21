@@ -1,0 +1,45 @@
+{
+  "id": "video:wavemakers-pr-ny-london",
+  "slug": "wavemakers-pr-ny-london",
+  "title": "Valid ID presents WAVEMAKERS: Puerto Rico, New York to London",
+  "kind": "episode",
+  "programme": "programme:wavemakers-pr-ny-london",
+  "order": 1,
+  "summary": "The opening WAVEMAKERS chapter, presented by Valid ID. In development.",
+  "description": "Valid ID presents the opening chapter of WAVEMAKERS, a Monumental Original about people shaping culture across borders. The journey runs from Puerto Rico to New York to London.\n\nThis chapter is in development. Nothing has been released and no release date has been announced. When it is published, it will play here.",
+  "categories": [
+    "interest:music",
+    "interest:culture",
+    "interest:documentary"
+  ],
+  "places": [
+    "place:san-juan",
+    "place:new-york-city",
+    "place:london"
+  ],
+  "periods": [],
+  "themes": [
+    "theme:diaspora",
+    "theme:migration",
+    "theme:identity"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "people": [
+    {
+      "person": "person:valid-id",
+      "role": "Presenter"
+    }
+  ],
+  "setting": null,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "planned",
+    "note": "In development — no release date announced."
+  },
+  "footage": [],
+  "provenance": "monumental-original",
+  "art": "art:wavemakers-lines"
+}

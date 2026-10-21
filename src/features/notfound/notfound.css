@@ -1,0 +1,87 @@
+/* ═════════════ NOT FOUND — a calm dead end with three ways out ═════════════ */
+
+.nf {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  min-height: calc(100dvh - var(--tabbar-h));
+  margin-top: calc(var(--nav-h) * -1);
+  padding: calc(var(--nav-h) + 3rem) 0 clamp(3rem, 8vw, 6rem);
+}
+.nf-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, black 0%, black 55%, transparent 100%);
+  mask-image: linear-gradient(180deg, black 0%, black 55%, transparent 100%);
+}
+.nf-backdrop-art {
+  position: absolute !important;
+  inset: 0 0 0 auto;
+  width: min(72%, 1180px);
+  background-color: transparent;
+  opacity: 0.75;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 45%);
+  mask-image: linear-gradient(90deg, transparent 0%, black 45%);
+}
+.nf-backdrop-art .art-provisional {
+  display: none;
+}
+.nf-backdrop-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--night) 62%, transparent) 0%, color-mix(in srgb, var(--night) 20%, transparent) 55%, transparent 75%),
+    linear-gradient(180deg, color-mix(in srgb, var(--night) 64%, transparent) 0%, transparent 22%);
+}
+.nf-inner {
+  display: grid;
+  gap: 1.4rem;
+  justify-items: start;
+}
+.nf-title {
+  max-width: 12ch;
+  margin: 0;
+  font-size: var(--step-6);
+}
+.nf-lede {
+  max-width: 50ch;
+}
+.nf-path {
+  padding: 0.05em 0.45em;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--glass-2);
+  color: var(--pearl);
+  font-family: var(--font-code);
+  font-size: 0.82em;
+  overflow-wrap: anywhere;
+}
+.nf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 767px) {
+  .nf {
+    align-items: end;
+  }
+  .nf-backdrop-art {
+    width: 100%;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .nf-backdrop-shade {
+    background: linear-gradient(0deg, color-mix(in srgb, var(--night) 85%, transparent) 0%, color-mix(in srgb, var(--night) 50%, transparent) 60%, color-mix(in srgb, var(--night) 55%, transparent) 100%);
+  }
+  .nf-title {
+    font-size: var(--step-5);
+  }
+  .nf-actions > .btn {
+    flex: 1 1 auto;
+  }
+}

@@ -1,0 +1,110 @@
+[
+  {
+    "id": "route:san-juan-new-york",
+    "from": "place:san-juan",
+    "to": "place:new-york-city",
+    "kind": "migration",
+    "label": "La Gran Migración",
+    "period": { "from": 1946, "to": 1964 },
+    "movements": ["movement:la-gran-migracion"],
+    "themes": ["theme:migration", "theme:diaspora"],
+    "summary": "After the Second World War, hundreds of thousands of Puerto Ricans flew from San Juan to New York, building communities in East Harlem, the Lower East Side and the Bronx."
+  },
+  {
+    "id": "route:kingston-london",
+    "from": "place:kingston",
+    "to": "place:london",
+    "kind": "migration",
+    "label": "Windrush generation",
+    "period": { "from": 1948, "to": 1971 },
+    "movements": ["movement:windrush-generation", "movement:sound-system-culture"],
+    "themes": ["theme:migration", "theme:diaspora"],
+    "summary": "From 1948, when the Empire Windrush docked at Tilbury, Caribbean migrants, many from Jamaica, settled in London and brought sound systems, carnival and new music with them."
+  },
+  {
+    "id": "route:kingston-the-bronx",
+    "from": "place:kingston",
+    "to": "place:the-bronx",
+    "kind": "influence",
+    "label": "From sound system to hip hop",
+    "period": { "from": 1967, "to": 1973 },
+    "movements": ["movement:sound-system-culture", "movement:hip-hop-origins"],
+    "themes": ["theme:sound-systems", "theme:migration"],
+    "summary": "DJ Kool Herc moved from Kingston to the Bronx in 1967, bringing Jamaican sound-system practice with him; his 1973 party at 1520 Sedgwick Avenue is widely cited as hip hop's starting point."
+  },
+  {
+    "id": "route:havana-little-havana",
+    "from": "place:havana",
+    "to": "place:little-havana",
+    "kind": "migration",
+    "label": "Cuban exile",
+    "period": { "from": 1959, "to": null },
+    "movements": ["movement:cuban-exile-miami"],
+    "themes": ["theme:migration", "theme:diaspora"],
+    "summary": "Since the 1959 revolution, waves of Cubans have left for Miami, making Little Havana the centre of exile life."
+  },
+  {
+    "id": "route:mariel-miami",
+    "from": "place:mariel",
+    "to": "place:miami",
+    "kind": "migration",
+    "label": "Mariel boatlift",
+    "period": { "from": 1980, "to": 1980 },
+    "movements": ["movement:mariel-boatlift"],
+    "themes": ["theme:migration", "theme:turning-points"],
+    "summary": "Between April and October 1980, about 125,000 Cubans crossed from the port of Mariel to South Florida."
+  },
+  {
+    "id": "route:port-au-prince-little-haiti",
+    "from": "place:port-au-prince",
+    "to": "place:little-haiti",
+    "kind": "migration",
+    "label": "From Haiti to Little Haiti",
+    "period": { "from": 1970, "to": null },
+    "movements": ["movement:haitian-miami"],
+    "themes": ["theme:migration", "theme:diaspora"],
+    "summary": "From the 1970s, Haitians settled in Miami and built Little Haiti into the centre of Haitian life in South Florida."
+  },
+  {
+    "id": "route:new-york-london",
+    "from": "place:new-york-city",
+    "to": "place:london",
+    "kind": "influence",
+    "label": "Hip hop crosses the Atlantic",
+    "period": { "from": 1980, "to": null },
+    "movements": ["movement:hip-hop-origins", "movement:grime"],
+    "themes": ["theme:street-culture", "theme:sound-systems"],
+    "summary": "From the early 1980s, records, films and touring crews carried hip hop from New York to London, where it met the city's sound-system culture and fed later British forms, grime among them."
+  },
+  {
+    "id": "route:san-juan-miami",
+    "from": "place:san-juan",
+    "to": "place:miami",
+    "kind": "exchange",
+    "label": "Latin music industry exchange",
+    "period": { "from": 2000, "to": null },
+    "movements": ["movement:reggaeton"],
+    "themes": ["theme:rhythm"],
+    "summary": "Since the 2000s, Miami has been a major centre of the Latin music business, and many Puerto Rican artists, producers and labels work between San Juan and Miami."
+  },
+  {
+    "id": "route:wavemakers-san-juan-new-york",
+    "from": "place:san-juan",
+    "to": "place:new-york-city",
+    "kind": "programme",
+    "label": "WAVEMAKERS: Puerto Rico to New York",
+    "period": { "from": 2025, "to": null },
+    "themes": ["theme:diaspora", "theme:migration"],
+    "summary": "Planned journey of the opening WAVEMAKERS chapter: the first leg, from San Juan to New York. In development; no episodes released yet."
+  },
+  {
+    "id": "route:wavemakers-new-york-london",
+    "from": "place:new-york-city",
+    "to": "place:london",
+    "kind": "programme",
+    "label": "WAVEMAKERS: New York to London",
+    "period": { "from": 2025, "to": null },
+    "themes": ["theme:diaspora", "theme:migration"],
+    "summary": "Planned journey of the opening WAVEMAKERS chapter: the second leg, from New York to London. In development; no episodes released yet."
+  }
+]

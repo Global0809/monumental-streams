@@ -1,0 +1,222 @@
+[
+  {
+    "id": "programme:wavemakers",
+    "slug": "wavemakers",
+    "title": "WAVEMAKERS",
+    "kind": "original-series",
+    "status": "in-development",
+    "original": true,
+    "tagline": "People shaping culture across borders.",
+    "description": "WAVEMAKERS is a Monumental Original about people shaping culture across borders. It opens with Valid ID's journey from Puerto Rico through New York to London, and is built to grow to other artists, presenters, disciplines and destinations.",
+    "presenters": [
+      "person:valid-id"
+    ],
+    "places": [
+      "place:puerto-rico",
+      "place:san-juan",
+      "place:new-york-city",
+      "place:london"
+    ],
+    "periods": [],
+    "categories": [
+      "interest:music",
+      "interest:culture",
+      "interest:documentary"
+    ],
+    "themes": [
+      "theme:diaspora",
+      "theme:migration",
+      "theme:identity",
+      "theme:community"
+    ],
+    "art": "art:wavemakers-lines",
+    "statusNote": "In development. No WAVEMAKERS episodes have been published yet. The opening chapter is in development with no release date announced; an illustrative motion teaser is available to watch now."
+  },
+  {
+    "id": "programme:wavemakers-pr-ny-london",
+    "slug": "wavemakers-pr-ny-london",
+    "title": "Valid ID presents WAVEMAKERS: Puerto Rico, New York to London",
+    "kind": "original-chapter",
+    "parent": "programme:wavemakers",
+    "status": "in-development",
+    "original": true,
+    "tagline": "Puerto Rico, New York to London.",
+    "description": "The opening chapter of WAVEMAKERS, presented by Valid ID. The journey runs from Puerto Rico to New York to London, three places linked by generations of movement and music. Episodes, contributors and release details have not been announced yet.",
+    "presenters": [
+      "person:valid-id"
+    ],
+    "places": [
+      "place:puerto-rico",
+      "place:san-juan",
+      "place:new-york-city",
+      "place:london"
+    ],
+    "periods": [],
+    "categories": [
+      "interest:music",
+      "interest:culture",
+      "interest:documentary"
+    ],
+    "themes": [
+      "theme:diaspora",
+      "theme:migration",
+      "theme:identity"
+    ],
+    "route": [
+      "place:san-juan",
+      "place:new-york-city",
+      "place:london"
+    ],
+    "art": "art:wavemakers-lines",
+    "statusNote": "In development. No release date has been announced and there are no episodes to watch yet. An illustrative motion teaser is available; it is a design concept, not footage from the programme."
+  },
+  {
+    "id": "programme:story-behind-the-story",
+    "slug": "story-behind-the-story",
+    "title": "THE STORY BEHIND THE STORY",
+    "kind": "original-series",
+    "status": "planned",
+    "original": true,
+    "tagline": "The moments behind the work.",
+    "description": "A Monumental Original series about the experiences, decisions, relationships, setbacks and turning points behind significant work and defining moments: not just what was made, but what it took to make it.",
+    "places": [],
+    "periods": [],
+    "categories": [
+      "interest:documentary",
+      "interest:culture"
+    ],
+    "themes": [
+      "theme:decisions",
+      "theme:relationships",
+      "theme:setbacks",
+      "theme:turning-points"
+    ],
+    "art": "art:story-paper",
+    "statusNote": "Planned. No episodes, subjects or release dates have been announced. An illustrative motion teaser is available; it is a design concept, not footage from the series."
+  },
+  {
+    "id": "programme:better-late-than-never",
+    "slug": "better-late-than-never",
+    "title": "Better Late Than Never",
+    "kind": "artist-campaign",
+    "status": "announced",
+    "original": false,
+    "tagline": "The EP from Valid ID.",
+    "description": "Valid ID's EP 'Better Late Than Never' anchors the opening artist campaign on Monumental Streams.",
+    "presenters": [
+      "person:valid-id"
+    ],
+    "places": [],
+    "periods": [],
+    "categories": [
+      "interest:music"
+    ],
+    "themes": [],
+    "art": "art:sound-aurora",
+    "statusNote": "Announced. Campaign assets, tracklist and release details are awaiting approval, so there is nothing to play yet."
+  },
+  {
+    "id": "programme:studio-specimens",
+    "slug": "studio-specimens",
+    "title": "Studio Specimens",
+    "kind": "demonstration-series",
+    "status": "available",
+    "original": false,
+    "tagline": "How the platform moves, in motion.",
+    "description": "Short reels assembled from Monumental's studio motion concepts: the atlas, the time machine, the sound and touch of the interface, and the screens you'll use to find, save and play. They are illustrative design work, made to show how the platform plays, saves and connects content.",
+    "places": [
+      "place:miami",
+      "place:miami-beach",
+      "place:london",
+      "place:san-juan"
+    ],
+    "periods": [],
+    "categories": [
+      "interest:art"
+    ],
+    "themes": [
+      "theme:design"
+    ],
+    "art": "art:living-membrane",
+    "statusNote": "Demonstration reels assembled from Monumental's studio motion concepts to show how the platform plays, saves and connects content. They are not programme footage."
+  },
+  {
+    "id": "programme:open-archive",
+    "slug": "open-archive",
+    "title": "Open Archive",
+    "kind": "demonstration-series",
+    "status": "available",
+    "original": false,
+    "tagline": "Films from the public record.",
+    "description": "Public-domain films from libraries and archives: actuality films, government films, a booster film, an advertisement and NASA engineering footage, from a 1905 subway ride under Manhattan to Apollo 11's launch in 1969. Each is credited with its source, and each is shown for what it is, with a context note where its framing needs one. They show how the platform handles complete films while original programming is produced.",
+    "places": [
+      "place:manhattan",
+      "place:coney-island",
+      "place:kingston",
+      "place:london",
+      "place:puerto-rico",
+      "place:coral-gables",
+      "place:key-biscayne",
+      "place:miami",
+      "place:miami-beach",
+      "place:miami-dade-county",
+      "place:launch-complex-39a"
+    ],
+    "periods": [
+      "period:1900s",
+      "period:1920s",
+      "period:1940s",
+      "period:1950s",
+      "period:1960s"
+    ],
+    "categories": [
+      "interest:film",
+      "interest:documentary"
+    ],
+    "themes": [
+      "theme:preservation"
+    ],
+    "art": "art:time-machine",
+    "statusNote": "Public-domain films used as demonstration media while original programming is produced. They are not Monumental Originals."
+  },
+  {
+    "id": "programme:open-cinema",
+    "slug": "open-cinema",
+    "title": "Open Cinema",
+    "kind": "demonstration-series",
+    "status": "available",
+    "original": false,
+    "tagline": "Open movies, free to share.",
+    "description": "Short films released by their makers under Creative Commons licences, each credited exactly as its licence requires. They show how the platform plays complete films while original programming is produced.",
+    "places": [
+      "place:amsterdam"
+    ],
+    "periods": [],
+    "categories": [
+      "interest:film"
+    ],
+    "themes": [],
+    "art": "art:bauhaus-categories",
+    "statusNote": "Creative Commons films used as demonstration media while original programming is produced. They are not Monumental Originals."
+  },
+  {
+    "id": "programme:open-play",
+    "slug": "open-play",
+    "title": "Open Play",
+    "kind": "demonstration-series",
+    "status": "available",
+    "original": false,
+    "tagline": "Free and open-source games, shown as they are.",
+    "description": "Trailers and gameplay recordings of free, open-source games under Creative Commons licences — demonstration media for the Gaming space while original programming is produced.",
+    "places": [],
+    "periods": [],
+    "categories": [
+      "interest:gaming"
+    ],
+    "themes": [
+      "theme:design"
+    ],
+    "art": "art:still-zero-ad-agni-trailer",
+    "statusNote": "Demonstration media under Creative Commons licences, shown unaltered with attribution — not Monumental Originals."
+  }
+]

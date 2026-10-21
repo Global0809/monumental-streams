@@ -1,0 +1,49 @@
+{
+  "id": "video:coney-island-1905",
+  "slug": "coney-island-1905",
+  "title": "Coney Island at Night",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 2,
+  "summary": "Edison's 1905 film of Coney Island's amusement parks drawn in electric light.",
+  "description": "Shot by Edwin S. Porter for the Edison company in 1905, this short film turns the camera on Coney Island after dark. Luna Park and Dreamland, both named in the film's own titles, appear as towers, domes and arches outlined entirely in electric bulbs against the night.\n\nIt is silent, with no soundtrack. A public-domain film shown as demonstration media while original programming is produced; it is not a Monumental Original.",
+  "categories": [
+    "interest:film",
+    "interest:culture"
+  ],
+  "places": [
+    "place:coney-island"
+  ],
+  "periods": [
+    "period:1900s"
+  ],
+  "themes": [
+    "theme:celebration",
+    "theme:architecture"
+  ],
+  "moods": [
+    "late",
+    "curious"
+  ],
+  "setting": {
+    "from": 1905,
+    "to": 1905
+  },
+  "made": 1905,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-coney-island-1905",
+  "art": "art:still-coney-island-1905",
+  "credits": {
+    "licence": "Public domain (US, published before 1930)",
+    "attribution": "Coney Island at Night (1905). Edwin S. Porter, Edison Manufacturing Company. Library of Congress, via Wikimedia Commons.",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Coney_Island_at_Night_(Edwin_S._Porter,_1905).webm"
+  }
+}

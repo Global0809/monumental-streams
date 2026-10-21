@@ -1,0 +1,85 @@
+/** Hand-drawn icon set: thin, slightly organic strokes. Decorative by default (aria-hidden). */
+import type { SVGProps } from 'react';
+
+const P: Record<string, string> = {
+  play: 'M8 5.5v13l10.5-6.5z',
+  pause: 'M8 5h3v14H8zM13.5 5h3v14h-3z',
+  plus: 'M12 5v14M5 12h14',
+  check: 'M5 12.5l4.5 4.5L19 7.5',
+  close: 'M6 6l12 12M18 6L6 18',
+  search: 'M10.5 4a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zM15.5 15.5L20 20',
+  save: 'M7 4h10v16l-5-3.6L7 20z',
+  saved: 'M7 4h10v16l-5-3.6L7 20zM9.5 9.5l2 2 3.5-3.5',
+  volume: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM15.5 9a4 4 0 0 1 0 6M17.8 6.6a7.4 7.4 0 0 1 0 10.8',
+  mute: 'M4 9.5h3.5L12 5.5v13l-4.5-4H4zM16 9.5l5 5M21 9.5l-5 5',
+  globe: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM3 12h18M12 3c2.6 2.6 3.6 5.7 3.6 9s-1 6.4-3.6 9c-2.6-2.6-3.6-5.7-3.6-9s1-6.4 3.6-9z',
+  time: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM12 7v5l3.5 2.2',
+  synapse: 'M6 7a2 2 0 1 1 0 .1M18 5a2 2 0 1 1 0 .1M17 18a2 2 0 1 1 0 .1M7 17a2 2 0 1 1 0 .1M7.8 7.6l8.4-2M7.6 8.7l8.5 7.8M16.3 6.8l.5 9.2M8.8 16.6l6.3 1',
+  stream: 'M3 12c2.5-4 5-4 7.5 0s5 4 7.5 0M3 7c2.5-4 5-4 7.5 0s5 4 7.5 0M3 17c2.5-4 5-4 7.5 0s5 4 7.5 0',
+  compass: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM15.5 8.5l-2 5-5 2 2-5z',
+  passport: 'M6 3.5h11a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6zM9 3.5v17M12.5 10.5a2.5 2.5 0 1 1 0 .1M11 15.5h4',
+  user: 'M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM4.5 20c1.4-3.6 4.2-5.5 7.5-5.5s6.1 1.9 7.5 5.5',
+  left: 'M14.5 6l-6 6 6 6',
+  right: 'M9.5 6l6 6-6 6',
+  down: 'M6 9.5l6 6 6-6',
+  up: 'M6 14.5l6-6 6 6',
+  fullscreen: 'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5',
+  exitFullscreen: 'M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5',
+  pip: 'M3.5 5.5h17v13h-17zM12 11.5h6.5v5H12z',
+  captions: 'M3.5 6h17v12h-17zM10.5 10.2a2.4 2.4 0 1 0 0 3.6M17 10.2a2.4 2.4 0 1 0 0 3.6',
+  settings: 'M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3L5.5 5.5',
+  lock: 'M6.5 10.5h11v9.5h-11zM8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5',
+  diamond: 'M12 3l7 9-7 9-7-9z',
+  arrow: 'M4 12h15M13.5 6.5L19 12l-5.5 5.5',
+  filter: 'M4 6h16M7 12h10M10 18h4',
+  list: 'M8.5 6.5H20M8.5 12H20M8.5 17.5H20M4 6.5h.1M4 12h.1M4 17.5h.1',
+  map: 'M3.5 6.5l5.5-2 6 2 5.5-2v13l-5.5 2-6-2-5.5 2zM9 4.5v13M15 6.5v13',
+  wave: 'M2.5 12h2l2-5 3 10 3-14 3 13 2.5-7 1.5 3h2.5',
+  replay: 'M4.5 12a7.5 7.5 0 1 0 2.2-5.3M4.5 4.5v4h4',
+  skipBack: 'M11.5 7.5L6.5 12l5 4.5M17.5 7.5L12.5 12l5 4.5',
+  skipFwd: 'M12.5 7.5l5 4.5-5 4.5M6.5 7.5l5 4.5-5 4.5',
+  next: 'M6 6l8.5 6L6 18zM17.5 6v12',
+  share: 'M8.5 12.5l7-4M8.5 11.5l7 4M6 10a2.5 2.5 0 1 1 0 4.1M18 5a2.5 2.5 0 1 1 0 .1M18 15a2.5 2.5 0 1 1 0 .1',
+  spark: 'M12 3v5M12 16v5M3 12h5M16 12h5M6.3 6.3l3 3M14.7 14.7l3 3M17.7 6.3l-3 3M9.3 14.7l-3 3',
+  info: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM12 11v6M12 7.5h.1',
+  link: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
+  menu: 'M4 7h16M4 12h16M4 17h16',
+  dice: 'M5 5h14v14H5zM9 9h.1M15 15h.1M15 9h.1M9 15h.1M12 12h.1',
+  trash: 'M5 7h14M10 4h4M7 7l1 13h8l1-13',
+  // destinations (one distinct mark per section)
+  home: 'M4 11l8-6.5 8 6.5M6 9.5V20h12V9.5M10 20v-5h4v5',
+  film: 'M4 5h16v14H4zM8 5v14M16 5v14M4 9h4M4 15h4M16 9h4M16 15h4',
+  music: 'M9 17.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM20 15.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM9 17.5V6l11-2v11.5',
+  sport: 'M12 3a9 9 0 1 1 0 18 9 9 0 0 1 0-18zM12 7.5l4 2.9-1.5 4.7h-5L8 10.4zM12 3v4.5M16 10.4l4.5-1.4M14.5 15.1l2.8 4M9.5 15.1l-2.8 4M8 10.4L3.5 9',
+  gamepad: 'M7 8h10a4 4 0 0 1 4 4v2.5a2.5 2.5 0 0 1-4.6 1.4L15 14H9l-1.4 1.9A2.5 2.5 0 0 1 3 14.5V12a4 4 0 0 1 4-4zM8 10.5v3M6.5 12h3M15.5 11h.1M17.5 13h.1',
+  news: 'M5 5h11v14H6a1 1 0 0 1-1-1zM16 9h3v9a1 1 0 0 1-2 0V9M8 8.5h5M8 12h5M8 15.5h3',
+  hanger: 'M12 7.5a2 2 0 1 1 2-2M12 7.5V9l-8.5 6a1 1 0 0 0 .6 1.8h15.8a1 1 0 0 0 .6-1.8L12 9',
+  palette: 'M12 3.5c-4.7 0-8.5 3.5-8.5 8 0 4.3 3.6 8 8 8 1.4 0 2-1 1.6-2.1-.4-1.1.2-2.1 1.4-2.1h2.2c2.1 0 3.8-1.6 3.8-3.8 0-4.4-3.8-8-8.5-8zM7.5 11.5h.1M10 7.5h.1M14.5 7.5h.1',
+  balloon: 'M12 3a5.5 5.5 0 0 1 5.5 5.5c0 3.6-3 6.5-5.5 6.5S6.5 12.1 6.5 8.5A5.5 5.5 0 0 1 12 3zM11 16.5h2L12 15zM12 16.5c0 2 1.5 2.5 0 4.5',
+  broadcast: 'M12 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8',
+};
+
+export type IconName = keyof typeof P;
+
+export function Icon({ name, size = 20, strokeWidth = 1.6, filled, title, ...rest }: { name: IconName; size?: number; strokeWidth?: number; filled?: boolean; title?: string } & SVGProps<SVGSVGElement>) {
+  const solid = filled ?? (name === 'play' || name === 'pause' || name === 'next');
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill={solid ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden={title ? undefined : true}
+      role={title ? 'img' : undefined}
+      focusable="false"
+      {...rest}
+    >
+      {title ? <title>{title}</title> : null}
+      <path d={P[name]} />
+    </svg>
+  );
+}

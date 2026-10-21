@@ -1,0 +1,13 @@
+[
+  {
+    "id": "movement:miami-bass",
+    "slug": "miami-bass",
+    "name": "Miami bass",
+    "start": 1985,
+    "end": null,
+    "places": ["place:miami"],
+    "categories": ["interest:music"],
+    "themes": ["theme:diaspora"],
+    "summary": "Fixture movement."
+  }
+]

@@ -1,0 +1,47 @@
+{
+  "id": "video:apollo-11-1969",
+  "slug": "apollo-11-1969",
+  "title": "Apollo 11 launch — engines at 500 fps (camera E-8)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 8,
+  "summary": "NASA's slow-motion view of Apollo 11's engines at liftoff on 16 July 1969.",
+  "description": "Camera E-8 at Launch Complex 39A, Kennedy Space Center, filmed the base of Apollo 11's Saturn V at 500 frames per second as its engines ignited and it lifted off on 16 July 1969, carrying Neil Armstrong, Buzz Aldrin and Michael Collins toward the first crewed Moon landing. Played back at normal speed, well under a minute of flame, smoke and steam stretches to more than eight minutes.\n\nSilent NASA engineering footage, credited to NASA/Kennedy Space Center; its use here does not imply endorsement by NASA. Launch Complex 39A is on Merritt Island in Brevard County, Florida, not in Miami. A public-domain film shown as demonstration media while original programming is produced; it is not a Monumental Original.",
+  "categories": [
+    "interest:documentary"
+  ],
+  "places": [
+    "place:launch-complex-39a"
+  ],
+  "periods": [
+    "period:1960s"
+  ],
+  "themes": [
+    "theme:turning-points"
+  ],
+  "moods": [
+    "curious",
+    "chill"
+  ],
+  "setting": {
+    "from": 1969,
+    "to": 1969,
+    "label": "16 July 1969"
+  },
+  "made": 1969,
+  "published": "2026-10-20",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-apollo-11-1969",
+  "art": "art:still-apollo-11-1969",
+  "credits": {
+    "licence": "Public domain (NASA)",
+    "attribution": "NASA/Kennedy Space Center"
+  }
+}

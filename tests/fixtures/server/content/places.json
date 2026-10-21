@@ -1,0 +1,35 @@
+[
+  {
+    "id": "place:united-states",
+    "slug": "united-states",
+    "name": "United States",
+    "kind": "country",
+    "country": "US",
+    "coords": [39.8, -98.6],
+    "summary": "Fixture country.",
+    "status": "active"
+  },
+  {
+    "id": "place:miami",
+    "slug": "miami",
+    "name": "Miami",
+    "kind": "city",
+    "parent": "place:united-states",
+    "country": "US",
+    "coords": [25.7617, -80.1918],
+    "summary": "Fixture gateway city.",
+    "gateway": true,
+    "status": "active"
+  },
+  {
+    "id": "place:wynwood",
+    "slug": "wynwood",
+    "name": "Wynwood",
+    "kind": "neighbourhood",
+    "parent": "place:miami",
+    "country": "US",
+    "coords": [25.8007, -80.1994],
+    "summary": "Fixture neighbourhood.",
+    "status": "active"
+  }
+]

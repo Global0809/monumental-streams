@@ -1,0 +1,40 @@
+{
+  "id": "video:caminandes-llama-drama",
+  "slug": "caminandes-llama-drama",
+  "title": "Caminandes: Llama Drama",
+  "kind": "short",
+  "programme": "programme:open-cinema",
+  "order": 4,
+  "summary": "Koro the llama has one goal: get across the road.",
+  "description": "A 90-second animated short from the Blender Foundation’s Caminandes series: Koro the llama tries, and keeps trying, to cross a road in a stylised Patagonian landscape. Wordless slapstick for every age.\n\nCreative Commons demonstration media; not a Monumental Original.",
+  "categories": [
+    "interest:kids",
+    "interest:film"
+  ],
+  "places": [],
+  "periods": [],
+  "themes": [
+    "theme:decisions"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": null,
+  "made": 2013,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "fiction"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:open-cinema-caminandes-llama-drama",
+  "art": "art:still-caminandes-llama-drama",
+  "credits": {
+    "licence": "CC BY 3.0",
+    "attribution": "Caminandes: Llama Drama — Pablo Vazquez, Beorn Leonard, Francesco Siddi; music and sound: Jan Morgenstern (Blender Foundation) — CC BY 3.0",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Caminandes-_Llama_Drama_-_Short_Movie.ogv"
+  }
+}

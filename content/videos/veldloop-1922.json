@@ -1,0 +1,47 @@
+{
+  "id": "video:veldloop-1922",
+  "slug": "veldloop-1922",
+  "title": "Cross-country day in the dunes (1922)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 10,
+  "summary": "A 1922 Polygoon newsreel of cross-country races in the dunes near The Hague.",
+  "description": "Dutch Polygoon newsreel, catalogued as “Eerste(?) veldloopdag in Nederland” — possibly the first cross-country running day in the Netherlands — organised by the Haagse Atletiek Vereniging in the dunes at The Hague, with women’s, men’s and veterans’ races.\n\nCreative Commons demonstration media from the Netherlands Institute for Sound & Vision; not a Monumental Original.",
+  "categories": [
+    "interest:sport",
+    "interest:news"
+  ],
+  "places": [
+    "place:the-hague"
+  ],
+  "periods": [
+    "period:1920s"
+  ],
+  "themes": [
+    "theme:community"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": {
+    "from": 1922,
+    "to": 1922
+  },
+  "made": 1922,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "creative-commons",
+  "media": "media:archive-veldloop-1922",
+  "art": "art:still-veldloop-1922",
+  "credits": {
+    "licence": "CC BY-SA 3.0 NL (Open Beelden)",
+    "attribution": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Eerste(%3F)_veldloopdag_in_Nederland-515982.ogv"
+  }
+}

@@ -1,0 +1,1349 @@
+/* ═════════════ MY WORLD — the viewer's own orbit ═════════════ */
+
+.you {
+  padding-top: 0;
+  padding-bottom: clamp(4rem, 9vw, 7rem);
+}
+
+/* Provisional-art tags inside My World: a quiet glass pill */
+.you .art-provisional {
+  left: 12px;
+  bottom: 12px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--lilac);
+  background: color-mix(in srgb, var(--night) 64%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+/* ───── The head: greeting, who is here, the constellation ───── */
+.mw-head {
+  position: relative;
+  isolation: isolate;
+  padding: clamp(2rem, 6vw, 4.5rem) 0 clamp(1.5rem, 3vw, 2.5rem);
+}
+/* the centre story, dissolved into light behind everything */
+.mw-aura {
+  position: absolute;
+  z-index: -1;
+  inset: -4rem 0 auto 30%;
+  height: 120%;
+  overflow: hidden;
+  opacity: 0.38;
+  filter: blur(70px) saturate(1.3);
+  -webkit-mask-image: radial-gradient(60% 55% at 62% 42%, black, transparent 72%);
+  mask-image: radial-gradient(60% 55% at 62% 42%, black, transparent 72%);
+  pointer-events: none;
+}
+.mw-aura-art {
+  position: absolute !important;
+  inset: 0;
+}
+.mw-aura .art-provisional {
+  display: none;
+}
+.mw-head-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+.mw-intro {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.4rem);
+  min-width: 0;
+}
+.mw-greet {
+  color: var(--gold);
+  font-size: var(--step-1);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.mw-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 1.4rem + 5.6vw, 7.8rem);
+  font-weight: 320;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+  color: var(--pearl);
+}
+.mw-title em {
+  font-weight: 560;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.mw-lede {
+  max-width: 46ch;
+  color: var(--lilac);
+  font-size: var(--step-1);
+  line-height: 1.5;
+}
+
+/* Who is here: one glass card */
+.mw-id {
+  display: grid;
+  gap: 1rem;
+  max-width: 560px;
+  margin-top: 0.5rem;
+  padding: clamp(1.1rem, 2.4vw, 1.5rem);
+}
+.mw-id-top {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+.mw-avatar {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 28%, rgb(255 255 255 / 0.55), transparent 42%),
+    linear-gradient(160deg, var(--iris-2), var(--iris-deep));
+  color: var(--pearl);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.18), 0 10px 30px -10px var(--iris-glow);
+}
+.mw-avatar.is-premium {
+  background:
+    radial-gradient(circle at 35% 28%, rgb(255 255 255 / 0.7), transparent 42%),
+    var(--gold-fill);
+  color: var(--on-gold);
+  box-shadow: 0 0 0 1px rgb(255 246 226 / 0.7), 0 10px 30px -10px var(--gold-glow);
+}
+.mw-id-who {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.mw-id-name {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--pearl);
+  overflow-wrap: anywhere;
+}
+.mw-id-sub {
+  color: var(--lilac-dim);
+  font-size: var(--step--1);
+  overflow-wrap: anywhere;
+}
+.mw-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.mw-pill {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 38px;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-pill);
+  background: var(--glass);
+  color: var(--lilac);
+  font: inherit;
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+button.mw-pill {
+  color: var(--pearl);
+  font-weight: 600;
+  transition:
+    border-color var(--t-fast),
+    background var(--t-fast);
+}
+button.mw-pill:hover {
+  border-color: var(--iris);
+  background: var(--glass-2);
+}
+.mw-pill-member svg {
+  color: var(--lilac);
+}
+.mw-pill-member.is-premium {
+  border-color: rgb(242 214 162 / 0.55);
+  color: var(--gold);
+}
+.mw-pill-member.is-premium svg {
+  color: var(--gold);
+}
+.mw-sync-word {
+  color: var(--pearl);
+  font-weight: 600;
+}
+.mw-sep,
+.mw-sync-ago {
+  color: var(--lilac-dim);
+}
+.mw-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--iris);
+  box-shadow: 0 0 10px var(--iris-glow);
+}
+.mw-sync-guest .mw-dot {
+  background: var(--frost);
+  box-shadow: 0 0 10px var(--frost-glow);
+}
+.mw-sync-saving .mw-dot {
+  animation: breathe calc(var(--beat-dur) * 2.4) var(--ease-inout) infinite;
+}
+.mw-pill-idle .mw-dot,
+.mw-sync-idle .mw-dot {
+  background: var(--lilac-dim);
+  box-shadow: none;
+}
+.mw-sync-offline,
+.mw-sync-error {
+  border-color: color-mix(in srgb, var(--rose) 45%, transparent);
+}
+.mw-sync-offline .mw-dot,
+.mw-sync-error .mw-dot {
+  background: var(--rose);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--rose) 50%, transparent);
+}
+.mw-sync-msg {
+  border-color: color-mix(in srgb, var(--rose) 40%, transparent);
+  background: color-mix(in srgb, var(--rose) 7%, transparent);
+}
+.mw-sync-msg svg {
+  color: var(--rose);
+}
+.mw-id-note {
+  max-width: 56ch;
+  color: var(--lilac);
+  font-size: var(--step--1);
+  line-height: 1.55;
+}
+.mw-id-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* ───── The constellation ───── */
+.mw-orbit {
+  --ring-continue: var(--iris);
+  --ring-saved: var(--gold);
+  --ring-places: var(--frost);
+  --ring-journeys: var(--rose);
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  justify-self: center;
+  aspect-ratio: 1;
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 700ms var(--ease-out);
+}
+.mw-orbit[data-lit] {
+  transition: transform 140ms linear;
+}
+.mw-orbit-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.mw-ring-line {
+  fill: none;
+  stroke: var(--line-2);
+  stroke-width: 1;
+  transition:
+    stroke var(--t-mid) var(--ease-out),
+    stroke-width var(--t-mid) var(--ease-out),
+    opacity var(--t-mid);
+}
+.mw-ring.is-void .mw-ring-line {
+  stroke: var(--line);
+  stroke-dasharray: 2 7;
+}
+.mw-ring-spin {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: mw-spin 120s linear infinite;
+}
+.mw-ring-saved .mw-ring-spin,
+.mw-ring-journeys .mw-ring-spin {
+  animation-direction: reverse;
+}
+@keyframes mw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.mw-orbit.is-lite .mw-ring-spin {
+  animation: none;
+}
+.mw-node-dot {
+  fill: var(--node);
+  filter: drop-shadow(0 0 6px var(--node));
+  transition: r var(--t-mid) var(--ease-out);
+}
+.mw-ring-continue {
+  --node: var(--ring-continue);
+}
+.mw-ring-saved {
+  --node: var(--ring-saved);
+}
+.mw-ring-places {
+  --node: var(--ring-places);
+}
+.mw-ring-journeys {
+  --node: var(--ring-journeys);
+}
+.mw-node-track {
+  fill: none;
+  stroke: rgb(232 224 255 / 0.18);
+  stroke-width: 2;
+}
+.mw-node-progress {
+  fill: none;
+  stroke: var(--node);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.mw-node-stamp {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 3;
+}
+/* a counter in focus lights its ring and dims the others */
+.mw-orbit[data-highlight] .mw-ring {
+  opacity: 0.35;
+  transition: opacity var(--t-mid);
+}
+.mw-orbit[data-highlight='continue'] .mw-ring-continue,
+.mw-orbit[data-highlight='saved'] .mw-ring-saved,
+.mw-orbit[data-highlight='places'] .mw-ring-places,
+.mw-orbit[data-highlight='stamps'] .mw-ring-places,
+.mw-orbit[data-highlight='journeys'] .mw-ring-journeys {
+  opacity: 1;
+}
+.mw-orbit[data-highlight='continue'] .mw-ring-continue .mw-ring-line,
+.mw-orbit[data-highlight='saved'] .mw-ring-saved .mw-ring-line,
+.mw-orbit[data-highlight='places'] .mw-ring-places .mw-ring-line,
+.mw-orbit[data-highlight='stamps'] .mw-ring-places .mw-ring-line,
+.mw-orbit[data-highlight='journeys'] .mw-ring-journeys .mw-ring-line {
+  stroke: var(--node);
+  stroke-width: 1.6;
+  stroke-dasharray: none;
+}
+.mw-orbit[data-highlight='stamps'] .mw-node:not(.is-stamp) {
+  opacity: 0.3;
+}
+
+/* The core: the story at the centre of the viewer's world */
+.mw-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 37%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.22),
+    0 0 0 8px rgb(143 123 255 / 0.08),
+    0 30px 80px -20px rgb(143 123 255 / 0.55);
+}
+.mw-core-art {
+  position: absolute !important;
+  inset: 0;
+}
+.mw-core .art-provisional {
+  display: none;
+}
+.mw-core-shade {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 25%, rgb(255 255 255 / 0.28), transparent 38%),
+    radial-gradient(circle at 50% 60%, transparent 40%, rgb(10 8 17 / 0.55) 100%);
+  pointer-events: none;
+}
+.mw-core-link {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.mw-core-link:focus-visible {
+  outline-offset: 4px;
+}
+.mw-core-play {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding-left: 3px;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background: rgb(10 8 17 / 0.45);
+  backdrop-filter: blur(8px);
+  color: var(--pearl);
+  transition:
+    transform var(--t-mid) var(--ease-out),
+    background var(--t-mid);
+}
+.mw-core-link:hover .mw-core-play,
+.mw-core-link:focus-visible .mw-core-play {
+  transform: scale(1.1);
+  background: rgb(10 8 17 / 0.65);
+}
+.mw-core-caption {
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  width: 70%;
+  text-align: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.mw-core-kicker {
+  color: var(--lilac-dim);
+  font-size: var(--step--2);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.mw-core-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--pearl);
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+
+/* ───── Counters: five numbers that move when the library does ───── */
+.mw-vitals {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.mw-vitals > li + li {
+  border-left: 1px solid var(--line);
+}
+.mw-vital {
+  --node: var(--iris);
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'node n'
+    'node l';
+  column-gap: 0.75rem;
+  row-gap: 0.25rem;
+  align-items: center;
+  width: 100%;
+  min-height: var(--hit);
+  padding: 1.2rem 1.1rem 1rem;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--pearl);
+  text-align: left;
+  overflow: hidden;
+}
+.mw-vital-saved {
+  --node: var(--gold);
+}
+.mw-vital-places {
+  --node: var(--frost);
+}
+.mw-vital-journeys {
+  --node: var(--rose);
+}
+.mw-vital-stamps {
+  --node: var(--gold);
+}
+.mw-vital::before {
+  /* the counter's own light, gathering where the pointer is */
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(220px circle at var(--px, 50%) var(--py, 120%), color-mix(in srgb, var(--node) 16%, transparent), transparent 70%);
+  opacity: 0;
+  transition: opacity var(--t-mid);
+  pointer-events: none;
+}
+.mw-vital:hover::before,
+.mw-vital:focus-visible::before,
+.mw-vital.is-current::before {
+  opacity: 1;
+}
+.mw-vital.is-current::after {
+  content: '';
+  position: absolute;
+  left: 1.1rem;
+  right: 1.1rem;
+  top: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--node);
+  box-shadow: 0 0 12px var(--node);
+}
+.mw-vital-node {
+  grid-area: node;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--node);
+  box-shadow: 0 0 12px var(--node);
+}
+.mw-vital-stamps .mw-vital-node {
+  background: none;
+  border: 1.5px dashed var(--gold);
+  box-shadow: none;
+}
+.mw-vital-n {
+  grid-area: n;
+  font-family: var(--font-display);
+  font-size: var(--step-4);
+  font-weight: 380;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+.mw-vital-n.is-bumped {
+  animation: mw-bump 900ms var(--ease-out);
+}
+@keyframes mw-bump {
+  0% {
+    color: var(--node);
+    transform: translateY(10px) scale(0.9);
+    text-shadow: 0 0 0 transparent;
+  }
+  35% {
+    color: var(--node);
+    transform: translateY(0) scale(1.08);
+    text-shadow: 0 0 24px var(--node);
+  }
+  100% {
+    color: var(--pearl);
+    transform: none;
+    text-shadow: 0 0 0 transparent;
+  }
+}
+.mw-vital-l {
+  grid-area: l;
+  color: var(--lilac);
+  font-size: var(--step--1);
+  font-weight: 500;
+}
+
+/* ───── Tabs: a glass segmented row ───── */
+.you-body {
+  padding-top: clamp(0.5rem, 2vw, 1.5rem);
+}
+.you-tabs {
+  min-width: 0;
+}
+.you-tabs .tabs {
+  width: max-content;
+  max-width: 100%;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--glass);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-float);
+}
+.you-tabs .tabs [role='tab'] {
+  min-height: 42px;
+  padding: 0 1.1rem;
+  border-radius: var(--radius-pill);
+  color: var(--lilac);
+  font-weight: 500;
+  transition:
+    background var(--t-fast),
+    color var(--t-fast);
+}
+.you-tabs .tabs [role='tab']:hover {
+  color: var(--pearl);
+  background: var(--glass-2);
+}
+.you-tabs .tabs [role='tab']:focus-visible {
+  outline-offset: -3px;
+  box-shadow: none;
+}
+.you-tabs .tabs [role='tab'][aria-selected='true'] {
+  color: var(--on-pearl);
+  background: var(--pearl-fill);
+  font-weight: 600;
+  box-shadow: 0 6px 20px -8px var(--iris-glow);
+}
+.you-tabs .tabs [role='tab'][aria-selected='true']::after {
+  display: none;
+}
+.you-tabs .tab-count {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--lilac-dim);
+}
+.you-tabs [role='tab'][aria-selected='true'] .tab-count {
+  color: color-mix(in srgb, var(--on-pearl) 66%, transparent);
+}
+
+/* ───── Panels ───── */
+.you-panel {
+  padding-top: clamp(2.75rem, 5.5vw, 4rem);
+  outline: none;
+  animation: rise var(--t-slow) var(--ease-out);
+}
+.you-panel .section-head {
+  flex-wrap: wrap;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+.you-panel .section-title {
+  font-size: var(--step-4);
+  letter-spacing: -0.035em;
+}
+.you-panel .section-sub {
+  max-width: 62ch;
+  margin-top: 0.65rem;
+  color: var(--lilac);
+  font-size: var(--step-0);
+}
+.you-panel .section-sub a {
+  color: var(--iris);
+}
+.you-sub + .you-sub,
+.you-grid + .you-sub {
+  margin-top: clamp(4rem, 8vw, 6.5rem);
+}
+
+/* Pod footers sit above the pod's whole-card link */
+.you-pod-foot {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 0.2rem;
+}
+.you-pod-progress {
+  display: grid;
+  gap: 0.55rem;
+  font-size: 0.84rem;
+  color: var(--lilac-dim);
+}
+.you-tc {
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--lilac);
+}
+.you-pod-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Image cards: places, journeys, followed interests — an image with an unboxed caption */
+.you-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 2.5rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.you-card {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  min-width: 0;
+  transition: transform var(--t-mid) var(--ease-out);
+}
+.you-card:hover,
+.you-card:focus-within {
+  transform: translateY(-4px);
+}
+.you-card > .you-card-art,
+.you-card-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  margin-bottom: 0.5rem;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card), 0 0 0 1px var(--line);
+  transition: box-shadow var(--t-mid) var(--ease-out);
+}
+.you-card:hover > .you-card-art,
+.you-card:hover .you-card-media,
+.you-card:focus-within > .you-card-art,
+.you-card:focus-within .you-card-media {
+  box-shadow: 0 30px 70px -30px color-mix(in srgb, var(--iris-2) 55%, transparent), 0 0 0 1px var(--line-2);
+}
+.you-card-media .you-card-art {
+  position: absolute !important;
+  inset: 0;
+}
+.you-card .art-provisional {
+  opacity: 1;
+}
+.you-card-body {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+.you-card-title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.you-card-title a {
+  color: var(--pearl);
+  text-decoration: none;
+}
+/* the title link covers the whole card; actions sit above it */
+.you-card-title a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: var(--radius-card);
+}
+.you-card-title a:hover {
+  color: var(--iris);
+}
+.you-card-title a:focus-visible {
+  box-shadow: none;
+}
+.you-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.5rem;
+  font-size: 0.86rem;
+  color: var(--lilac-dim);
+}
+.you-card-meta span + span::before {
+  content: '·';
+  margin-right: 0.5rem;
+}
+.you-place .you-card-meta span:first-child {
+  text-transform: capitalize;
+}
+.you-card-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--lilac);
+  font-size: var(--step--1);
+}
+.you-card-actions,
+.you-card .you-pod-actions {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+/* Journeys: the route is a line that means something */
+.you-journey-kind {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-2);
+  background: color-mix(in srgb, var(--night) 62%, transparent);
+  backdrop-filter: blur(10px);
+  color: var(--pearl);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.you-journey-passport .you-journey-kind svg {
+  color: var(--frost);
+}
+.you-journey-somewhere .you-journey-kind svg {
+  color: var(--iris);
+}
+.you-route {
+  display: grid;
+  margin: 0.4rem 0 0.2rem;
+  padding: 0;
+  list-style: none;
+}
+.you-route li {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 30px;
+  color: var(--lilac);
+  font-size: var(--step--1);
+}
+.you-route li + li::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  bottom: 50%;
+  width: 1.5px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--frost), var(--iris));
+  opacity: 0.6;
+}
+.you-route-node {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--frost);
+  background: var(--night);
+}
+.you-route li:last-child .you-route-node {
+  border-color: var(--iris);
+  background: var(--iris);
+  box-shadow: 0 0 10px var(--iris-glow);
+}
+
+/* History: days in frost, rows on hairlines */
+.you-history {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 3.5rem);
+}
+.you-day-label {
+  margin-bottom: 0.9rem;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--frost);
+}
+.you-hist-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.you-hist {
+  display: grid;
+  grid-template-columns: 144px minmax(0, 1fr) auto;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.you-hist-thumb {
+  display: block;
+  width: 144px;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.you-hist-thumb .art-provisional {
+  display: none;
+}
+.you-hist-body {
+  min-width: 0;
+}
+.you-hist-title {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--pearl);
+  text-decoration: none;
+}
+a.you-hist-title:hover {
+  color: var(--iris);
+}
+.you-hist-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.5rem;
+  margin-top: 0.35rem;
+  font-size: 0.86rem;
+  color: var(--lilac-dim);
+}
+.you-hist-meta > * + *::before {
+  content: '·';
+  margin-right: 0.5rem;
+}
+
+/* Interests */
+.you-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+.you-chips .chip {
+  min-height: var(--hit);
+  padding-inline: 1em 1.2em;
+}
+.you-live {
+  color: var(--lilac-dim);
+  font-size: var(--step--1);
+}
+.you-followed {
+  margin-top: clamp(2.75rem, 5vw, 3.75rem);
+}
+.you-foot-note {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  color: var(--lilac);
+  font-size: var(--step--1);
+}
+.you-foot-note svg {
+  flex: none;
+  color: var(--iris);
+}
+.you-foot-note a {
+  color: var(--iris);
+}
+
+/* ───── Settings: grouped on glass panels ───── */
+.you-settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(460px, 100%), 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+.you-set {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+.you-set.panel-pad {
+  padding: clamp(1.4rem, 3vw, 2.2rem);
+}
+.you-set-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--pearl);
+}
+.you-set-title svg {
+  flex: none;
+  color: var(--iris);
+}
+.you-set-title-sub {
+  margin-top: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--step-1);
+}
+.you-set-note {
+  max-width: 60ch;
+  color: var(--lilac);
+  font-size: var(--step--1);
+}
+.you-set-note b {
+  color: var(--pearl);
+  font-weight: 600;
+}
+.you-set-hint {
+  color: var(--lilac-dim);
+  font-size: 0.86rem;
+}
+.you-sound-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.25rem 0 0.5rem;
+}
+.you-set-state {
+  color: var(--pearl);
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+.you-settings .segmented {
+  justify-self: start;
+  max-width: 100%;
+}
+.you-settings .segmented button {
+  min-height: var(--hit);
+}
+.you-settings .switch-label {
+  color: var(--pearl);
+}
+.you-settings .switch-desc {
+  color: var(--lilac);
+}
+.you-captions-sample {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: end center;
+  aspect-ratio: 16 / 7;
+  min-height: 140px;
+  padding: 1rem;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.you-captions-art {
+  position: absolute !important;
+  inset: 0;
+  z-index: -1;
+}
+.you-captions-art .art-provisional {
+  display: none;
+}
+.you-captions-sample::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(0deg, color-mix(in srgb, var(--night) 70%, transparent), transparent 60%);
+}
+.you-captions-line {
+  padding: 0.15em 0.55em;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--night) 84%, transparent);
+  color: var(--pearl);
+  font-size: 1rem;
+  transition: font-size var(--t-mid) var(--ease-out);
+}
+.you-captions-sample[data-size='l'] .you-captions-line {
+  font-size: 1.25rem;
+}
+.you-captions-sample[data-size='xl'] .you-captions-line {
+  font-size: 1.55rem;
+}
+
+/* ───── Membership summary: the vault image beside honest facts ───── */
+.you-member {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.85fr) minmax(0, 1.15fr);
+  max-width: 1000px;
+  overflow: hidden;
+}
+.you-member.is-premium {
+  border-color: color-mix(in srgb, var(--gold) 40%, transparent);
+  box-shadow: var(--shadow-float), 0 30px 80px -40px var(--gold-glow);
+}
+.you-member-media {
+  position: relative;
+  min-height: 260px;
+}
+.you-member-art {
+  position: absolute !important;
+  inset: 0;
+}
+.you-member-media .art-provisional {
+  opacity: 1;
+}
+.you-member-seal {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold) 50%, transparent);
+  background: color-mix(in srgb, var(--night) 55%, transparent);
+  backdrop-filter: blur(10px);
+  color: var(--gold);
+}
+.you-member-body {
+  display: grid;
+  align-content: start;
+  gap: 1.5rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+.you-member-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: 1.25rem 2rem;
+  margin: 0;
+}
+.you-fact-label {
+  color: var(--lilac-dim);
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+.you-member-facts dd {
+  margin: 0.3rem 0 0;
+  color: var(--pearl);
+  font-weight: 500;
+}
+
+/* Dialogs */
+.you-dialog {
+  display: grid;
+  gap: 1.5rem;
+}
+.you-dialog p {
+  max-width: 54ch;
+  color: var(--lilac);
+}
+.you-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+/* Quiet actions stay quiet (the shared skin re-borders .btn after .btn-quiet) */
+.you .btn-quiet {
+  --b-bg: transparent;
+  --b-edge: transparent;
+  backdrop-filter: none;
+}
+.you .btn-quiet:hover {
+  --b-edge: var(--line-2);
+}
+
+/* Destructive actions: a rose-tinted glass pill, on palette */
+.you .btn-danger {
+  --b-bg: color-mix(in srgb, var(--danger) 12%, transparent);
+  --b-edge: color-mix(in srgb, var(--danger) 48%, transparent);
+  --b-fg: var(--pearl);
+}
+
+/* ───── Responsive ───── */
+@media (max-width: 1180px) {
+  .mw-head-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+  }
+  .mw-vitals {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .mw-vitals > li:nth-child(4) {
+    border-left: 0;
+  }
+  .mw-vitals > li:nth-child(n + 4) {
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 900px) {
+  .mw-head-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mw-orbit {
+    order: -1;
+    max-width: 380px;
+    margin: -0.5rem 0 -0.5rem;
+  }
+  .mw-intro {
+    justify-items: start;
+  }
+}
+
+@media (max-width: 767px) {
+  .mw-head {
+    padding-top: 1rem;
+  }
+  .mw-orbit {
+    max-width: 300px;
+  }
+  .mw-vitals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .mw-vitals > li:nth-child(n) {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .mw-vitals > li:nth-child(even) {
+    border-left: 1px solid var(--line);
+  }
+  .mw-vitals > li:first-child {
+    border-top: 0;
+  }
+  .mw-vitals > li:nth-child(2) {
+    border-top: 0;
+  }
+  .mw-vital {
+    padding: 0.9rem 0.8rem;
+  }
+  .mw-vital-n {
+    font-size: var(--step-3);
+  }
+  .you-panel .section-title {
+    font-size: var(--step-3);
+  }
+  .you-hist {
+    grid-template-columns: 88px minmax(0, 1fr) auto;
+    gap: 0.85rem;
+  }
+  .you-hist-thumb {
+    width: 88px;
+    border-radius: 10px;
+  }
+  .you-member {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .you-member-media {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (max-width: 420px) {
+  .mw-id-actions > .btn,
+  .you-pod-actions > .btn {
+    flex: 1 1 auto;
+  }
+}
+
+/* Touch: title links keep their size; --tap-pad grows the tap box to >= 44px */
+@media (pointer: coarse) {
+  .you-hist-title {
+    display: inline-block;
+    padding-block: var(--tap-pad);
+    margin-block: calc(var(--tap-pad) * -1);
+  }
+}
+@media (pointer: coarse) {
+  .you-tabs .tabs [role='tab'] {
+    min-height: var(--hit);
+  }
+}
+
+/* ───── Places: passport stamps as seals ───── */
+.you-stamps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.you-stamp {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgb(242 214 162 / 0.28);
+  border-radius: 22px;
+  background: linear-gradient(160deg, rgb(242 214 162 / 0.07), transparent 60%), var(--glass);
+}
+.you-stamp-seal {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--gold);
+  color: var(--gold);
+  transform: rotate(-8deg);
+}
+.you-stamp-body {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.you-stamp-place {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.you-stamp-place a {
+  color: var(--pearl);
+  text-decoration: none;
+}
+.you-stamp-place a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+}
+.you-stamp-place a:hover {
+  color: var(--gold);
+}
+.you-stamp-place a:focus-visible {
+  box-shadow: none;
+}
+.you-stamp:focus-within {
+  border-color: var(--gold);
+}
+.you-stamped {
+  color: var(--gold);
+}
+.you-inline-btn {
+  padding: var(--tap-pad) 0;
+  margin: calc(var(--tap-pad) * -1) 0;
+  border: 0;
+  background: none;
+  color: var(--iris);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+:root[data-motion='reduce'] .mw-ring-spin {
+  animation: none;
+}
+.you-stamp .you-card-meta {
+  display: grid;
+  gap: 0.1rem;
+}
+.you-stamp .you-card-meta span + span::before {
+  content: none;
+}
+@media (pointer: coarse) {
+  .mw-pill {
+    min-height: var(--hit);
+  }
+}
+/* Low-graphics devices: no blurred aura (the core image still leads) */
+.mw.is-lite .mw-aura {
+  display: none;
+}

@@ -1,0 +1,47 @@
+{
+  "id": "video:world-series-1959",
+  "slug": "world-series-1959",
+  "title": "West Coast Hails First World Series (1959)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 11,
+  "summary": "Universal Newsreel on the first World Series played on the West Coast: Dodgers v White Sox at the Coliseum.",
+  "description": "Universal Newsreel from 5 October 1959: the Los Angeles Dodgers host the Chicago White Sox at the Los Angeles Memorial Coliseum in the first World Series games played on the West Coast. Low-resolution copy with a small glitch noted in the source catalogue.\n\nPublic-domain demonstration media; not a Monumental Original.",
+  "categories": [
+    "interest:sport",
+    "interest:news"
+  ],
+  "places": [
+    "place:la-memorial-coliseum"
+  ],
+  "periods": [
+    "period:1950s"
+  ],
+  "themes": [
+    "theme:celebration"
+  ],
+  "moods": [
+    "lively"
+  ],
+  "setting": {
+    "from": 1959,
+    "to": 1959
+  },
+  "made": 1959,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-world-series-1959",
+  "art": "art:still-world-series-1959",
+  "credits": {
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 5 Oct 1959 — public domain (via National Archives / Internet Archive)",
+    "sourceUrl": "https://archive.org/details/1959-10-05_West_Coast_Hails_First_World_Series"
+  }
+}

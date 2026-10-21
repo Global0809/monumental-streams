@@ -1,0 +1,38 @@
+{
+  "media:free-film": {
+    "id": "media:free-film",
+    "duration": 12,
+    "width": 640,
+    "height": 360,
+    "hasAudio": false,
+    "renditions": [{ "height": 360, "width": 640, "bandwidth": 400000, "label": "360p" }],
+    "hls": "free-film/master.m3u8",
+    "mp4": "free-film/360.mp4",
+    "captions": [{ "lang": "en", "label": "English", "kind": "captions", "src": "/media/public/captions/free-film.en.vtt", "default": true }],
+    "chapters": "/media/public/captions/free-film.chapters.vtt",
+    "source": "Server test fixture"
+  },
+  "media:premium-film": {
+    "id": "media:premium-film",
+    "duration": 8,
+    "width": 640,
+    "height": 360,
+    "hasAudio": true,
+    "renditions": [{ "height": 360, "width": 640, "bandwidth": 400000, "label": "360p" }],
+    "hls": "premium-film/master.m3u8",
+    "mp4": "premium-film/360.mp4",
+    "captions": [],
+    "source": "Server test fixture"
+  },
+  "media:unreferenced": {
+    "id": "media:unreferenced",
+    "duration": 5,
+    "width": 640,
+    "height": 360,
+    "hasAudio": false,
+    "renditions": [],
+    "mp4": "unreferenced/360.mp4",
+    "captions": [],
+    "source": "Listed but its files are absent"
+  }
+}

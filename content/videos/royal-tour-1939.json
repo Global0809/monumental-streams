@@ -1,0 +1,48 @@
+{
+  "id": "video:royal-tour-1939",
+  "slug": "royal-tour-1939",
+  "title": "King and Queen Leave Britain on American Tour (1939)",
+  "kind": "archive-film",
+  "programme": "programme:open-archive",
+  "order": 13,
+  "summary": "George VI and Queen Elizabeth leave London for their 1939 North American tour.",
+  "description": "Universal Newsreel from 15 May 1939: King George VI and Queen Elizabeth leave Buckingham Palace and sail from Portsmouth aboard the Empress of Australia, setting out on the royal tour of Canada and the United States months before the Second World War.\n\nPublic-domain demonstration media; captions are machine-generated and unreviewed. Not a Monumental Original.",
+  "categories": [
+    "interest:news",
+    "interest:documentary"
+  ],
+  "places": [
+    "place:buckingham-palace",
+    "place:portsmouth"
+  ],
+  "periods": [
+    "period:1930s"
+  ],
+  "themes": [
+    "theme:turning-points"
+  ],
+  "moods": [
+    "curious"
+  ],
+  "setting": {
+    "from": 1939,
+    "to": 1939
+  },
+  "made": 1939,
+  "published": "2026-10-21",
+  "access": "free",
+  "availability": {
+    "status": "available"
+  },
+  "footage": [
+    "archive"
+  ],
+  "provenance": "public-domain",
+  "media": "media:archive-royal-tour-1939",
+  "art": "art:still-royal-tour-1939",
+  "credits": {
+    "licence": "Public domain (Universal Newsreel, gifted to the public)",
+    "attribution": "Universal Newsreel, 15 May 1939 — public domain",
+    "sourceUrl": "https://archive.org/details/1939-05-15_King_and_Queen_Leave_For_American_Tour"
+  }
+}

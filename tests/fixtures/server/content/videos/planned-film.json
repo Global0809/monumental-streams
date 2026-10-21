@@ -1,0 +1,22 @@
+{
+  "id": "video:planned-film",
+  "slug": "planned-film",
+  "title": "Planned Film",
+  "kind": "episode",
+  "programme": "programme:fixture-series",
+  "order": 3,
+  "summary": "Announced, not yet made.",
+  "description": "No media exists yet.",
+  "categories": ["interest:music"],
+  "places": ["place:miami"],
+  "periods": [],
+  "themes": [],
+  "moods": [],
+  "setting": null,
+  "published": "2026-03-01",
+  "access": "free",
+  "availability": { "status": "planned" },
+  "footage": ["commentary"],
+  "provenance": "monumental-original",
+  "art": "art:missing"
+}
