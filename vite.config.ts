@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react';
 const API = process.env.MS_API_ORIGIN ?? 'http://127.0.0.1:8787';
 
 export default defineConfig({
+  // GitHub Pages serves the static build under /<repo>/ (see scripts/build-static.ts)
+  base: process.env.MS_BASE ?? '/',
   plugins: [react()],
   server: {
     port: Number(process.env.MS_WEB_PORT ?? 5173),

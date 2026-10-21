@@ -23,7 +23,7 @@ export function shouldAwaken(): boolean {
   if (typeof window === 'undefined') return false;
   const params = new URLSearchParams(window.location.search);
   if (params.get('intro') === '1') return true;
-  if (window.location.pathname !== '/') return false;
+  if (window.location.pathname.replace(/\/$/, '') !== import.meta.env.BASE_URL.replace(/\/$/, '')) return false;
   try {
     return localStorage.getItem(KEY) !== '1';
   } catch {

@@ -6,6 +6,7 @@ import './ui/ui.css';
 import './ui/skin.css';
 import './styles/reactive.css';
 import { App } from './app/App.tsx';
+import { installStaticApi } from './lib/static-api.ts';
 import { initChapterTracking } from './app/chapters.ts';
 import { initLibraryPersistence, libraryStore } from './state/library.ts';
 import { initHeartbeat } from './systems/heartbeat.ts';
@@ -13,6 +14,9 @@ import { initMotion } from './systems/motion.ts';
 import { initPreviews } from './systems/previews.ts';
 import { initReactive } from './systems/reactive.ts';
 import { initSound, sound } from './systems/sound/engine.ts';
+
+// Static hosting (GitHub Pages): answer the API in the browser from baked files.
+if (import.meta.env.VITE_STATIC === '1') installStaticApi();
 
 // Restore the persisted guest library before first paint so preferences apply immediately.
 try {
