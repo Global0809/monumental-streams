@@ -1,2 +1,1 @@
 var e=new Map;function t(t){let n=e.get(t);return n||(n=fetch(t).then(e=>{if(!e.ok)throw Error(`${t} → ${e.status}`);return e.json()}),n.catch(()=>e.delete(t)),e.set(t,n)),n}var n=()=>t(`/data/globe-dots.json`),r=()=>t(`/data/land-paths.json`);export{r as n,n as t};
-//# sourceMappingURL=data-B--aKAZo.js.map
