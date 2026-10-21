@@ -1,35 +1,40 @@
 /**
  * TIME MACHINE — /time-machine and /time-machine/:decade?year=&lens=&interest=&movement=
  *
- * The vertebral clock chooses a decade; the year strand narrows it to one year (only stories
- * whose dates under the lens include that year — setting by its recorded from/to span). Lenses
- * (set in / made in / published) decide which date counts. Beside the instrument, the field
- * notes read the chosen place in time: movements active, places involved (into World), people,
- * and the categories present, which filter the stories. Below: the stories as image cards, the
- * movement span timeline, and the connections through time from roots to today's programmes.
+ * The instrument is the living world: the stage's `time` helix (one vertebra per decade, seeds
+ * along it by year). This page is the editorial layer over it — a monumental place in time, the
+ * story to start with, and a precise DOM time control (decade + year scrubbers, lens) that drives
+ * useArrangement({ kind: 'time', decade, year, lens }) and lights the seeds whose dates match.
+ * Scrubbing previews in the world (the camera travels along the spine) and commits to the URL;
+ * clicking a vertebra in the world (decadeActivate) travels there too.
+ *
+ * Below the fold: the stories (Set in / Made / Published kept apart on every card), the time in
+ * context (movements alive, places → World, people), and its roots and echoes. A time with few
+ * or no stories still shows its context, offers the nearest years or decades that hold stories,
+ * and lights the stories closest in time.
  *
  * Everything lives in the URL: decade and year changes push history (Back walks through time),
  * lens / category / movement replace it; direct links and refresh restore the exact view.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { overlaps } from '../../../shared/catalogue.ts';
 import type { Category, FootageType, ID, Movement, Period, Video } from '../../../shared/types.ts';
-import { jumpTo, useChapters } from '../../app/chapters.ts';
-import { FOOTAGE_LABEL, plural } from '../../lib/format.ts';
+import { useChapters } from '../../app/chapters.ts';
+import { FOOTAGE_LABEL, dateLabel, plural, settingLabel } from '../../lib/format.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
-import { deviceTier } from '../../systems/device.ts';
+import type { Arrangement } from '../../stage/contract.ts';
+import { setHovered, stageStore, useArrangement, useStageEvent } from '../../stage/store.ts';
 import { useReducedMotion } from '../../systems/motion.ts';
 import { sound } from '../../systems/sound/engine.ts';
-import { Button, ButtonLink, Segmented } from '../../ui/controls.tsx';
+import { Button, ButtonLink, Chip } from '../../ui/controls.tsx';
 import { EmptyState } from '../../ui/feedback.tsx';
 import { Icon } from '../../ui/Icon.tsx';
-import { SectionHeader } from '../../ui/Pod.tsx';
-import { LENSES, LENS_EXPLAIN, LENS_LABEL, LENS_VERB, decadePhrase, nearestStoried, pickDefaultPeriod, rangeContext, resolveEra, type Lens } from './chrono.ts';
-import { EraPanel } from './EraPanel.tsx';
+import { Art, VideoPod, useAccessState } from '../../ui/Pod.tsx';
+import { LENSES, LENS_LABEL, LENS_VERB, decadePhrase, dialValueText, nearestStoried, pickDefaultPeriod, rangeContext, resolveEra, type Lens } from './chrono.ts';
 import { Lineage } from './Lineage.tsx';
-import { MovementDetail, MovementSpans } from './MovementSpans.tsx';
-import { TimeCard } from './TimeCard.tsx';
+import { TimeContext } from './TimeContext.tsx';
+import { TimeControl, type Stop } from './TimeControl.tsx';
 import {
   categoriesPresent,
   distanceLabel,
@@ -39,15 +44,13 @@ import {
   rangePhrase,
   readTimeParams,
   storiesIn,
-  storySpan,
   timeHref,
   yearlyCounts,
   yearsOf,
+  type NearStory,
   type TimeRange,
   type TimeState,
 } from './timeline.ts';
-import { VertebralClock } from './VertebralClock.tsx';
-import { YearStrand } from './YearStrand.tsx';
 import './time.css';
 
 const FOOTAGE_MEANING: Record<FootageType, string> = {
@@ -60,19 +63,30 @@ const FOOTAGE_MEANING: Record<FootageType, string> = {
 };
 const FOOTAGE_ORDER: FootageType[] = ['archive', 'illustrative', 'fiction', 'reconstruction', 'commentary', 'contemporary'];
 
-/** What a single year means under each lens — the rule stated plainly, never more than the data holds. */
-const YEAR_RULE: Record<Lens, (y: number) => string> = {
-  setting: (y) => `Stories appear when their recorded historical setting includes ${y}.`,
-  made: (y) => `Stories appear when the work was originally made in ${y}.`,
-  published: (y) => `Stories appear when they arrived on Monumental Streams in ${y}.`,
+/** What a lens means, in one line under the control. */
+const LENS_CAPTION: Record<Lens, string> = {
+  setting: 'Placed by when each story takes place.',
+  made: 'Placed by when the footage was originally made.',
+  published: 'Placed by when each story arrived on Monumental Streams.',
 };
 
 const CHAPTERS = [
-  { id: 'tm-instrument', label: 'Time' },
+  { id: 'tm-time', label: 'Time' },
   { id: 'tm-stories', label: 'Stories' },
-  { id: 'tm-movements', label: 'Movements' },
-  { id: 'tm-lineage', label: 'Connections' },
+  { id: 'tm-context', label: 'Context' },
+  { id: 'tm-lineage', label: 'Roots & echoes' },
 ];
+
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** True while the world has this seed under the pointer (or the DOM lit it). */
+function useSeedLit(id: ID | undefined) {
+  return useSyncExternalStore(
+    stageStore.subscribe,
+    () => !!id && stageStore.get().hovered === id,
+    () => false,
+  );
+}
 
 export default function TimePage() {
   const cat = useCatalogue();
@@ -81,13 +95,22 @@ export default function TimePage() {
   const location = useLocation();
   const navigate = useNavigate();
   const reduced = useReducedMotion();
-  const [tier] = useState(() => deviceTier());
   const [showAll, setShowAll] = useState(false);
+  const [preview, setPreview] = useState<{
+    period: Period;
+    year: number | null;
+  } | null>(null);
   const thisYear = useMemo(() => new Date().getFullYear(), []);
   const periods = cat.periods;
   const first = periods[0];
   const last = periods[periods.length - 1];
-  const bounds = useMemo<TimeRange>(() => ({ start: first?.start ?? 1900, end: Math.min(last?.end ?? thisYear, thisYear) }), [first, last, thisYear]);
+  const bounds = useMemo<TimeRange>(
+    () => ({
+      start: first?.start ?? 1900,
+      end: Math.min(last?.end ?? thisYear, thisYear),
+    }),
+    [first, last, thisYear],
+  );
 
   /* ───── where we are ───── */
 
@@ -113,7 +136,7 @@ export default function TimePage() {
   const selectedMovement = base.movement ? (cat.bySlug('movement', base.movement) as Movement | undefined) : undefined;
   const phrase = period ? rangePhrase(period, year) : '';
 
-  // A bare year ("/time-machine/1942"), a year without a decade, or stale parameters settle on the canonical address.
+  // A bare year ("/time-machine/1942"), a year without a decade, ?cat= or stale parameters settle on the canonical address.
   useEffect(() => {
     if (!period || unknown) return;
     if (!slug && !params.has('year')) return;
@@ -135,14 +158,35 @@ export default function TimePage() {
     }
     return list;
   }, [cat, ctx, inView, interest]);
+  const closest = useMemo(() => (range && !results.length ? nearestStories(cat, lens, range, interest, 3) : []), [cat, lens, range, interest, results.length]);
   const years = useMemo(() => (period ? yearsOf(period, thisYear) : []), [period, thisYear]);
   const yearCounts = useMemo(() => (period ? yearlyCounts(cat, lens, period, interest) : new Map<number, number>()), [cat, lens, period, interest]);
-  const allYearCounts = useMemo(() => yearlyCounts(cat, lens, bounds, interest), [cat, lens, bounds, interest]);
 
   useEffect(() => {
     document.title = `${unknown ? 'Beyond the archive' : year != null ? String(year) : period ? `The ${period.label}` : 'Time Machine'} — Time Machine · Monumental Streams`;
   }, [period, year, unknown]);
   useChapters(period && !unknown ? CHAPTERS : []);
+
+  /* ───── the world: the helix travels to the place in time (or the place being scrubbed to) ───── */
+
+  const shown = preview ?? (period && !unknown ? { period, year } : null);
+  const shownRange = useMemo<TimeRange | null>(() => (shown ? (shown.year != null ? { start: shown.year, end: shown.year } : { start: shown.period.start, end: shown.period.end }) : null), [shown]);
+  const arrangement: Arrangement = shown
+    ? {
+        kind: 'time',
+        decade: shown.period.start,
+        ...(shown.year != null ? { year: shown.year } : {}),
+        ...(lens !== 'setting' ? { lens } : {}),
+      }
+    : { kind: 'time', ...(lens !== 'setting' ? { lens } : {}) };
+  const highlight = useMemo(() => {
+    if (!shownRange) return null;
+    const lit = preview ? storiesIn(cat, lens, shownRange, interest) : results;
+    if (lit.length) return lit.map((v) => v.id);
+    // a time without stories lights the ones closest to it, so the eye finds where stories are
+    return (preview ? nearestStories(cat, lens, shownRange, interest, 3) : closest).map((n) => n.video.id);
+  }, [cat, lens, interest, shownRange, preview, results, closest]);
+  useArrangement(arrangement, highlight);
 
   /* ───── moving through time ───── */
 
@@ -151,201 +195,216 @@ export default function TimePage() {
     (r: TimeRange) => (selectedMovement && (showAll || overlaps(selectedMovement.start, selectedMovement.end ?? 9999, r.start, r.end)) ? selectedMovement.slug : null),
     [selectedMovement, showAll],
   );
-  const hrefFor = useCallback((p: Period, next: Partial<TimeState> = {}) => timeHref(cat, p, { ...state, year: null, movement: movementFor(p), ...next }), [cat, state, movementFor]);
+  const hrefFor = useCallback(
+    (p: Period, next: Partial<TimeState> = {}) =>
+      timeHref(cat, p, {
+        ...state,
+        year: null,
+        movement: movementFor(p),
+        ...next,
+      }),
+    [cat, state, movementFor],
+  );
   const hrefForYear = useCallback(
     (y: number) => {
       const p = periods.find((x) => y >= x.start && y <= x.end);
-      return p ? timeHref(cat, p, { ...state, year: y, movement: movementFor({ start: y, end: y }) }) : '/time-machine';
+      return p
+        ? timeHref(cat, p, {
+            ...state,
+            year: y,
+            movement: movementFor({ start: y, end: y }),
+          })
+        : '/time-machine';
     },
     [cat, periods, state, movementFor],
   );
   const go = useCallback(
     (next: Partial<TimeState>, replace: boolean) => {
-      if (period) navigate(timeHref(cat, period, { ...state, ...next }), { replace, preventScrollReset: true });
+      if (period)
+        navigate(timeHref(cat, period, { ...state, ...next }), {
+          replace,
+          preventScrollReset: true,
+        });
     },
     [cat, period, state, navigate],
   );
 
-  const commitDecade = useCallback(
-    (i: number) => {
-      const p = periods[i];
-      if (!p || (p === period && !unknown && year == null)) return;
+  const travelTo = useCallback(
+    (p: Period | undefined) => {
+      if (!p) return;
       sound.play('transition');
       navigate(hrefFor(p), { preventScrollReset: true });
     },
-    [periods, period, unknown, year, navigate, hrefFor],
+    [navigate, hrefFor],
   );
+  // clicking a vertebra of the helix in the world travels there, keeping lens and category
+  useStageEvent(
+    'decadeActivate',
+    useCallback(({ decade }: { decade: number }) => travelTo(periods.find((p) => p.start === decade)), [periods, travelTo]),
+  );
+
   const commitYear = useCallback(
     (y: number | null) => {
       if (y === year || !period) return;
       sound.play('transition');
-      go({ year: y, movement: movementFor(y == null ? period : { start: y, end: y }) }, false);
+      go(
+        {
+          year: y,
+          movement: movementFor(y == null ? period : { start: y, end: y }),
+        },
+        false,
+      );
     },
     [year, period, go, movementFor],
   );
   const setLens = (l: Lens) => go({ lens: l }, true);
   const setInterest = (id: ID | null) => go({ interest: id }, true);
-  const selectMovement = (m: Movement | null) => go({ movement: m?.slug ?? null }, true);
-  const readMovement = (m: Movement) => {
-    selectMovement(m);
-    window.setTimeout(() => jumpTo('tm-mv-detail'), 80);
+  const selectMovement = (m: Movement | null) => {
+    go({ movement: m?.slug ?? null }, true);
+    if (!m) return;
+    window.setTimeout(() => {
+      const el = document.getElementById('tm-mv-title');
+      el?.focus({ preventScroll: true });
+      el?.closest('article')?.scrollIntoView({
+        block: 'nearest',
+        behavior: reduced ? 'auto' : 'smooth',
+      });
+    }, 80);
   };
 
-  const dialIndex = Math.max(0, periods.indexOf((period ?? unknown?.nearest ?? periods[0]) as Period));
-  const eraT = periods.length > 1 ? dialIndex / (periods.length - 1) : 0;
-  const defaultView = !slug && !params.has('year');
-  const index = period ? periods.indexOf(period) : -1;
-  const prev = index > 0 ? periods[index - 1] : undefined;
-  const next = index >= 0 && index < periods.length - 1 ? periods[index + 1] : undefined;
+  /* ───── the control's scales ───── */
 
-  const lede = unknown
-    ? `The Time Machine spans the ${first?.label} to the ${last?.label}.`
-    : !period
-      ? ''
-      : defaultView
-        ? `Turn the clock to travel from the ${first?.label} to the ${last?.label}, then choose a year. Stories are placed by when they happen, not when they were published. ${(counts[period.id] ?? 0) > 0 ? `Starting in ${decadePhrase(period)}, the decade with the most stories.` : `Starting at the beginning: ${decadePhrase(period)}.`}`
-        : year != null
-          ? `A single year inside ${decadePhrase(period)}. ${YEAR_RULE[lens](year)}`
-          : `${period.start}–${period.end}. Turn the clock to change decade, choose a year to narrow the stories, and pick a lens to see what was set, made or published then.`;
+  const dialIndex = Math.max(0, periods.indexOf((period ?? unknown?.nearest ?? periods[0]) as Period));
+  const maxDecade = Math.max(1, ...periods.map((p) => counts[p.id] ?? 0));
+  const decadeStops: Stop[] = periods.map((p, i) => ({
+    key: p.slug,
+    long: p.label,
+    short: `’${p.label.slice(2)}`,
+    weight: (counts[p.id] ?? 0) / maxDecade,
+    empty: !(counts[p.id] ?? 0),
+    major: i % 3 === 0,
+  }));
+  const maxYear = Math.max(1, ...years.map((y) => yearCounts.get(y) ?? 0));
+  const yearStops: Stop[] = [
+    { key: 'all', long: 'All', short: 'All', weight: 1, major: true },
+    ...years.map((y) => ({
+      key: String(y),
+      long: String(y),
+      short: `’${String(y).slice(2)}`,
+      weight: (yearCounts.get(y) ?? 0) / maxYear,
+      empty: !(yearCounts.get(y) ?? 0),
+      major: y % 5 === 0,
+    })),
+  ];
+  const decadeTotal = period ? (counts[period.id] ?? 0) : 0;
+  const decadeControl = {
+    stops: decadeStops,
+    value: dialIndex,
+    valueText: (i: number) => {
+      const p = periods[i];
+      return p ? dialValueText(p, counts[p.id] ?? 0, movementCounts[p.id] ?? 0) : '';
+    },
+    onPreview: (i: number | null) => setPreview(i == null || !periods[i] ? null : { period: periods[i], year: null }),
+    onCommit: (i: number) => travelTo(periods[i]),
+    commitSame: !!unknown,
+  };
+  const yearControl =
+    period && !unknown
+      ? {
+          stops: yearStops,
+          value: year == null ? 0 : Math.max(0, years.indexOf(year) + 1),
+          valueText: (i: number) => (i === 0 ? `Whole ${period.label} — ${plural(decadeTotal, 'story', 'stories')}` : `${years[i - 1]} — ${plural(yearCounts.get(years[i - 1]) ?? 0, 'story', 'stories')}`),
+          onPreview: (i: number | null) => setPreview(i == null ? null : { period, year: i === 0 ? null : (years[i - 1] ?? null) }),
+          onCommit: (i: number) => commitYear(i === 0 ? null : (years[i - 1] ?? null)),
+        }
+      : undefined;
+
+  /* ───── the story to start with ───── */
+
+  const lead: { video: Video; near?: NearStory } | null = results.length ? { video: results.find((v) => cat.isPlayable(v)) ?? results[0] } : closest[0] ? { video: closest[0].video, near: closest[0] } : null;
 
   return (
-    <div className="page wrap tm-page" data-tier={tier} style={{ ['--era-t' as string]: eraT.toFixed(3) }}>
-      <header className="page-head tm-head">
-        <p className="kicker">
-          <b>Time Machine</b> · culture through time
-        </p>
-        <h1 className="page-title tm-title" tabIndex={-1}>
-          {unknown ? (
-            <>
-              This era isn’t in the archive <em>yet</em>
-            </>
-          ) : year != null ? (
-            <>
-              The year <em>{year}</em>
-            </>
-          ) : (
-            <>
-              The <em>{period?.label}</em>
-            </>
-          )}
-        </h1>
-        <p className="page-lede">{lede}</p>
-      </header>
-
-      <section id="tm-instrument" className="tm-hero" aria-label="Time controls">
-        <div className="tm-instrument">
-          <div className="tm-dial-wrap">
-            <VertebralClock
-              periods={periods}
-              value={dialIndex}
-              counts={counts}
-              movementCounts={movementCounts}
-              lensLabel={interestName ? `${LENS_LABEL[lens]} · ${interestName}` : LENS_LABEL[lens]}
-              reduced={reduced}
-              onCommit={commitDecade}
-              describedBy="tm-dial-hint"
-              hubLabel={year != null ? String(year) : undefined}
-              hubMovements={ctx?.movements.length}
-              yearMarks={unknown ? undefined : years.map((y) => ({ year: y, count: yearCounts.get(y) ?? 0, selected: y === year }))}
-            />
-          </div>
-          <p id="tm-dial-hint" className="tm-hint">
-            Drag the stylus, tap a decade or use the arrow keys. Brighter vertebrae hold more stories; the chosen one opens into its years.
+    <div className="page wrap tm-page">
+      <section id="tm-time" className="tm-hero" aria-labelledby="tm-h1">
+        <div className="tm-hero-text">
+          <p className="eyebrow">
+            <b>Time Machine</b>
           </p>
-
-          {period && !unknown ? (
-            <>
-              <div className="tm-strand">
-                <div className="tm-strand-head">
-                  <p className="tm-strand-label">
-                    <span className="kicker">
-                      <b>Year</b>
-                    </span>
-                    <span className="tm-strand-range">
-                      in {decadePhrase(period)} · {year != null ? plural(yearCounts.get(year) ?? 0, 'story', 'stories') + ` in ${year}` : plural(counts[period.id] ?? 0, 'story', 'stories')}
-                    </span>
-                  </p>
-                  <nav className="tm-strand-nav" aria-label="Neighbouring decades">
-                    {prev ? (
-                      <Link to={hrefFor(prev)} preventScrollReset className="tm-hop" aria-label={`Previous decade, ${prev.label}`} onClick={() => sound.play('transition')}>
-                        <Icon name="left" size={16} />
-                        <span aria-hidden="true">{prev.label}</span>
-                      </Link>
-                    ) : null}
-                    {next ? (
-                      <Link to={hrefFor(next)} preventScrollReset className="tm-hop" aria-label={`Next decade, ${next.label}`} onClick={() => sound.play('transition')}>
-                        <span aria-hidden="true">{next.label}</span>
-                        <Icon name="right" size={16} />
-                      </Link>
-                    ) : null}
-                  </nav>
-                </div>
-                <YearStrand years={years} counts={yearCounts} total={counts[period.id] ?? 0} decadeLabel={period.label} value={year} reduced={reduced} onCommit={commitYear} describedBy="tm-strand-hint" />
-                <p id="tm-strand-hint" className="tm-hint tm-strand-hint">
-                  Choose a year, or drag along the strand. Filaments rise where a year holds stories.
-                </p>
-              </div>
-              <div className="tm-lens">
-                <Segmented label="Lens" value={lens} onChange={setLens} options={LENSES.map((l) => ({ value: l, label: `${LENS_LABEL[l]} · ${l === lens ? inView.length : range ? storiesIn(cat, l, range).length : 0}` }))} />
-                <p className="tm-lens-explain">{LENS_EXPLAIN}</p>
-              </div>
-            </>
+          {unknown ? (
+            <h1 id="tm-h1" className="title-monument tm-title" data-long="" tabIndex={-1}>
+              This era isn’t in the archive yet
+            </h1>
+          ) : (
+            <h1 id="tm-h1" className="title-monument tm-title" tabIndex={-1}>
+              <span className="tm-title-pre">{year != null ? 'The year' : 'The'}</span> <span className="tm-title-main">{year != null ? year : period?.label}</span>
+            </h1>
+          )}
+          {unknown ? (
+            <p className="lede tm-lede">
+              The archive covers {first ? decadePhrase(first) : ''} to {last ? decadePhrase(last) : ''}, up to {thisYear}.{' '}
+              {unknown.nearest ? `The nearest decade it holds is ${decadePhrase(unknown.nearest)}.` : `“${unknown.slug}” isn’t a decade or year the Time Machine recognises.`}
+            </p>
+          ) : period ? (
+            <p className="lede tm-lede">{period.summary}</p>
           ) : null}
-        </div>
 
-        <div className="tm-reading">
-          {period && ctx && !unknown ? (
-            <EraPanel period={period} year={year} lens={lens} ctx={ctx} presence={presence} inView={inView.length} interest={interest} selectedMovement={selectedMovement} onInterest={setInterest} onMovement={readMovement} />
-          ) : unknown ? (
-            <div className="tm-beyond panel panel-pad" role="status">
-              <span className="tm-beyond-glyph" aria-hidden="true">
-                <Icon name="time" size={30} />
-              </span>
-              <h2 className="tm-beyond-title serif">“{unknown.slug}” is beyond the clock’s reach</h2>
-              <p>
-                The archive covers {first?.label}–{last?.label}, up to {thisYear}.{' '}
-                {unknown.nearest ? `The nearest decade it holds is ${decadePhrase(unknown.nearest)}.` : 'That address isn’t a decade or year the Time Machine recognises.'}
-              </p>
-              <div className="tm-beyond-actions">
-                {unknown.nearest ? (
-                  <ButtonLink to={timeHref(cat, unknown.nearest, { ...state, year: null })} variant="primary" icon="time">
-                    Go to {decadePhrase(unknown.nearest)}
-                  </ButtonLink>
-                ) : null}
-                <ButtonLink to="/time-machine" variant="ghost">
-                  Start at the beginning
+          {unknown ? (
+            <div className="tm-actions" role="status">
+              {unknown.nearest ? (
+                <ButtonLink to={timeHref(cat, unknown.nearest, { ...state, year: null })} variant="primary" icon="time">
+                  Go to {decadePhrase(unknown.nearest)}
                 </ButtonLink>
-              </div>
+              ) : null}
+              <ButtonLink to="/time-machine" variant="quiet">
+                Start at the beginning
+              </ButtonLink>
             </div>
+          ) : lead && period ? (
+            <Lead video={lead.video} near={lead.near} lens={lens} />
           ) : null}
         </div>
+        <TimeControl decade={decadeControl} year={yearControl} lens={unknown ? undefined : lens} onLens={setLens} reduced={reduced} caption={LENS_CAPTION[lens]} />
       </section>
 
       {period && ctx && range && !unknown ? (
         <>
-          <section id="tm-stories" className="section tm-stories" aria-labelledby="tm-stories-h">
-            <SectionHeader id="tm-stories-h" kicker={`Lens · ${LENS_LABEL[lens]}`} title={`${interestName ? `${interestName} stories` : 'Stories'} ${LENS_VERB[lens]} ${phrase}`}>
-              <span aria-live="polite" aria-atomic="true">
-                {plural(results.length, interestName ? `${interestName.toLowerCase()} story` : 'story', interestName ? `${interestName.toLowerCase()} stories` : 'stories')} {LENS_VERB[lens]} {phrase}.
-              </span>{' '}
-              Every story shows when it is set, when it was made and when it was published.
-            </SectionHeader>
-
-            <ActiveFilters
-              year={year}
-              lens={lens}
-              interestName={interestName}
-              onYear={() => commitYear(null)}
-              onLens={() => setLens('setting')}
-              onInterest={() => setInterest(null)}
-              onAll={() => go({ year: null, lens: 'setting', interest: null }, false)}
-            />
+          <section id="tm-stories" className="tm-section" aria-labelledby="tm-stories-h">
+            <header className="tm-section-head">
+              <h2 id="tm-stories-h" className="tm-h2">
+                {interestName ? `${interestName} stories` : 'Stories'} {LENS_VERB[lens]} {phrase}
+              </h2>
+              <p className="tm-sub">
+                <span aria-live="polite" aria-atomic="true">
+                  {plural(results.length, interestName ? `${interestName.toLowerCase()} story` : 'story', interestName ? `${interestName.toLowerCase()} stories` : 'stories')} {LENS_VERB[lens]} {phrase}.
+                </span>
+                {year != null ? (
+                  <button type="button" className="tm-inline" onClick={() => commitYear(null)}>
+                    Show the whole {period.label}
+                  </button>
+                ) : null}
+              </p>
+              {presence.length ? (
+                <div className="tm-cats" role="group" aria-label="Categories present">
+                  <Chip selected={!interest} onToggle={() => setInterest(null)} count={inView.length} tone="plasma">
+                    All
+                  </Chip>
+                  {presence.map((p) => (
+                    <span key={p.category.id} className="tm-cat" data-quiet={p.count === 0 || undefined}>
+                      <Chip selected={interest === p.category.id} onToggle={() => setInterest(interest === p.category.id ? null : p.category.id)} count={p.count} tone="plasma">
+                        {p.category.name}
+                        {p.count === 0 ? <span className="sr-only"> (carried by {plural(p.movements.length, 'movement')}, no stories yet)</span> : null}
+                      </Chip>
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </header>
 
             {results.length ? (
-              <ul className="tm-grid" aria-label={`${results.length} results`}>
+              <ul className="tm-grid" aria-label={plural(results.length, 'story', 'stories')}>
                 {results.map((v, i) => (
                   <li key={v.id}>
-                    <TimeCard video={v} lens={lens} decade={period} year={year} priority={i < 3} />
+                    <VideoPod video={v} priority={i < 3} footer={<Dates video={v} lens={lens} />} />
                   </li>
                 ))}
               </ul>
@@ -355,14 +414,13 @@ export default function TimePage() {
                 periods={periods}
                 year={year}
                 lens={lens}
-                range={range}
                 interest={interest}
                 interestName={interestName}
                 inViewCount={inView.length}
                 carriers={presence.find((p) => p.category.id === interest)?.movements ?? []}
                 counts={countsByLens}
-                allYearCounts={allYearCounts}
                 bounds={bounds}
+                closest={closest}
                 hrefFor={hrefFor}
                 hrefForYear={hrefForYear}
                 setLens={setLens}
@@ -377,9 +435,7 @@ export default function TimePage() {
               <dl>
                 {FOOTAGE_ORDER.map((f) => (
                   <div key={f} data-present={results.some((v) => v.footage.includes(f)) || undefined}>
-                    <dt>
-                      <span className={`badge badge-footage badge-f-${f}`}>{FOOTAGE_LABEL[f]}</span>
-                    </dt>
+                    <dt>{FOOTAGE_LABEL[f]}</dt>
                     <dd>{FOOTAGE_MEANING[f]}</dd>
                   </div>
                 ))}
@@ -387,52 +443,23 @@ export default function TimePage() {
             </details>
           </section>
 
-          <section id="tm-movements" className="section" aria-labelledby="tm-movements-h" data-reveal>
-            <SectionHeader
-              id="tm-movements-h"
-              kicker="Movements · span timeline"
-              title={`Alive in ${phrase}`}
-              action={
-                <Segmented
-                  label="Movements shown"
-                  hideLabel
-                  value={showAll ? 'all' : 'active'}
-                  onChange={(v) => setShowAll(v === 'all')}
-                  options={[
-                    { value: 'active', label: `Active · ${ctx.movements.length}` },
-                    { value: 'all', label: `All · ${cat.movements.length}` },
-                  ]}
-                />
-              }
-            >
-              Bars span each movement’s real years across {first?.label}–{last?.label}; the frost column is {year != null ? year : decadePhrase(period)}. A left arrow marks roots older than the clock, a right arrow a movement still going.
-            </SectionHeader>
-            {(() => {
-              const list = showAll ? cat.movements : ctx.movements.concat(selectedMovement && !ctx.movements.includes(selectedMovement) ? [selectedMovement] : []);
-              return list.length ? (
-                <div className="tm-mv-layout">
-                  <MovementSpans periods={periods} movements={list} decade={period} range={range} phrase={phrase} selected={selectedMovement} onSelect={selectMovement} />
-                  {selectedMovement ? (
-                    <MovementDetail movement={selectedMovement} range={range} phrase={phrase} onClose={() => selectMovement(null)} />
-                  ) : (
-                    <div className="tm-mv tm-mv-empty panel panel-pad">
-                      <Icon name="wave" size={22} />
-                      <p>Choose a movement to read its dates, facts, places and lineage.</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <EmptyState icon="wave" tone="plasma" title={`No movements recorded for ${phrase}`}>
-                  <p>Switch to “All” to see every movement on the timeline.</p>
-                </EmptyState>
-              );
-            })()}
+          <section id="tm-context" className="tm-section" aria-labelledby="tm-context-h">
+            <header className="tm-section-head">
+              <h2 id="tm-context-h" className="tm-h2">
+                {cap(phrase)} in context
+              </h2>
+              <p className="tm-sub">What was alive, where it happened and who carried it — even where the archive holds no story yet.</p>
+            </header>
+            <TimeContext periods={periods} range={range} phrase={phrase} ctx={ctx} selected={selectedMovement} showAll={showAll} onShowAll={setShowAll} onSelect={selectMovement} />
           </section>
 
-          <section id="tm-lineage" className="section" aria-labelledby="tm-lineage-h" data-reveal>
-            <SectionHeader id="tm-lineage-h" kicker="Connections through time" title={`Roots & echoes of ${phrase}`}>
-              From what {phrase} drew on, through the movements alive then, to the movements and the programmes on Monumental that carry it today. Point at or focus any node to light its thread.
-            </SectionHeader>
+          <section id="tm-lineage" className="tm-section" aria-labelledby="tm-lineage-h">
+            <header className="tm-section-head">
+              <h2 id="tm-lineage-h" className="tm-h2">
+                Roots &amp; echoes of {phrase}
+              </h2>
+              <p className="tm-sub">From what {phrase} drew on, through the movements alive then, to what carries it on Monumental today. Point at or focus any node to light its thread.</p>
+            </header>
             <Lineage phrase={phrase} label={year != null ? String(year) : period.label} ctx={ctx} />
           </section>
         </>
@@ -441,41 +468,76 @@ export default function TimePage() {
   );
 }
 
-/* ───────────── Active filters: what is narrowing the stories, each removable ───────────── */
+/* ───────────── The story to start with: lights its seed, one gold action ───────────── */
 
-function ActiveFilters({ year, lens, interestName, onYear, onLens, onInterest, onAll }: { year: number | null; lens: Lens; interestName: string | null; onYear: () => void; onLens: () => void; onInterest: () => void; onAll: () => void }) {
-  const items: { key: string; label: string; remove: string; run: () => void }[] = [];
-  if (year != null) items.push({ key: 'year', label: `Year ${year}`, remove: `Clear year ${year}, show the whole decade`, run: onYear });
-  if (interestName) items.push({ key: 'interest', label: interestName, remove: `Remove category ${interestName}`, run: onInterest });
-  if (lens !== 'setting') items.push({ key: 'lens', label: `Lens: ${LENS_LABEL[lens]}`, remove: `Remove Lens: ${LENS_LABEL[lens]} (back to ${LENS_LABEL.setting})`, run: onLens });
-  if (!items.length) return null;
+function Lead({ video: v, near, lens }: { video: Video; near?: NearStory; lens: Lens }) {
+  const cat = useCatalogue();
+  const access = useAccessState(v);
+  const lit = useSeedLit(v.id);
+  const href = cat.href(v.id);
+  const playable = cat.isPlayable(v);
+  const place = v.places[0] ? cat.label(v.places[0]) : null;
+  const when = lens === 'setting' ? (v.setting?.label ? settingLabel(v) : `Set ${settingLabel(v)}`) : lens === 'made' ? `Made ${v.made ?? '—'}` : `Published ${dateLabel(v.published)}`;
+  const reach = () => setHovered(v.id);
+  const release = () => {
+    if (stageStore.get().hovered === v.id) setHovered(null);
+  };
+  useEffect(() => () => release(), [v.id]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
-    <div className="tm-active">
-      <span className="tm-active-label">Showing</span>
-      <ul aria-label="Active filters">
-        {items.map((it) => (
-          <li key={it.key}>
-            <button
-              type="button"
-              className="tm-pill"
-              aria-label={it.remove}
-              onClick={() => {
-                sound.play('unsave');
-                it.run();
-              }}
-            >
-              <span>{it.label}</span>
-              <Icon name="close" size={14} />
-            </button>
-          </li>
-        ))}
-      </ul>
-      {items.length > 1 ? (
-        <Button variant="quiet" size="sm" onClick={onAll}>
-          Clear all
-        </Button>
-      ) : null}
+    <div className="tm-lead" data-seed={v.id} data-world-lit={lit || undefined} onPointerEnter={reach} onPointerLeave={release} onFocus={reach} onBlur={release}>
+      <Link
+        to={href}
+        className="tm-lead-art"
+        tabIndex={-1}
+        aria-hidden="true"
+        draggable={false}
+        data-cursor={playable ? 'play' : 'view'}
+        data-cursor-label={playable ? (access.locked ? 'Preview' : 'Watch') : 'Details'}
+        onClick={() => sound.play('transition')}
+      >
+        <Art art={v.art} eager alt="" />
+      </Link>
+      <div className="tm-lead-text">
+        <p className="tm-lead-note">{near ? `Closest in time · ${distanceLabel(near)}` : [when, place].filter(Boolean).join(' · ')}</p>
+        <p className="tm-lead-title">{v.title}</p>
+        <div className="tm-lead-actions">
+          {playable ? (
+            <ButtonLink to={href} variant="primary" icon="play" aria-label={`${access.locked ? 'Preview' : 'Watch'} ${v.title}`} data-cursor="play" data-cursor-label={access.locked ? 'Preview' : 'Watch'}>
+              {access.locked ? 'Preview' : 'Watch'}
+            </ButtonLink>
+          ) : (
+            <ButtonLink to={href} variant="ghost" icon="info" aria-label={`Details for ${v.title}`}>
+              Details
+            </ButtonLink>
+          )}
+          {access.key !== 'free' ? <span className="tm-lead-mark">{access.label}</span> : null}
+        </div>
+      </div>
     </div>
+  );
+}
+
+/* ───────────── The three dates, kept apart ───────────── */
+
+function Dates({ video: v, lens }: { video: Video; lens: Lens }) {
+  return (
+    <dl className="tm-dates">
+      <div data-on={lens === 'setting' || undefined}>
+        <dt>Set in</dt>
+        <dd>{v.setting ? settingLabel(v) : 'Timeless'}</dd>
+      </div>
+      <div data-on={lens === 'made' || undefined}>
+        <dt>Made</dt>
+        <dd>
+          {v.made != null ? v.made : '—'}
+          {v.made == null ? <span className="sr-only"> (not recorded)</span> : null}
+        </dd>
+      </div>
+      <div data-on={lens === 'published' || undefined}>
+        <dt>Published</dt>
+        <dd>{dateLabel(v.published)}</dd>
+      </div>
+    </dl>
   );
 }
 
@@ -486,14 +548,13 @@ function EmptyTime({
   periods,
   year,
   lens,
-  range,
   interest,
   interestName,
   inViewCount,
   carriers,
   counts,
-  allYearCounts,
   bounds,
+  closest,
   hrefFor,
   hrefForYear,
   setLens,
@@ -503,14 +564,13 @@ function EmptyTime({
   periods: Period[];
   year: number | null;
   lens: Lens;
-  range: TimeRange;
   interest: ID | null;
   interestName: string | null;
   inViewCount: number;
   carriers: Movement[];
   counts: Record<Lens, Record<ID, number>>;
-  allYearCounts: Map<number, number>;
   bounds: TimeRange;
+  closest: NearStory[];
   hrefFor: (p: Period) => string;
   hrefForYear: (y: number) => string;
   setLens: (l: Lens) => void;
@@ -519,21 +579,14 @@ function EmptyTime({
   const cat = useCatalogue();
   const phrase = rangePhrase(period, year);
   const noun = interestName ? `${interestName.toLowerCase()} stories` : 'stories';
+  const allYearCounts = useMemo(() => (year != null ? yearlyCounts(cat, lens, bounds, interest) : null), [cat, lens, bounds, interest, year]);
   const nearDecades = year == null ? nearestStoried(periods, counts[lens], periods.indexOf(period)) : {};
-  const nearYrs = year != null ? nearestYears(allYearCounts, year, bounds) : {};
-  const closest = useMemo(() => nearestStories(cat, lens, range, interest, 3), [cat, lens, range, interest]);
+  const nearYrs = year != null && allYearCounts ? nearestYears(allYearCounts, year, bounds) : {};
   const otherLens = LENSES.filter((l) => l !== lens)
     .map((l) => ({ l, n: Object.values(counts[l]).reduce((a, b) => a + b, 0) }))
     .filter((x) => x.n > 0)[0];
-  const decadeOf = (v: Video): TimeRange => {
-    const s = storySpan(v, lens);
-    return (s && periods.find((p) => s.start >= p.start && s.start <= p.end)) || period;
-  };
 
-  const near =
-    year == null
-      ? [nearDecades.before, nearDecades.after].filter((x): x is NonNullable<typeof x> => !!x)
-      : [];
+  const near = year == null ? [nearDecades.before, nearDecades.after].filter((x): x is NonNullable<typeof x> => !!x) : [];
   const nearY = year != null ? [nearYrs.before, nearYrs.after].filter((x): x is NonNullable<typeof x> => !!x) : [];
 
   return (
@@ -546,22 +599,22 @@ function EmptyTime({
           <>
             {year == null && nearDecades.before ? (
               <ButtonLink to={hrefFor(nearDecades.before.period)} preventScrollReset icon="left">
-                {nearDecades.before.period.label} · {nearDecades.before.count}
+                {nearDecades.before.period.label} · {plural(nearDecades.before.count, 'story', 'stories')}
               </ButtonLink>
             ) : null}
             {year == null && nearDecades.after ? (
               <ButtonLink to={hrefFor(nearDecades.after.period)} preventScrollReset iconAfter="right">
-                {nearDecades.after.period.label} · {nearDecades.after.count}
+                {nearDecades.after.period.label} · {plural(nearDecades.after.count, 'story', 'stories')}
               </ButtonLink>
             ) : null}
             {year != null && nearYrs.before ? (
               <ButtonLink to={hrefForYear(nearYrs.before.year)} preventScrollReset icon="left">
-                {nearYrs.before.year} · {nearYrs.before.count}
+                {nearYrs.before.year} · {plural(nearYrs.before.count, 'story', 'stories')}
               </ButtonLink>
             ) : null}
             {year != null && nearYrs.after ? (
               <ButtonLink to={hrefForYear(nearYrs.after.year)} preventScrollReset iconAfter="right">
-                {nearYrs.after.year} · {nearYrs.after.count}
+                {nearYrs.after.year} · {plural(nearYrs.after.count, 'story', 'stories')}
               </ButtonLink>
             ) : null}
             {interest && inViewCount > 0 ? (
@@ -571,7 +624,7 @@ function EmptyTime({
             ) : null}
             {!near.length && !nearY.length && !(interest && inViewCount) && otherLens ? (
               <Button icon="time" onClick={() => setLens(otherLens.l)}>
-                Try “{LENS_LABEL[otherLens.l]}” · {otherLens.n}
+                Try “{LENS_LABEL[otherLens.l]}”
               </Button>
             ) : null}
           </>
@@ -583,19 +636,29 @@ function EmptyTime({
             : nearY.length
               ? `The nearest ${nearY.length > 1 ? 'years' : 'year'} with ${noun} ${nearY.length > 1 ? 'are' : 'is'} ${nearY.map((x) => `${x.year} (${x.count})`).join(' and ')}.`
               : `Nothing in the archive is dated this way${interestName ? ` in ${interestName}` : ''} yet.`}{' '}
-          {carriers.length ? `${interestName} is carried in ${phrase} by ${carriers.map((m) => m.name).join(', ')} — see the movements below.` : 'The movements, places and people of this time still map it.'}
+          {carriers.length
+            ? `${interestName} is carried in ${phrase} by ${carriers.map((m) => m.name).join(', ')} — see the context below.`
+            : 'The movements, places and people of this time still map it — see the context below.'}
         </p>
       </EmptyState>
 
       {closest.length ? (
-        <div className="tm-closest" aria-labelledby="tm-closest-h" role="group">
-          <h3 id="tm-closest-h" className="tm-closest-h">
+        <div className="tm-closest" role="group" aria-labelledby="tm-closest-h">
+          <h3 id="tm-closest-h" className="tm-h3">
             Closest in time
           </h3>
-          <ul className="tm-grid tm-grid-near">
+          <ul className="tm-grid">
             {closest.map((n) => (
               <li key={n.video.id}>
-                <TimeCard video={n.video} lens={lens} decade={decadeOf(n.video)} year={null} note={distanceLabel(n)} />
+                <VideoPod
+                  video={n.video}
+                  footer={
+                    <>
+                      <Dates video={n.video} lens={lens} />
+                      <p className="tm-closest-note">{distanceLabel(n)}</p>
+                    </>
+                  }
+                />
               </li>
             ))}
           </ul>

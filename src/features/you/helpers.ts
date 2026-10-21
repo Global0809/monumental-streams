@@ -124,3 +124,14 @@ export function nearestSpeed(rate: number): (typeof SPEEDS)[number] {
   for (const s of SPEEDS) if (Math.abs(s - rate) < Math.abs(best - rate)) best = s;
   return best;
 }
+
+/**
+ * The part of the orbit a hovered item is about: the saved seeds (`orbit`) among `ids`, or
+ * null when that is none of them (nothing to light) or all of them (already all lit), so a
+ * preview only ever dims the world when it has something real to single out.
+ */
+export function orbitSubset(ids: Iterable<ID>, orbit: readonly ID[]): ID[] | null {
+  const inOrbit = new Set(orbit);
+  const out = [...new Set(ids)].filter((id) => inOrbit.has(id));
+  return out.length && out.length < inOrbit.size ? out : null;
+}

@@ -1,7 +1,8 @@
 /**
  * TIME MACHINE — the year-level model (pure: no DOM, no React).
  *
- * A place in time is a decade (the dial) and, optionally, one year inside it (the strand).
+ * A place in time is a decade and, optionally, one year inside it (the two scrubbers of the time
+ * control, mirrored by the helix in the living world).
  * Stories are matched against a range of years under a lens, and the lens decides which of a
  * story's dates is compared — never a mixture:
  *   setting   — the story's historical setting {from, to}; a year matches when the setting includes it
@@ -11,7 +12,7 @@
  * Nothing here invents a date: years come only from the records.
  *
  * The URL carries the whole position so links, refresh and Back restore it:
- *   /time-machine/1940s?year=1942&lens=made&interest=film&movement=plena
+ *   /time-machine/1940s?year=1942&lens=made&interest=film&movement=plena   (?cat= is read as ?interest=)
  */
 import { overlaps, type Catalogue } from '../../../shared/catalogue.ts';
 import type { Category, ID, Movement, Period, Video } from '../../../shared/types.ts';
@@ -79,14 +80,14 @@ export function storiesIn(cat: Catalogue, lens: Lens, range: TimeRange, interest
   );
 }
 
-/** Story counts per decade (period id) under a lens and interest — what lights the dial. */
+/** Story counts per decade (period id) under a lens and interest — the marks on the decade scrubber. */
 export function periodCounts(cat: Catalogue, lens: Lens, interest?: ID | null): Record<ID, number> {
   const out: Record<ID, number> = {};
   for (const p of cat.periods) out[p.id] = storiesIn(cat, lens, p, interest).length;
   return out;
 }
 
-/** Story counts per year (inclusive range) in one pass — what lights the year strand. */
+/** Story counts per year (inclusive range) in one pass — the marks on the year scrubber. */
 export function yearlyCounts(cat: Catalogue, lens: Lens, range: TimeRange, interest?: ID | null): Map<number, number> {
   const out = new Map<number, number>();
   for (let y = range.start; y <= range.end; y++) out.set(y, 0);
@@ -183,7 +184,7 @@ export function categoriesPresent(cat: Catalogue, stories: Video[], movements: M
   return [...map.values()].sort((a, b) => b.count - a.count || b.movements.length - a.movements.length || a.category.name.localeCompare(b.category.name));
 }
 
-/* ───────────── The decade ribbon on each card ───────────── */
+/* ───────────── The decade ribbon (kept for its unit tests; cards now spell the three dates out) ───────────── */
 
 export interface RibbonCell {
   year: number;
@@ -222,7 +223,8 @@ export interface TimeState {
 
 /** Read the query string. A year outside `range`, an unknown interest or movement is ignored. */
 export function readTimeParams(params: URLSearchParams, cat: Catalogue, range?: TimeRange): TimeState {
-  const interestSlug = params.get('interest');
+  // ?cat= is accepted as a shorthand for ?interest= (the canonical address keeps ?interest=)
+  const interestSlug = params.get('interest') ?? params.get('cat');
   const movementSlug = params.get('movement');
   const interest = interestSlug ? (cat.bySlug('interest', interestSlug)?.id ?? null) : null;
   return {

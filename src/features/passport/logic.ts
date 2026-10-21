@@ -1,6 +1,7 @@
 /**
  * Culture Passport — pure helpers: URL state, stamps, ready-made journeys derived from the
- * catalogue, place search, and the fitted projection for the route schematic.
+ * catalogue, place search and distances. (The fitted projection below drew the old 2D route
+ * schematic; the living globe now shows the journey, and it stays only for its unit tests.)
  *
  *   /passport                                → the first ready-made journey
  *   /passport?stops=san-juan,london&title=…  → any journey (place slugs, in order)

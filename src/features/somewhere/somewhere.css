@@ -1,195 +1,66 @@
-/*
- * TAKE ME SOMEWHERE — the Discovery Instrument, in Chrome Bloom.
- * One calm glass console: a quiet preview of the trip, four lavender-chrome knobs and a pearl
- * GO with a soft violet glow. The itinerary below is image-led: a clear time meter, then the
- * stops as large image rows.
- */
+/* ═════════════ TAKE ME SOMEWHERE — the instrument, played against the world ═════════════
+ * The page is the instrument (four knobs and GO) and the itinerary. The world is the screen:
+ * while dialling it lights the matching stories, after GO the plan comes forward with its
+ * stops joined by light. The console is the one glass slab (controls over the moving world). */
 
-/* ───────────── Page head ───────────── */
+.tms-page {
+  padding-bottom: clamp(4rem, 9vw, 7rem);
+}
+
+/* ───── Head ───── */
 .tms-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 440px);
-  gap: clamp(1.5rem, 4vw, 4rem);
-  align-items: end;
-  margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  justify-items: start;
+  gap: clamp(0.8rem, 1.6vw, 1.15rem);
+  padding-top: clamp(1rem, 4vw, 3rem);
 }
-.tms-head-text {
-  display: grid;
-  gap: 1rem;
+.tms-title {
+  max-width: 9.5ch;
+  margin-left: -0.04em;
 }
-.tms-head .page-title {
-  font-size: var(--step-5);
-}
-@media (max-width: 899px) {
-  .tms-head {
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
-  }
-}
-@media (max-width: 767px) {
-  .tms-head {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  /* The loop is a garnish: on phones the instrument comes first. */
-  .tms-head-loop {
-    display: none;
-  }
-  .tms-head .page-title {
-    font-size: var(--step-4);
-  }
-  .tms-head .page-lede {
-    font-size: var(--step-0);
-  }
+.tms-lede {
+  max-width: 36rem;
 }
 
-/* ───────────── The console (one glass panel) ───────────── */
+/* ───── The console ───── */
+.tms-instrument {
+  margin-top: clamp(1.75rem, 4vw, 3rem);
+}
 .tms-console {
-  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.7fr) auto;
-  grid-template-areas: 'screen knobs go';
-  gap: clamp(1.5rem, 3vw, 3rem);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  padding: clamp(1.5rem, 3.2vw, 3rem) clamp(1.25rem, 3.4vw, 3.25rem);
-  border-radius: var(--radius-panel);
+  gap: clamp(1rem, 3vw, 2.25rem);
+  max-width: 38rem;
+  padding: clamp(0.9rem, 2vw, 1.4rem) clamp(1rem, 2.6vw, 2rem);
   border: 1px solid var(--line);
-  background:
-    radial-gradient(42% 90% at 92% 50%, color-mix(in srgb, var(--iris-2) 16%, transparent), transparent 72%),
-    radial-gradient(60% 120% at 0% 0%, color-mix(in srgb, var(--pearl) 6%, transparent), transparent 60%),
-    linear-gradient(180deg, color-mix(in srgb, var(--plum-2) 80%, transparent), color-mix(in srgb, var(--night-2) 86%, transparent));
-  box-shadow: var(--shadow-float);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  isolation: isolate;
+  border-radius: var(--radius-panel);
+  background: linear-gradient(180deg, rgb(20 16 31 / 0.62), rgb(10 8 16 / 0.7));
+  backdrop-filter: blur(14px) saturate(1.1);
 }
-
-/* ───────────── Preview (unboxed, inside the console) ───────────── */
-.tms-screen {
-  grid-area: screen;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 1.1rem;
-  align-self: stretch;
-  min-width: 0;
-  min-height: 220px;
-  padding-right: clamp(1.25rem, 2.6vw, 2.5rem);
-  border-right: 1px solid var(--line);
-}
-.tms-screen-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.15rem 0;
-  font-size: var(--step--1);
-  font-weight: 500;
-  color: var(--lilac);
-}
-.tms-screen-tags span {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.tms-screen-tags span:first-child {
-  color: var(--pearl);
-  font-weight: 600;
-}
-.tms-screen-tags span:not(:last-child)::after {
-  content: '·';
-  margin: 0 0.5em;
-  color: var(--lilac-dim);
-}
-.tms-screen-body {
-  display: grid;
-  align-content: center;
-  min-width: 0;
-}
-.tms-screen-list {
-  display: grid;
-  gap: 0.7rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.tms-screen-list li {
-  display: grid;
-  grid-template-columns: 1.4rem minmax(0, 1fr) auto;
-  gap: 0.75rem;
-  align-items: baseline;
-  animation: rise var(--t-slow) var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 70ms);
-}
-.tms-screen-n {
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--lilac-dim);
-}
-.tms-screen-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 600;
-  color: var(--pearl);
-}
-.tms-screen-time {
-  font-family: var(--font-code);
-  font-size: var(--step--1);
-  font-variant-numeric: tabular-nums;
-  color: var(--frost);
-}
-.tms-screen-list li.tms-screen-more {
-  display: block;
-  padding-left: calc(1.4rem + 0.75rem);
-  color: var(--lilac-dim);
-  font-size: var(--step--1);
-}
-.tms-screen-list[data-shuffle] li {
-  grid-template-columns: minmax(0, 1fr);
-  animation: none;
-}
-.tms-shimmer {
-  display: block;
-  width: calc(92% - var(--i, 0) * 14%);
-  height: 1.05em;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, var(--glass) 0%, color-mix(in srgb, var(--lilac) 26%, transparent) 50%, var(--glass) 100%) 0 0 / 200% 100%;
-  animation: shimmer 1.1s linear infinite;
-}
-.tms-screen-prompt {
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -0.035em;
-  color: var(--pearl);
-  text-wrap: balance;
-}
-.tms-console[data-dirty] .tms-screen-prompt {
-  color: var(--rose);
-}
-.tms-screen-foot {
-  font-size: var(--step--1);
-  color: var(--lilac-dim);
-}
-
-/* ───────────── Knobs: lavender chrome ───────────── */
+/* two by two, so the console stays in the editorial column and the world keeps the open side */
 .tms-knobs {
-  grid-area: knobs;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem clamp(0.5rem, 1.6vw, 1.25rem);
 }
 .tms-knob {
   display: grid;
   justify-items: center;
-  gap: 0.6rem;
+  align-content: start;
+  gap: 0.35rem;
   min-width: 0;
   text-align: center;
 }
 .tms-knob-name {
+  color: var(--lilac-dim);
   font-size: var(--step--1);
-  font-weight: 600;
-  color: var(--lilac);
+  font-weight: 560;
 }
+
+/* the dial: a bone collar with a dark glass cap and a gold pointer */
 .tms-dial {
-  --size: 118px;
+  --size: 84px;
   position: relative;
   width: var(--size);
   height: var(--size);
@@ -203,9 +74,9 @@
   cursor: grabbing;
 }
 .tms-dial:focus-visible {
-  border-radius: 50%;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
-/* Detents: one soft mark per option; the current one is iris. */
 .tms-dial-ticks {
   position: absolute;
   inset: 0;
@@ -214,95 +85,68 @@
   overflow: visible;
 }
 .tms-dial-ticks line {
-  stroke: color-mix(in srgb, var(--lilac-dim) 55%, transparent);
+  stroke: rgb(239 230 214 / 0.28);
   stroke-width: 1.6;
   stroke-linecap: round;
   transition: stroke var(--t-mid);
 }
 .tms-dial-ticks line[data-on] {
-  stroke: var(--iris);
+  stroke: var(--gold);
   stroke-width: 2.8;
 }
-/* The skirt: brushed lavender chrome, lit from above (it does not rotate). */
 .tms-dial-skirt {
   position: absolute;
-  inset: 14%;
+  inset: 15%;
   border-radius: 50%;
-  background: conic-gradient(
-    from 200deg,
-    var(--pearl),
-    color-mix(in oklab, var(--lilac-dim) 72%, var(--plum-3)),
-    var(--lilac),
-    var(--pearl),
-    color-mix(in oklab, var(--lilac-dim) 58%, var(--night)),
-    var(--lilac),
-    var(--pearl)
-  );
+  background: radial-gradient(circle at 50% 35%, rgb(239 230 214 / 0.95), rgb(205 192 170 / 0.85) 55%, rgb(120 108 96 / 0.9) 100%);
   box-shadow:
-    0 18px 30px -14px color-mix(in srgb, var(--night) 92%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--pearl) 35%, transparent),
-    inset 0 1px 1px var(--pearl);
+    0 14px 26px -12px rgb(0 0 0 / 0.9),
+    0 0 0 1px rgb(255 246 226 / 0.35);
   transition: box-shadow var(--t-mid) var(--ease-out);
 }
-/* The cap: a glossy lavender dome that turns with the value. */
 .tms-dial-cap {
   position: absolute;
-  inset: 22%;
+  inset: 23%;
   border-radius: 50%;
-  background: radial-gradient(circle at 50% 50%, var(--lilac) 0%, color-mix(in oklab, var(--lilac) 70%, var(--lilac-dim)) 55%, color-mix(in oklab, var(--lilac-dim) 70%, var(--plum-3)) 100%);
+  background: radial-gradient(circle at 50% 30%, #2a2338, #120f1b 70%);
   box-shadow:
-    inset 0 -6px 12px color-mix(in srgb, var(--plum-3) 45%, transparent),
-    inset 0 2px 3px var(--pearl),
-    0 3px 8px color-mix(in srgb, var(--night) 55%, transparent);
+    inset 0 1px 1px rgb(255 255 255 / 0.18),
+    0 2px 6px rgb(0 0 0 / 0.6);
   transform: rotate(var(--tms-angle, 0deg));
   transition: transform var(--t-mid) var(--ease-out);
-}
-/* Fixed specular light over the cap, so the gloss stays put while the cap turns. */
-.tms-dial::after {
-  content: '';
-  position: absolute;
-  inset: 22%;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(70% 55% at 36% 24%, color-mix(in srgb, var(--pearl) 85%, transparent), transparent 70%);
-  mix-blend-mode: screen;
 }
 .tms-dial-pointer {
   position: absolute;
   left: 50%;
   top: 9%;
-  width: 5px;
-  height: 24%;
-  margin-left: -2.5px;
+  width: 4px;
+  height: 30%;
+  margin-left: -2px;
   border-radius: var(--radius-pill);
-  background: linear-gradient(180deg, var(--iris), var(--iris-2));
-  box-shadow: 0 0 8px var(--iris-glow), inset 0 1px 0 color-mix(in srgb, var(--pearl) 60%, transparent);
-}
-.tms-dial[data-dragging] .tms-dial-cap {
-  transition: none;
+  background: linear-gradient(180deg, #fff3da, var(--gold) 60%, var(--gold-2));
+  box-shadow: 0 0 10px var(--gold-glow);
 }
 .tms-dial:hover .tms-dial-skirt,
 .tms-dial[data-dragging] .tms-dial-skirt {
   box-shadow:
-    0 18px 30px -14px color-mix(in srgb, var(--night) 92%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--pearl) 45%, transparent),
-    0 0 30px -4px var(--iris-glow),
-    inset 0 1px 1px var(--pearl);
+    0 14px 26px -12px rgb(0 0 0 / 0.9),
+    0 0 0 1px rgb(255 246 226 / 0.6),
+    0 0 26px -6px var(--gold-glow);
 }
 .tms-knob-readout {
   display: grid;
   grid-template-columns: 26px minmax(0, 1fr) 26px;
   align-items: center;
   width: 100%;
-  max-width: 220px;
+  max-width: 200px;
   min-height: var(--hit);
 }
 .tms-knob-value {
-  font-size: var(--step-0);
+  color: var(--pearl);
+  font-size: var(--step--1);
   font-weight: 600;
   line-height: 1.2;
-  color: var(--pearl);
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 .tms-knob-step {
   display: grid;
@@ -311,13 +155,11 @@
   height: var(--hit);
   padding: 0;
   border: 0;
-  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--lilac-dim);
-  transition: background var(--t-fast), color var(--t-fast);
+  transition: color var(--t-fast);
 }
 .tms-knob-step:hover {
-  background: var(--glass-2);
   color: var(--pearl);
 }
 .tms-knob-step:disabled {
@@ -325,16 +167,10 @@
   cursor: default;
 }
 .tms-knob-flag {
-  padding: 2px 10px;
-  border-radius: var(--radius-pill);
+  color: var(--rose);
   font-size: var(--step--2);
   font-weight: 600;
-  color: var(--rose);
-  border: 1px solid color-mix(in srgb, var(--rose) 45%, transparent);
-  background: color-mix(in srgb, var(--rose) 9%, transparent);
 }
-
-/* Coarse pointers get full-size step targets. */
 @media (pointer: coarse) {
   .tms-knob-readout {
     grid-template-columns: 40px minmax(0, 1fr) 40px;
@@ -344,66 +180,55 @@
   }
 }
 
-/* ───────────── GO: a pearl button with a soft violet glow ───────────── */
+/* GO: gold while it is the next step, a hairline ring once a plan is on screen */
 .tms-go-well {
-  grid-area: go;
   display: grid;
   justify-items: center;
-  gap: 1rem;
-  padding: 0.5rem 0.25rem;
+  gap: 0.75rem;
 }
 .tms-go {
-  --go: 152px;
+  --go: 112px;
   position: relative;
   display: grid;
   place-items: center;
   width: var(--go);
   height: var(--go);
   padding: 0;
-  border: 0;
+  border: 1px solid var(--line-2);
   border-radius: 50%;
-  background: var(--pearl-fill);
-  color: var(--on-pearl);
-  box-shadow:
-    inset 0 2px 0 var(--pearl),
-    inset 0 -14px 26px color-mix(in srgb, var(--iris-2) 24%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--pearl) 70%, transparent),
-    0 26px 60px -20px var(--iris-glow),
-    0 0 90px -14px var(--iris-glow);
+  background: rgb(255 255 255 / 0.04);
+  color: var(--pearl);
+  cursor: pointer;
   transition:
     transform var(--t-mid) var(--ease-out),
-    box-shadow var(--t-mid) var(--ease-out);
+    box-shadow var(--t-mid) var(--ease-out),
+    border-color var(--t-mid);
 }
-/* A slow halo of violet light that breathes around the button. */
-.tms-go::before {
+.tms-go::after {
+  /* the ring that turns while the world re-forms */
   content: '';
   position: absolute;
-  inset: -18px;
-  z-index: -1;
+  inset: -7px;
   border-radius: 50%;
+  border: 1px solid transparent;
+  border-top-color: var(--gold);
+  opacity: 0;
   pointer-events: none;
-  background: radial-gradient(circle closest-side, transparent 76%, color-mix(in srgb, var(--iris) 34%, transparent) 86%, transparent 100%);
-  animation: tms-halo 5.2s var(--ease-inout) infinite;
 }
-@keyframes tms-halo {
-  0%, 100% { opacity: 0.35; transform: scale(0.97); }
-  50% { opacity: 1; transform: scale(1.04); }
+.tms-go-well[data-spinning] .tms-go::after {
+  opacity: 1;
+  animation: spin 0.62s linear;
 }
 .tms-go-word {
   font-family: var(--font-display);
   font-size: var(--step-3);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1;
 }
 .tms-go:hover {
-  transform: translateY(-3px);
-  box-shadow:
-    inset 0 2px 0 var(--pearl),
-    inset 0 -14px 26px color-mix(in srgb, var(--iris-2) 28%, transparent),
-    0 0 0 1px var(--pearl),
-    0 30px 70px -18px var(--iris-glow),
-    0 0 120px -8px var(--iris-glow);
+  transform: translateY(-2px);
+  border-color: var(--gold);
 }
 .tms-go:active {
   transform: scale(0.97);
@@ -411,420 +236,332 @@
 .tms-go:focus-visible {
   border-radius: 50%;
 }
+.tms-go-well[data-primary] .tms-go {
+  border-color: rgb(255 246 226 / 0.95);
+  background: var(--gold-fill);
+  color: var(--on-gold);
+  box-shadow:
+    0 18px 50px -18px rgb(242 214 162 / 0.7),
+    inset 0 1px 0 rgb(255 255 255 / 0.85);
+}
 .tms-go-hint {
-  max-width: 18ch;
-  font-size: var(--step--1);
+  max-width: 16ch;
   color: var(--lilac-dim);
+  font-size: var(--step--2);
   text-align: center;
 }
 
-.tms-footnote {
+/* supporting text: what the knobs currently match, then the rule of the instrument */
+.tms-readout {
   display: flex;
+  align-items: center;
   gap: 0.6rem;
-  align-items: flex-start;
-  max-width: 80ch;
-  margin-top: 1.4rem;
-  padding-inline: 0.25rem;
+  max-width: 38rem;
+  margin-top: 1.1rem;
+  color: var(--lilac);
   font-size: var(--step--1);
-  color: var(--lilac-dim);
+  font-variant-numeric: tabular-nums;
 }
-.tms-footnote svg {
+.tms-readout-dot {
   flex: none;
-  margin-top: 3px;
-  color: var(--iris);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
+}
+.tms-footnote {
+  max-width: 62ch;
+  margin-top: 0.5rem;
+  color: var(--lilac-dim);
+  font-size: var(--step--1);
 }
 
-/* Tablet: preview + GO on top, the knobs in a row beneath. */
-@media (max-width: 1179px) {
-  .tms-console {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      'screen go'
-      'knobs knobs';
-  }
-  .tms-screen {
-    min-height: 0;
-  }
-  .tms-knobs {
-    padding-top: clamp(1.25rem, 3vw, 2rem);
-    border-top: 1px solid var(--line);
-  }
-}
-
-/* Phone: a stacked console — preview, knobs 2×2, then GO. */
-@media (max-width: 699px) {
-  .tms-console {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      'screen'
-      'knobs'
-      'go';
-    gap: 1.5rem;
-    padding: 1.4rem 1.1rem 1.6rem;
-  }
-  .tms-screen {
-    padding: 0 0 1.4rem;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-  .tms-screen-prompt {
-    font-size: var(--step-2);
-  }
-  .tms-knobs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem 0.5rem;
-    padding-top: 0;
-    border-top: 0;
-  }
-  .tms-dial {
-    --size: 104px;
-  }
-  .tms-go {
-    --go: 128px;
-  }
-}
-
-/* ───────────── Itinerary ───────────── */
+/* ───── Itinerary ───── */
 .tms-itinerary {
-  margin-top: clamp(4rem, 8vw, 7rem);
-  scroll-margin-top: calc(var(--topbar-h) + 16px);
+  position: relative;
+  isolation: isolate;
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
+}
+/* the read steps in front of the lit plan: a soft night scrim, not glass */
+.tms-itinerary::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -4rem 0 0;
+  background: linear-gradient(180deg, rgb(7 6 12 / 0) 0, rgb(7 6 12 / 0.55) 10rem);
+  pointer-events: none;
 }
 .tms-it-head {
   display: grid;
   gap: 0.75rem;
-  max-width: 72ch;
+  max-width: 48rem;
 }
-.tms-it-head .section-title {
-  font-size: var(--step-4);
-  letter-spacing: -0.04em;
-}
-.tms-it-head .section-title:focus-visible {
-  border-radius: 12px;
+.tms-it-title {
+  outline: none;
 }
 .tms-explain {
-  font-size: var(--step-1);
-  line-height: 1.5;
+  max-width: 60ch;
   color: var(--lilac);
 }
-.tms-dirty,
-.tms-relaxed {
-  margin-top: 1.5rem;
-  max-width: 80ch;
-}
 .tms-dirty {
-  border-color: color-mix(in srgb, var(--rose) 40%, transparent);
-  background: color-mix(in srgb, var(--rose) 7%, transparent);
+  max-width: 54rem;
+  margin-top: 1.5rem;
 }
-.tms-dirty svg {
-  color: var(--rose);
-}
-
-/* The time meter and actions share one glass panel. */
 .tms-summary {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 1.5rem clamp(1.5rem, 4vw, 3.5rem);
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  margin-top: clamp(1.75rem, 3vw, 2.5rem);
-  padding: clamp(1.25rem, 2.6vw, 2rem) clamp(1.25rem, 3vw, 2.25rem);
-  border-radius: var(--radius-panel);
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--plum-2) 78%, transparent), color-mix(in srgb, var(--night-2) 84%, transparent));
-  box-shadow: var(--shadow-float);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  max-width: 68rem;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  padding: 1.25rem 0;
+  border-block: 1px solid var(--line);
 }
 .tms-meter {
   display: grid;
-  gap: 0.9rem;
+  gap: 0.7rem;
+  flex: 1 1 16rem;
   min-width: 0;
 }
 .tms-meter-label {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.2em 0.45em;
-  font-size: var(--step-1);
   color: var(--lilac);
+  font-size: var(--step--1);
 }
 .tms-meter-total {
+  margin-right: 0.15em;
+  color: var(--pearl);
   font-family: var(--font-display);
-  font-size: var(--step-4);
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
+  font-size: var(--step-3);
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
-  background: var(--chrome);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  padding-bottom: 0.04em;
+  letter-spacing: -0.03em;
 }
 .tms-meter-spare {
-  font-size: var(--step-0);
   color: var(--lilac-dim);
 }
 .tms-meter-track {
   display: flex;
   gap: 3px;
-  height: 12px;
-  border-radius: var(--radius-pill);
-  background: var(--glass-2);
-  box-shadow: inset 0 0 0 1px var(--line);
-  overflow: hidden;
+  height: 4px;
+  max-width: 28rem;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.06);
 }
 .tms-meter-track span {
-  min-width: 4px;
-  border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, var(--iris-2), var(--iris));
-  box-shadow: 0 0 12px var(--iris-glow);
+  min-width: 3px;
+  border-radius: 4px;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold-glow);
 }
 .tms-meter-track span:nth-child(even) {
-  background: linear-gradient(90deg, var(--iris), color-mix(in oklab, var(--iris) 45%, var(--pearl)));
+  background: var(--iris);
+  box-shadow: 0 0 8px var(--iris-glow);
 }
 .tms-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.6rem;
+  align-items: center;
+  gap: 0.4rem;
 }
-@media (max-width: 1099px) {
-  .tms-summary {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .tms-actions {
-    justify-content: flex-start;
-  }
+.tms-relaxed {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  max-width: 62ch;
+  margin-top: 1rem;
+  color: var(--lilac);
+  font-size: var(--step--1);
+}
+.tms-relaxed svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--rose);
 }
 
-/* Stops: large image rows with unboxed captions. */
+/* stops: posters and words on hairlines; a stop lights with its seed */
 .tms-stops {
   display: grid;
-  gap: clamp(2rem, 3.4vw, 2.75rem);
-  margin: clamp(2.5rem, 5vw, 3.75rem) 0 0;
+  max-width: 68rem;
+  margin: clamp(1.25rem, 3vw, 2rem) 0 0;
   padding: 0;
   list-style: none;
 }
 .tms-stop {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(260px, 460px) minmax(0, 1fr);
-  gap: 1.25rem clamp(1.5rem, 3vw, 2.75rem);
+  grid-template-columns: clamp(140px, 18vw, 240px) minmax(0, 1fr);
   align-items: center;
+  gap: 0.75rem clamp(1rem, 2.4vw, 2rem);
+  padding: clamp(0.9rem, 1.6vw, 1.2rem) 0;
+  border-bottom: 1px solid var(--line);
   animation: rise var(--t-slow) var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 70ms);
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+.tms-stop::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 20%;
+  bottom: 20%;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--gold);
+  box-shadow: 0 0 12px var(--gold-glow);
+  opacity: 0;
+  transition: opacity var(--t-mid);
+}
+.tms-stop[data-world-lit]::before {
+  opacity: 1;
 }
 .tms-stop-art {
   position: relative;
   display: block;
+  overflow: hidden;
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-card);
-  overflow: hidden;
-  box-shadow: var(--shadow-card), 0 0 0 1px var(--line);
-  transition:
-    transform var(--t-mid) var(--ease-out),
-    box-shadow var(--t-mid) var(--ease-out);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  transition: box-shadow var(--t-mid);
 }
 .tms-stop-art .art {
   position: absolute;
   inset: 0;
 }
-.tms-stop:hover .tms-stop-art,
-.tms-stop:focus-within .tms-stop-art {
-  transform: translateY(-4px);
-  box-shadow: 0 30px 70px -30px color-mix(in srgb, var(--iris-2) 60%, transparent), 0 0 0 1px var(--line-2);
+.tms-stop[data-world-lit] .tms-stop-art {
+  box-shadow:
+    inset 0 0 0 1px rgb(242 214 162 / 0.65),
+    0 0 30px -8px var(--gold-glow);
 }
 .tms-stop-num {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  left: 8px;
+  top: 8px;
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  border: 1px solid var(--line-2);
-  background: color-mix(in srgb, var(--night) 58%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-family: var(--font-display);
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 13px;
+  background: rgb(7 6 12 / 0.7);
+  color: var(--gold);
+  font-size: 0.78rem;
   font-weight: 700;
-  color: var(--pearl);
+  font-variant-numeric: tabular-nums;
 }
 .tms-stop-body {
   display: grid;
-  gap: 0.6rem;
+  gap: 0.35rem;
   min-width: 0;
 }
 .tms-stop-at {
+  color: var(--lilac-dim);
   font-size: var(--step--1);
-  color: var(--lilac);
 }
-.tms-tc {
-  font-family: var(--font-code);
-  font-size: 0.94em;
-  font-variant-numeric: tabular-nums;
+.tms-stop-at .timecode {
   color: var(--frost);
 }
 .tms-stop-title {
   font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -0.035em;
-  color: var(--pearl);
+  font-size: var(--step-2);
+  font-weight: 540;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 .tms-stop-title a {
+  color: var(--pearl);
   text-decoration: none;
 }
 .tms-stop-title a:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 2px;
+  color: var(--gold);
 }
-.tms-stop-badges {
+.tms-stop-meta {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem 0.6rem;
-}
-.tms-stop-prov {
-  font-size: var(--step--1);
+  gap: 0.15rem 0.6rem;
   color: var(--lilac-dim);
+  font-size: var(--step--1);
+}
+.tms-stop-meta > * + *::before {
+  content: '·';
+  margin-right: 0.6rem;
+}
+.tms-stop-access {
+  color: var(--gold);
 }
 
-@media (max-width: 899px) {
+/* ───── Tablet ───── */
+@media (max-width: 1179px) {
+  .tms-dial {
+    --size: 80px;
+  }
+  .tms-go {
+    --go: 96px;
+  }
+}
+
+/* ───── Phone: knobs two by two, GO a full-width row beneath ───── */
+@media (max-width: 767px) {
+  .tms-head {
+    padding-top: 0.75rem;
+  }
+  .tms-lede {
+    font-size: var(--step-0);
+  }
+  .tms-instrument {
+    margin-top: 1.25rem;
+  }
+  .tms-console {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.85rem 0.6rem;
+  }
+  .tms-knobs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 0.5rem;
+  }
+  .tms-knob {
+    gap: 0.2rem;
+  }
+  .tms-dial {
+    --size: 64px;
+  }
+  .tms-go-well {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: start;
+    gap: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .tms-go {
+    --go: 64px;
+  }
+  .tms-go-word {
+    font-size: var(--step-2);
+  }
+  .tms-go-hint {
+    max-width: none;
+    text-align: left;
+  }
+  .tms-summary {
+    align-items: stretch;
+  }
+  .tms-actions > .btn-primary {
+    flex: 1 1 100%;
+  }
   .tms-stop {
-    grid-template-columns: minmax(180px, 280px) minmax(0, 1fr);
+    grid-template-columns: 112px minmax(0, 1fr);
     align-items: start;
   }
   .tms-stop-title {
-    font-size: var(--step-2);
+    font-size: var(--step-1);
   }
-}
-@media (max-width: 599px) {
-  .tms-stop {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1rem;
-  }
-  .tms-actions .btn {
-    flex: 1 1 auto;
+  .tms-stop::before {
+    left: -10px;
   }
 }
 
-/* ═════════════ Touch targets (pointer: coarse) ═════════════
- * Title links keep their typographic size; --tap-pad grows the tap box to >= 44px and the
- * matching negative margin keeps the layout exactly where it was. */
-@media (pointer: coarse) {
-  .tms-stop-title a {
-    display: inline-block;
-    padding-block: var(--tap-pad);
-    margin-block: calc(var(--tap-pad) * -1);
-  }
-}
-
-/* ═════════════ Gold / iris alignment ═════════════
- * Gold marks what to do next: GO while there is no plan (or the knobs changed), then the
- * gold moves to "Start journey" and GO steps back to lavender chrome. Pointers and the
- * current detent are gold; the knob bodies stay lavender chrome. */
-.tms-head .page-title {
-  font-weight: 300;
-  letter-spacing: -0.05em;
-}
-.tms-head .page-title em {
-  font-weight: 600;
-  background: var(--gold-chrome);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-.tms-dial-ticks line[data-on] {
-  stroke: var(--gold);
-}
-.tms-dial-pointer {
-  background: linear-gradient(180deg, #fff3da, var(--gold) 60%, #b88f52);
-  box-shadow: 0 0 10px var(--gold-glow), inset 0 1px 0 rgb(255 255 255 / 0.7);
-}
-.tms-dial:hover .tms-dial-skirt,
-.tms-dial[data-dragging] .tms-dial-skirt {
-  box-shadow:
-    0 18px 30px -14px color-mix(in srgb, var(--night) 92%, transparent),
-    0 0 0 1px rgb(242 214 162 / 0.55),
-    0 0 30px -4px var(--gold-glow),
-    inset 0 1px 1px var(--pearl);
-}
-/* the knob's value never breaks mid-word; it scales with the knob's width instead */
-.tms-knob {
-  container-type: inline-size;
-}
-.tms-knob-value {
-  font-size: clamp(12px, 12.5cqi, 1.05rem);
-  overflow-wrap: normal;
-  word-break: normal;
-  hyphens: none;
-  text-wrap: balance;
-}
-@media (pointer: fine) {
-  .tms-knob-readout {
-    grid-template-columns: 20px minmax(0, 1fr) 20px;
-  }
-  .tms-knob-step {
-    width: 20px;
-  }
-}
-.tms-go-well[data-primary] .tms-go {
-  background: var(--gold-fill);
-  color: var(--on-gold);
-  box-shadow:
-    inset 0 2px 0 #fff,
-    inset 0 -14px 26px rgb(184 143 82 / 0.35),
-    0 0 0 1px rgb(255 246 226 / 0.85),
-    0 26px 60px -20px var(--gold-glow),
-    0 0 90px -14px var(--gold-glow);
-}
-.tms-go-well[data-primary] .tms-go:hover {
-  box-shadow:
-    inset 0 2px 0 #fff,
-    inset 0 -14px 26px rgb(184 143 82 / 0.4),
-    0 0 0 1px #fff,
-    0 30px 70px -18px var(--gold-glow),
-    0 0 120px -8px var(--gold-glow);
-}
-.tms-go-well[data-primary] .tms-go::before {
-  background: radial-gradient(circle closest-side, transparent 76%, rgb(242 214 162 / 0.38) 86%, transparent 100%);
-}
-/* an orbit: a single satellite rides around GO while it waits to be pressed */
-.tms-go::after {
-  content: '';
-  position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  border: 1px solid transparent;
-  border-top-color: rgb(242 214 162 / 0.6);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--t-mid);
-}
-.tms-go-well[data-primary] .tms-go::after {
-  opacity: 1;
-  animation: tms-orbit 4.8s linear infinite;
-}
-@keyframes tms-orbit {
-  to {
-    rotate: 360deg;
-  }
-}
-.tms-go:hover {
-  transform: none;
-}
-.tms-meter-total {
-  font-weight: 600;
-}
-.tms-meter-track span {
-  background: linear-gradient(90deg, #d8b072, var(--gold));
-  box-shadow: 0 0 12px var(--gold-glow);
-}
-.tms-meter-track span:nth-child(even) {
-  background: linear-gradient(90deg, var(--iris-2), var(--iris));
-  box-shadow: 0 0 12px var(--iris-glow);
-}
-:root[data-motion='reduce'] .tms-go::after {
+:root[data-motion='reduce'] .tms-stop {
   animation: none;
 }

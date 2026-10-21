@@ -1,6 +1,7 @@
 /**
- * Stage data for the globe and the flat map, seen through the lens. Pure (no DOM, no
- * Three.js) so the "what glows" rules are unit-tested:
+ * Node and route states for the flat map (the 2D view of the world), seen through the lens.
+ * Pure (no DOM) so the "what glows" rules are unit-tested. The living globe itself is the
+ * shared stage; it reads the same lens as the page's highlight.
  *
  *   selected place ............ 3 (ring + label)
  *   route ends, the place's

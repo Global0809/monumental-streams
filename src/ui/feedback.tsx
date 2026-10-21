@@ -22,13 +22,17 @@ export function Skeleton({ w = '100%', h = 16, r = 8 }: { w?: number | string; h
   return <span className="skeleton" style={{ width: w, height: h, borderRadius: r }} aria-hidden="true" />;
 }
 
-/** The pulse loader: an EKG trace. Announces its label politely. */
+/** The loader: five vertebrae lighting up the spine in turn. Announces its label politely. */
 export function Pulse({ label = 'Loading' }: { label?: string }) {
   return (
     <div className="pulse" role="status" aria-live="polite">
-      <svg viewBox="0 0 120 30" width="120" height="30" aria-hidden="true">
-        <path d="M0 15h38l6-10 7 20 6-26 6 22 4-6h53" />
-      </svg>
+      <span className="pulse-spine" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
+        <i />
+      </span>
       <span className="kicker">{label}</span>
     </div>
   );
@@ -106,7 +110,7 @@ const DIALOG_CLOSE_MS = 200;
  * Closing animates (the sheet sinks and fades) and is interruptible: asked to open again
  * while it is still closing, it simply rises back. Reduced motion closes at once.
  */
-export function Dialog({ open, onClose, title, children, wide, labelledBy }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean; labelledBy?: string }) {
+export function Dialog({ open, onClose, title, children, wide, labelledBy, variant = 'center' }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean; labelledBy?: string; /** 'sheet' rises from the bottom edge on phones (menus) */ variant?: 'center' | 'sheet' }) {
   const ref = useRef<HTMLDialogElement>(null);
   const opener = useRef<Element | null>(null);
   const timer = useRef(0);
@@ -176,7 +180,7 @@ export function Dialog({ open, onClose, title, children, wide, labelledBy }: { o
   return (
     <dialog
       ref={ref}
-      className={`dialog ${wide ? 'dialog-wide' : ''}`}
+      className={`dialog ${wide ? 'dialog-wide' : ''} ${variant === 'sheet' ? 'dialog-sheet' : ''}`}
       aria-labelledby={titleId}
       onClick={(e) => {
         if (e.target === ref.current) closeAnimated();

@@ -112,7 +112,7 @@
       "interest:music"
     ],
     "themes": [],
-    "art": "art:sound-aurora",
+    "art": "art:organ-music",
     "statusNote": "Announced. Campaign assets, tracklist and release details are awaiting approval, so there is nothing to play yet."
   },
   {
@@ -176,7 +176,7 @@
     "themes": [
       "theme:preservation"
     ],
-    "art": "art:time-machine",
+    "art": "art:still-coney-island-1905",
     "statusNote": "Public-domain films used as demonstration media while original programming is produced. They are not Monumental Originals."
   },
   {
@@ -196,7 +196,7 @@
       "interest:film"
     ],
     "themes": [],
-    "art": "art:bauhaus-categories",
+    "art": "art:still-sintel",
     "statusNote": "Creative Commons films used as demonstration media while original programming is produced. They are not Monumental Originals."
   },
   {

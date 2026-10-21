@@ -1,532 +1,345 @@
 /*
- * The lens — the World's filter membrane. A glass band across the top of the page: category
- * chips (gold when chosen, like every active state), the facet sub-row, the era strip (frost,
- * the colour of time — each decade's bar is how many stories are set then, a gold seed when a
- * movement was alive) and access / stories only. A thread of living light runs along its lower
- * edge and wakes while a filter is on. Under 768px the second row folds behind one button.
+ * The lens: quiet text choices in the editorial column — no pill wall. The chosen category is
+ * pearl on an iris underline; decades sit on a frost timeline whose bars show where the stories
+ * are. On narrow screens everything folds behind one "Filter" toggle.
  */
-
 .wl {
   position: relative;
-  z-index: 6;
+}
+.wl-body {
   display: grid;
-  gap: 10px;
-  min-width: 0;
-  padding: 14px 44px 12px 24px;
-  border-bottom: 1px solid var(--line);
-  background:
-    radial-gradient(60% 140% at 0% 0%, color-mix(in oklab, var(--iris) 9%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in oklab, var(--night-2) 86%, transparent), color-mix(in oklab, var(--night) 55%, transparent));
-  backdrop-filter: blur(18px) saturate(1.15);
-}
-.wl::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--iris) 25%, var(--frost) 50%, var(--gold) 75%, transparent) 0 0 / 200% 100%;
-  opacity: 0.18;
-  transition: opacity var(--t-slow) var(--ease-out);
-  pointer-events: none;
-}
-.wl[data-filtering]::after {
-  opacity: 0.85;
-  animation: wl-flow 7s linear infinite;
-}
-@keyframes wl-flow {
-  to {
-    background-position: -200% 0;
-  }
+  gap: 0.9rem;
 }
 
-.wl-main {
+/* ── category / facet chips ── */
+.wl-cats .wl-radios,
+.wl-row-facets .wl-radios {
   display: flex;
-  align-items: center;
-  gap: 18px;
-  min-width: 0;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.1rem;
+  margin-left: -0.65rem;
 }
-.wl-main > .wl-scroll {
-  flex: 1 1 auto;
-}
-.wl-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: none;
-}
-
-/* Horizontal scrollers keep the page itself from ever scrolling sideways. */
-.wl-scroll {
-  min-width: 0;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  padding: 3px;
-  margin: -3px;
-}
-.wl-scroll::-webkit-scrollbar {
-  display: none;
-}
-.wl-scroll[data-more-right] {
-  mask-image: linear-gradient(90deg, #000 calc(100% - 44px), transparent);
-}
-.wl-scroll[data-more-left] {
-  mask-image: linear-gradient(90deg, transparent, #000 44px);
-}
-.wl-scroll[data-more-left][data-more-right] {
-  mask-image: linear-gradient(90deg, transparent, #000 44px, #000 calc(100% - 44px), transparent);
-}
-
-.wl-radios {
-  display: flex;
-  gap: 5px;
-  width: max-content;
-}
-
 .wl-chip {
   position: relative;
   display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  min-height: 40px;
-  padding: 0 0.7em 0 0.75em;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line);
-  background: var(--glass);
-  color: var(--lilac);
+  align-items: baseline;
+  gap: 0.4rem;
+  min-height: 38px;
+  padding: 0.55rem 0.65rem 0.6rem;
+  border: 0;
+  border-radius: 10px;
+  background: none;
   font-family: var(--font-body);
   font-size: var(--step--1);
-  font-weight: 500;
+  font-weight: 560;
+  line-height: 1.2;
+  color: var(--lilac);
   white-space: nowrap;
   cursor: pointer;
-  isolation: isolate;
-  overflow: hidden;
   transition:
-    color var(--t-mid),
-    background var(--t-mid),
-    border-color var(--t-mid),
-    box-shadow var(--t-mid),
-    transform var(--t-mid) var(--ease-out);
-}
-/* specular light that follows a fine pointer (reactive.ts sets --px/--py) */
-.wl-chip::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: radial-gradient(80% 120% at var(--px, 50%) var(--py, 50%), rgb(255 255 255 / 0.16), transparent 60%);
-  opacity: 0;
-  transition: opacity var(--t-mid);
-}
-.wl-chip[data-lit]::before {
-  opacity: 1;
+    color var(--t-fast),
+    background var(--t-fast);
 }
 .wl-chip:hover {
   color: var(--pearl);
-  border-color: var(--line-2);
-  background: var(--glass-2);
+  background: var(--glass);
 }
-.wl-chip:active {
-  transform: scale(0.97);
+.wl-chip::after {
+  content: '';
+  position: absolute;
+  left: 0.65rem;
+  right: 0.65rem;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--iris);
+  box-shadow: 0 0 10px var(--iris-glow);
+  opacity: 0;
+  scale: 0.4 1;
+  transition:
+    opacity var(--t-fast),
+    scale var(--t-mid) var(--ease-out);
 }
-.wl-chip-node {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  border: 1.5px solid var(--iris);
+.wl-chip[aria-checked='true'] {
+  color: var(--pearl);
 }
-.wl-chip > svg {
-  color: var(--iris);
+.wl-chip[aria-checked='true']::after {
+  opacity: 1;
+  scale: 1 1;
 }
 .wl-chip-count {
-  min-width: 1.4em;
-  padding: 0 0.45em;
-  border-radius: var(--radius-pill);
-  background: rgb(255 255 255 / 0.06);
-  font-size: 0.74rem;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--lilac-dim);
+  font-variant-numeric: tabular-nums;
+}
+.wl-chip[aria-checked='true'] .wl-chip-count {
+  color: var(--iris);
 }
 .wl-chip[data-empty] {
   color: var(--lilac-dim);
 }
-/* nothing there yet: the dashed node says so; the number would only repeat it */
-.wl-chip[data-empty]:not([aria-checked='true']) .wl-chip-count {
-  min-width: 0;
-  padding: 0;
-  background: none;
-}
-.wl-chip[data-empty]:not([aria-checked='true']) .wl-chip-count > [aria-hidden] {
-  display: none;
-}
-.wl-chip[data-empty] .wl-chip-node {
-  border-color: var(--lilac-dim);
-  border-style: dashed;
-}
-.wl-chip[aria-checked='true'] {
-  color: var(--on-gold);
-  background: var(--gold-fill);
-  border-color: rgb(255 244 220 / 0.9);
-  box-shadow:
-    0 12px 30px -14px var(--gold-glow),
-    inset 0 1px 0 #fff;
-}
-.wl-chip[aria-checked='true'] .wl-chip-node {
-  border-color: var(--on-gold);
-  background: var(--on-gold);
-}
-.wl-chip[aria-checked='true'] .wl-chip-count {
-  background: rgb(37 24 4 / 0.12);
-  color: var(--on-gold);
-}
-.wl-chip:focus-visible,
-.wl-era-cell:focus-visible,
-.wl-era-any:focus-visible,
-.wl-switch:focus-visible,
-.wl-clear:focus-visible,
-.wl-more-btn:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
+.wl-chip[data-empty] .wl-chip-count {
+  opacity: 0.7;
 }
 
-.wl-clear {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45em;
-  min-height: 40px;
-  padding: 0 1em;
-  border-radius: var(--radius-pill);
-  border: 1px solid color-mix(in oklab, var(--gold) 40%, transparent);
-  background: transparent;
-  color: var(--gold);
-  font-size: var(--step--1);
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background var(--t-mid);
-}
-.wl-clear:hover {
-  background: color-mix(in oklab, var(--gold) 10%, transparent);
-}
-.wl-clear {
-  flex: none;
-}
-.wl-clear-n {
-  display: inline-grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 5px;
-  border-radius: 10px;
-  background: var(--gold-fill);
-  color: var(--on-gold);
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
-/* Facets of the chosen section */
-.wl-facets {
+.wl-row-facets {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: wl-unfold var(--t-slow) var(--ease-out);
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  padding-left: 0.9rem;
+  border-left: 1px solid color-mix(in oklab, var(--iris) 40%, transparent);
 }
-@keyframes wl-unfold {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-}
-.wl-facets-lead {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3em;
+.wl-label {
   flex: none;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gold);
+  font-size: 12px;
+  color: var(--lilac-dim);
+}
+.wl-row-facets .wl-scroll {
+  min-width: 0;
 }
 
-/* Second row */
-.wl-more-btn {
-  display: none;
-}
-.wl-more {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px 18px;
-  min-width: 0;
+/* ── era: a frost timeline ── */
+.wl-scroll {
+  position: relative;
 }
 .wl-era-wrap {
-  flex: 0 1 auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-inline: -4px;
+  padding-inline: 4px;
+}
+.wl-era-wrap::-webkit-scrollbar {
+  display: none;
 }
 .wl-era {
   display: flex;
   align-items: stretch;
-  gap: 8px;
-  width: max-content;
-}
-.wl-era-any {
-  display: inline-flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 0 1em;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line);
-  background: var(--glass);
-  color: var(--lilac);
-  font-size: var(--step--1);
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  align-self: center;
-  transition:
-    color var(--t-mid),
-    background var(--t-mid),
-    border-color var(--t-mid);
-}
-.wl-era-any:hover {
-  color: var(--pearl);
-  background: var(--glass-2);
-}
-.wl-era-any[aria-checked='true'] {
-  color: var(--night);
-  background: linear-gradient(180deg, #effaff, var(--frost));
-  border-color: #effaff;
-}
-.wl-era-track {
-  display: flex;
   gap: 2px;
-  padding: 3px;
-  border-radius: 16px;
-  border: 1px solid var(--line);
-  background:
-    linear-gradient(180deg, transparent 62%, color-mix(in oklab, var(--frost) 6%, transparent)),
-    var(--glass);
+  min-width: 100%;
 }
 .wl-era-cell {
+  flex: 1 0 31px;
   display: grid;
-  grid-template-rows: 1fr auto;
   justify-items: center;
-  align-items: end;
-  width: 40px;
-  height: 44px;
-  padding: 5px 0 4px;
+  align-content: end;
+  gap: 5px;
+  min-height: 46px;
+  padding: 4px 0 5px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 8px;
   background: none;
-  color: var(--lilac-dim);
   font-family: var(--font-body);
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 560;
+  color: var(--lilac-dim);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition:
-    background var(--t-mid),
-    color var(--t-mid),
-    box-shadow var(--t-mid);
+    color var(--t-fast),
+    background var(--t-fast);
 }
-.wl-era-cell:hover {
-  color: var(--pearl);
-  background: var(--glass-2);
-}
-.wl-era-cell[data-empty] {
-  color: color-mix(in oklab, var(--lilac-dim) 80%, transparent);
+.wl-era-any {
+  flex: 0 0 auto;
+  padding-inline: 0.6rem;
 }
 .wl-era-bar {
   position: relative;
   display: flex;
   align-items: flex-end;
-  width: 6px;
-  height: 18px;
-  border-radius: 3px;
-  background: rgb(255 255 255 / 0.07);
+  justify-content: center;
+  width: 100%;
+  height: 20px;
+  border-bottom: 1px solid color-mix(in oklab, var(--frost) 28%, transparent);
 }
 .wl-era-bar > span {
-  width: 100%;
+  width: 3px;
   height: calc(var(--h, 0) * 100%);
-  border-radius: 3px;
-  background: linear-gradient(180deg, #e9f8ff, var(--frost) 40%, var(--iris-2));
-  box-shadow: 0 0 10px var(--frost-glow);
-  transition: height var(--t-slow) var(--ease-out);
+  border-radius: 2px 2px 0 0;
+  background: color-mix(in oklab, var(--frost) 70%, transparent);
+  transition:
+    height var(--t-mid) var(--ease-out),
+    background var(--t-fast);
 }
+/* a movement alive then: a small hollow ring above the bar */
 .wl-era-bar > i {
   position: absolute;
-  top: -6px;
-  left: 50%;
-  width: 4px;
-  height: 4px;
-  margin-left: -2px;
+  top: -2px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 6px var(--gold-glow);
+  border: 1px solid color-mix(in oklab, var(--frost) 60%, transparent);
+}
+.wl-era-cell:hover {
+  color: var(--pearl);
+  background: var(--glass);
+}
+.wl-era-cell[data-empty] {
+  opacity: 0.55;
 }
 .wl-era-cell[aria-checked='true'] {
-  color: var(--pearl);
-  background: linear-gradient(180deg, color-mix(in oklab, var(--frost) 24%, transparent), color-mix(in oklab, var(--frost) 6%, transparent));
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--frost) 70%, transparent), 0 0 22px -6px var(--frost-glow);
+  color: var(--frost);
+}
+.wl-era-cell[aria-checked='true'] .wl-era-bar {
+  border-bottom: 2px solid var(--frost);
+}
+.wl-era-cell[aria-checked='true'] .wl-era-bar > span {
+  background: var(--frost);
+  box-shadow: 0 0 10px var(--frost-glow);
 }
 
-.wl-tail {
+/* ── access, stories only, clear ── */
+.wl-tail-controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-}
-.wl .segmented-wrap {
-  margin: 0;
-}
-.wl .segmented button {
-  min-height: 40px;
+  gap: 0.6rem 1.4rem;
 }
 .wl-switch {
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
+  gap: 0.6rem;
   min-height: 40px;
-  padding: 0 1em 0 0.55em;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line);
-  background: var(--glass);
-  color: var(--lilac);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-body);
   font-size: var(--step--1);
-  font-weight: 500;
-  white-space: nowrap;
+  font-weight: 560;
+  color: var(--lilac);
   cursor: pointer;
-  transition:
-    color var(--t-mid),
-    border-color var(--t-mid);
 }
 .wl-switch:hover {
   color: var(--pearl);
-  border-color: var(--line-2);
 }
 .wl-switch-track {
   position: relative;
+  flex: none;
   width: 34px;
   height: 20px;
-  border-radius: 10px;
+  border-radius: 999px;
   border: 1px solid var(--line-2);
-  background: var(--plum-3);
-  transition: background var(--t-mid);
+  background: rgb(255 255 255 / 0.04);
+  transition:
+    background var(--t-mid),
+    border-color var(--t-mid);
 }
 .wl-switch-track > span {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--chrome-soft);
-  transition: transform var(--t-mid) var(--ease-out);
+  background: var(--lilac);
+  transition:
+    translate var(--t-mid) var(--ease-out),
+    background var(--t-mid);
 }
 .wl-switch[aria-checked='true'] {
   color: var(--pearl);
-  border-color: color-mix(in oklab, var(--gold) 50%, transparent);
 }
 .wl-switch[aria-checked='true'] .wl-switch-track {
-  background: var(--gold-fill);
-  border-color: rgb(255 244 220 / 0.8);
+  background: color-mix(in oklab, var(--iris) 30%, transparent);
+  border-color: var(--iris);
 }
 .wl-switch[aria-checked='true'] .wl-switch-track > span {
-  transform: translateX(14px);
-  background: var(--on-gold);
+  translate: 14px 0;
+  background: var(--pearl);
+}
+.wl-clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--iris);
+  cursor: pointer;
+}
+.wl-clear:hover {
+  color: var(--pearl);
 }
 
-/* ── Touch: every control grows to the 44px target ── */
-@media (pointer: coarse) {
-  .wl-chip,
-  .wl-clear,
-  .wl-era-any,
-  .wl-switch,
-  .wl .segmented button {
-    min-height: var(--hit);
-  }
-  .wl-era-cell {
-    width: var(--hit);
-    height: 48px;
-  }
+/* ── narrow: one toggle, the stories first ── */
+.wl-fold {
+  display: none;
 }
-
-/* ── Tablet and phone ── */
-@media (max-width: 1099px) {
-  .wl {
-    padding: 12px var(--gutter) 12px;
-  }
-}
-@media (max-width: 767px) {
-  .wl {
-    gap: 8px;
-    padding: 10px 16px 12px;
-  }
-  /* chips, then the facet row, then the actions, then the folded second row */
-  .wl-main {
-    display: contents;
-  }
-  .wl-cats {
-    order: 1;
-  }
-  .wl-facets {
-    order: 2;
-  }
-  .wl-actions {
-    order: 3;
+@media (max-width: 1023px), (max-aspect-ratio: 9/10) {
+  .wl-fold {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem 1rem;
     flex-wrap: wrap;
   }
-  .wl-more {
-    order: 4;
-  }
-  .wl-more-btn {
+  .wl-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 0.55em;
+    gap: 0.5rem;
     min-height: var(--hit);
-    padding: 0 1em;
-    border-radius: var(--radius-pill);
+    padding: 0 0.9rem 0 0.8rem;
+    border-radius: var(--radius-control);
     border: 1px solid var(--line-2);
-    background: var(--glass);
-    color: var(--pearl);
+    background: rgb(12 10 19 / 0.5);
+    backdrop-filter: blur(12px);
+    font-family: var(--font-body);
     font-size: var(--step--1);
     font-weight: 600;
+    color: var(--pearl);
     cursor: pointer;
   }
-  .wl-more-btn > svg:last-child {
-    transition: transform var(--t-mid) var(--ease-out);
+  .wl-toggle > svg:last-child {
+    transition: rotate var(--t-mid) var(--ease-out);
   }
-  .wl-more-btn[aria-expanded='true'] > svg:last-child {
-    transform: rotate(180deg);
+  .wl-toggle[aria-expanded='true'] > svg:last-child {
+    rotate: 180deg;
   }
-  .wl-more-n {
+  .wl-toggle-n {
     display: inline-grid;
     place-items: center;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 6px;
-    border-radius: 11px;
-    background: var(--gold-fill);
-    color: var(--on-gold);
-    font-size: 0.74rem;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background: var(--iris);
+    color: var(--on-pearl);
+    font-size: 11px;
     font-weight: 700;
   }
-  .wl-more {
-    display: none;
+  .wl-fold-now {
+    min-width: 0;
+    font-size: 13px;
+    color: var(--lilac-dim);
   }
-  .wl[data-open] .wl-more {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    animation: wl-unfold var(--t-slow) var(--ease-out);
+  .wl[data-filtering] .wl-fold-now {
+    color: var(--gold);
+  }
+  .wl-body {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem 1rem 0.6rem 1.15rem;
+    border-radius: var(--radius-panel);
+    border: 1px solid var(--line);
+    background: rgb(12 10 19 / 0.72);
+    backdrop-filter: blur(16px);
+  }
+  .wl[data-open] .wl-body {
+    display: grid;
+  }
+  .wl-era-cell {
+    flex-basis: 46px;
   }
 }
 
-:root[data-motion='reduce'] .wl[data-filtering]::after,
-:root[data-motion='reduce'] .wl-facets,
-:root[data-motion='reduce'] .wl[data-open] .wl-more {
-  animation: none;
+@media (pointer: coarse) {
+  .wl-chip,
+  .wl-era-cell,
+  .wl-switch,
+  .wl-clear {
+    min-height: var(--hit);
+  }
 }

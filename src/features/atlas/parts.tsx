@@ -1,7 +1,18 @@
-/** Small pieces shared by the World stage views and panels. */
-import { createContext, useContext } from 'react';
+/**
+ * Small pieces shared by the World views and panels — above all the DOM ⇄ world link for
+ * places. Seeds (stories) already answer through VideoPod; places answer here:
+ *
+ *   pointer / focus on a place row ─→ stageStore.hoveredPlace ─→ the globe lights the node
+ *   a place under the pointer on the globe ─→ stageStore.hoveredPlace ─→ its rows light
+ *                                                                     (data-world-lit)
+ *
+ * The DOM only ever clears what the DOM set, so a hover coming from the globe is never wiped
+ * by a row losing focus, and the place preview can tell the two apart (isDomHot).
+ */
+import { useSyncExternalStore } from 'react';
 import { Link } from 'react-router';
 import type { ID, Place, Route } from '../../../shared/types.ts';
+import { stageStore } from '../../stage/store.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
 import { sound } from '../../systems/sound/engine.ts';
 import { Icon } from '../../ui/Icon.tsx';
@@ -9,23 +20,51 @@ import { ROUTE_KIND_LABEL } from './model.ts';
 
 export type HrefFor = (slug: string | null, route?: string | null) => string;
 
-/* ───────────── Hover link: a row beside the stage lights its node on the globe ───────────── */
+/* ───────────── Places ⇄ world ───────────── */
 
-export const HotContext = createContext<(id: ID | null) => void>(() => {});
+let domHot: ID | null = null;
 
-/** Pointer and focus handlers that light `id` on the stage while the row is hovered or focused. */
+/** Light (or clear) a place in the world from the DOM. */
+export function setHotPlace(id: ID | null) {
+  const prev = domHot;
+  domHot = id;
+  stageStore.set((s) => {
+    if (id) return s.hoveredPlace === id ? s : { ...s, hoveredPlace: id };
+    return prev && s.hoveredPlace === prev ? { ...s, hoveredPlace: null } : s;
+  });
+}
+
+/** True when the current hovered place came from the DOM (not from the globe). */
+export const isDomHot = (id: ID | null) => !!id && id === domHot;
+
+/** The place under the pointer — on the globe or on a row. */
+export function useHoveredPlace(): ID | null {
+  return useSyncExternalStore(stageStore.subscribe, () => stageStore.get().hoveredPlace, () => null);
+}
+
+/** Whether `id` is lit in the world right now (re-renders only when that flips). */
+export function usePlaceLit(id: ID | null | undefined): boolean {
+  return useSyncExternalStore(
+    stageStore.subscribe,
+    () => !!id && stageStore.get().hoveredPlace === id,
+    () => false,
+  );
+}
+
+/** Pointer and focus handlers that light `id` in the world, plus the lit state for styling. */
 export function useHot(id: ID | null | undefined) {
-  const setHot = useContext(HotContext);
+  const lit = usePlaceLit(id);
   if (!id) return {};
   return {
-    onPointerEnter: () => setHot(id),
-    onPointerLeave: () => setHot(null),
-    onFocus: () => setHot(id),
-    onBlur: () => setHot(null),
+    onPointerEnter: () => setHotPlace(id),
+    onPointerLeave: () => setHotPlace(null),
+    onFocus: () => setHotPlace(id),
+    onBlur: () => setHotPlace(null),
+    'data-world-lit': lit || undefined,
   };
 }
 
-/* ───────────── Zoom ───────────── */
+/* ───────────── Zoom (flat map) ───────────── */
 
 export function ZoomControls({ onIn, onOut, onReset, resetLabel = 'Recentre' }: { onIn: () => void; onOut: () => void; onReset: () => void; resetLabel?: string }) {
   const tap = (fn: () => void) => () => {
@@ -51,7 +90,7 @@ export function RouteSwatch({ kind }: { kind: Route['kind'] }) {
   return <span className={`atlas-swatch atlas-swatch-route atlas-k-${kind}`} aria-hidden="true" />;
 }
 
-/** Legend for nodes and route kinds. A disclosure, so it never depends on hover. */
+/** Legend for places and route kinds. A disclosure, so it never depends on hover. */
 export function Legend({ lensed }: { lensed?: boolean }) {
   return (
     <details className="atlas-legend">
@@ -59,15 +98,15 @@ export function Legend({ lensed }: { lensed?: boolean }) {
       <ul className="atlas-legend-list">
         <li>
           <span className="atlas-swatch atlas-swatch-active" aria-hidden="true" />
-          {lensed ? 'Stories that match — size grows with the count' : 'Stories here — size grows with the count'}
+          {lensed ? 'Stories that match — brighter with more' : 'Stories here — brighter with more'}
         </li>
         <li>
           <span className="atlas-swatch atlas-swatch-expanding" aria-hidden="true" />
-          {lensed ? 'Hollow — culture here, no matching stories' : 'Expanding — mapped, no stories yet'}
+          {lensed ? 'Hollow ring — culture here, no matching stories' : 'Hollow ring — mapped, no stories yet'}
         </li>
         <li>
           <span className="atlas-swatch atlas-swatch-gateway" aria-hidden="true" />
-          Gateway
+          Miami, the gateway
         </li>
         {(Object.keys(ROUTE_KIND_LABEL) as Route['kind'][]).map((k) => (
           <li key={k}>
@@ -75,6 +114,7 @@ export function Legend({ lensed }: { lensed?: boolean }) {
             {ROUTE_KIND_LABEL[k]} route
           </li>
         ))}
+        <li className="atlas-legend-credit">Land from Natural Earth, public domain</li>
       </ul>
     </details>
   );
@@ -89,13 +129,12 @@ export function Trail({ slugs, current, hrefFor, onClear }: { slugs: string[]; c
     .filter((s) => s !== current)
     .map((s) => cat.bySlug('place', s) as Place | undefined)
     .filter((p): p is Place => !!p)
-    .slice(0, 5);
+    .slice(0, 4);
   if (!items.length) return null;
   return (
     <nav className="atlas-trail" aria-label="Recent places">
       <span className="atlas-trail-lead" aria-hidden="true">
-        <Icon name="replay" size={14} />
-        Trail
+        Recent
       </span>
       <ol className="atlas-trail-list">
         {items.map((p) => (
@@ -115,7 +154,6 @@ function TrailLink({ place, to }: { place: Place; to: string }) {
   const hot = useHot(place.id);
   return (
     <Link to={to} className="atlas-trail-link" onClick={() => sound.play('transition')} {...hot}>
-      <span className="atlas-trail-node" aria-hidden="true" />
       {place.name}
     </Link>
   );

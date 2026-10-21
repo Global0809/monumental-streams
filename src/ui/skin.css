@@ -1,463 +1,10 @@
 /* ════════════════════════════════════════════════════════════════════════════
- * CHROME BLOOM SKIN — visual layer over the component structure in ui.css.
- * Pearl-chrome primary actions, calm glass controls, image-first cards, generous space.
- * Loaded after ui.css; structure and accessibility rules stay in ui.css.
+ * REACTIVE LANGUAGE — how the components in ui.css answer. Press physics, ripples and the
+ * pointer light live in src/styles/reactive.css; this is the visual side of each state.
+ * Loaded after ui.css.
  * ════════════════════════════════════════════════════════════════════════════ */
 
-/* Buttons */
-.btn {
-  --b-bg: var(--glass);
-  --b-edge: var(--line-2);
-  min-height: 48px;
-  padding: 0 1.4em;
-  font-weight: 600;
-  font-size: var(--step--1);
-  letter-spacing: 0;
-  backdrop-filter: blur(14px);
-}
-.btn::before {
-  background: radial-gradient(120% 140% at 50% 120%, rgb(199 183 255 / 0.28), transparent 60%);
-}
-@media (pointer: fine) {
-  .btn-sm {
-    min-height: 38px;
-  }
-}
-.btn-lg {
-  min-height: 58px;
-  padding: 0 1.9em;
-  font-size: var(--step-0);
-}
-.btn-primary {
-  --b-bg: var(--pearl-fill);
-  --b-fg: var(--on-pearl);
-  --b-edge: rgb(255 255 255 / 0.9);
-  box-shadow: 0 14px 40px -14px rgb(160 140 255 / 0.55), inset 0 1px 0 #fff;
-}
-.btn-primary::before {
-  background: radial-gradient(120% 140% at 50% 120%, rgb(160 140 255 / 0.35), transparent 60%);
-}
-.btn-quiet {
-  --b-bg: transparent;
-  --b-edge: transparent;
-  backdrop-filter: none;
-}
-.btn-quiet:hover {
-  --b-edge: var(--line);
-}
-.btn-chrome {
-  --b-bg: linear-gradient(180deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.03));
-  --b-edge: rgb(232 224 255 / 0.26);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
-}
-.btn-aurum {
-  --b-bg: linear-gradient(180deg, #fff3da, var(--gold));
-  --b-fg: #241703;
-  --b-edge: rgb(255 244 220 / 0.9);
-  box-shadow: 0 14px 40px -16px var(--gold-glow), inset 0 1px 0 #fff;
-}
-.icon-btn:hover {
-  background: var(--glass-2);
-  border-color: var(--line-2);
-}
-.icon-btn[aria-pressed='true'] {
-  color: var(--iris);
-  border-color: rgb(179 163 255 / 0.5);
-}
-
-/* Chips: soft glass pills; selected = pearl */
-.chip {
-  min-height: 40px;
-  padding: 0 1em 0 0.85em;
-  border-color: var(--line);
-  background: var(--glass);
-  color: var(--lilac);
-  font-weight: 500;
-  backdrop-filter: blur(10px);
-}
-.chip-node {
-  width: 7px;
-  height: 7px;
-  border-width: 1.5px;
-}
-.chip[aria-pressed='true'] {
-  color: var(--on-pearl);
-  background: var(--pearl-fill);
-  border-color: #fff;
-}
-.chip[aria-pressed='true'] .chip-node {
-  background: var(--iris-2);
-  border-color: var(--iris-2);
-  box-shadow: none;
-}
-.chip[aria-pressed='true'] .chip-count {
-  color: #4a3f6a;
-}
-
-/* Switch / segmented / tabs */
-.switch {
-  background: var(--plum-3);
-  border-color: var(--line-2);
-}
-.switch-knob {
-  background: var(--chrome-soft);
-}
-.switch[aria-checked='true'] {
-  background: linear-gradient(90deg, var(--iris-deep), var(--iris-2));
-  border-color: rgb(179 163 255 / 0.6);
-}
-.segmented {
-  border-radius: var(--radius-pill);
-  background: var(--glass);
-  border-color: var(--line);
-}
-.segmented button {
-  border-radius: var(--radius-pill);
-  font-weight: 500;
-}
-.segmented button[aria-checked='true'] {
-  background: var(--pearl-fill);
-  color: var(--on-pearl);
-  border-color: #fff;
-  box-shadow: none;
-}
-.tabs [role='tab'][aria-selected='true']::after {
-  height: 3px;
-  border-radius: 3px;
-  background: var(--pearl-fill);
-  box-shadow: 0 0 14px var(--iris-glow);
-}
-
-/* Badges: quiet pills */
-.badge {
-  height: 24px;
-  padding: 0 0.7em;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  background: rgb(10 8 17 / 0.62);
-  border-color: var(--line-2);
-  backdrop-filter: blur(10px);
-}
-.badge-free {
-  color: var(--pearl);
-  border-color: rgb(179 163 255 / 0.5);
-}
-.badge-premium,
-.badge-early {
-  color: var(--gold);
-  border-color: rgb(242 214 162 / 0.5);
-}
-.badge-planned,
-.badge-soon,
-.badge-unavailable {
-  color: var(--frost);
-  border-color: rgb(159 220 255 / 0.45);
-}
-.badge-f-archive {
-  color: #ffe2b8;
-  border-color: rgb(255 226 184 / 0.4);
-}
-
-/* Cards: image-first, rounded, unboxed body */
-.pod {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-}
-.pod:hover,
-.pod:focus-within,
-.pod[data-access='premium']:hover,
-.pod[data-access='early']:hover {
-  border: 0;
-  box-shadow: none;
-  transform: translateY(-4px);
-}
-.pod-specimen {
-  margin: 0;
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card), 0 0 0 1px var(--line);
-  transition: box-shadow var(--t-mid) var(--ease-out);
-}
-.pod:hover .pod-specimen,
-.pod:focus-within .pod-specimen {
-  box-shadow: 0 30px 70px -30px rgb(120 90 255 / 0.55), 0 0 0 1px rgb(232 224 255 / 0.35);
-}
-.pod[data-access='premium']:hover .pod-specimen,
-.pod[data-access='early']:hover .pod-specimen {
-  box-shadow: 0 30px 70px -30px var(--gold-glow), 0 0 0 1px rgb(242 214 162 / 0.4);
-}
-.pod-ribs {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.1), transparent 22%, transparent 62%, rgb(10 8 17 / 0.55));
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
-}
-.pod-runtime {
-  right: 12px;
-  bottom: 12px;
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.72rem;
-  background: rgb(10 8 17 / 0.66);
-  backdrop-filter: blur(8px);
-}
-.pod-vein {
-  height: 3px;
-  background: rgb(255 255 255 / 0.18);
-}
-.pod-vein span {
-  background: var(--pearl-fill);
-  box-shadow: 0 0 10px var(--iris-glow);
-}
-.pod-body {
-  padding: 0.9rem 0.25rem 0.4rem;
-  gap: 0.4rem;
-}
-.pod-title {
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
-.pod-sm .pod-title {
-  font-size: var(--step-0);
-}
-.pod-lg .pod-title {
-  font-size: var(--step-2);
-}
-.pod:has(.pod-title a:focus-visible) {
-  box-shadow: none;
-}
-.pod:has(.pod-title a:focus-visible) .pod-specimen {
-  box-shadow: var(--focus-ring);
-}
-.pod-meta {
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  letter-spacing: 0;
-  color: var(--lilac-dim);
-}
-.pod-meta span + span::before {
-  content: '·';
-  color: var(--lilac-dim);
-}
-.pod-save {
-  border-radius: 50%;
-  border-color: rgb(255 255 255 / 0.22);
-  background: rgb(10 8 17 / 0.5);
-  backdrop-filter: blur(10px);
-}
-.pod-save:hover,
-.pod-save[aria-pressed='true'] {
-  color: var(--on-pearl);
-  background: var(--pearl-fill);
-  border-color: #fff;
-}
-
-/* Reasons: soft inline links */
-.reason {
-  font-size: 0.8rem;
-  color: var(--lilac);
-}
-.reason a {
-  border-bottom-color: rgb(179 163 255 / 0.45);
-}
-.reason a:hover {
-  color: var(--pearl);
-}
-.reason-node,
-.reason-period .reason-node,
-.reason-movement .reason-node,
-.reason-lineage .reason-node,
-.reason-person .reason-node,
-.reason-programme .reason-node,
-.reason-series-order .reason-node {
-  width: 4px;
-  height: 4px;
-  background: var(--iris);
-  box-shadow: none;
-}
-@media (pointer: coarse) {
-  .reason a {
-    text-decoration-color: rgb(179 163 255 / 0.5);
-  }
-}
-
-/* Sections and rows */
-.section-head {
-  margin-bottom: 1.4rem;
-}
-.section-title {
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
-}
-.section-sub {
-  color: var(--lilac);
-}
-.row-track {
-  grid-auto-columns: minmax(280px, 360px);
-  gap: 1.25rem;
-}
-.row-nav .icon-btn {
-  background: rgb(10 8 17 / 0.6);
-}
-
-/* Empty / pulse */
-.empty {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-panel);
-  background: radial-gradient(70% 90% at 50% 0%, rgb(120 90 255 / 0.12), transparent 70%), var(--glass);
-}
-.empty-glyph,
-.empty-plasma .empty-glyph,
-.empty-aurum .empty-glyph {
-  border-color: var(--line-2);
-  color: var(--pearl);
-  background: var(--glass-2);
-  box-shadow: 0 0 40px -10px var(--iris-glow);
-}
-.empty-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-}
-.pulse svg path {
-  stroke: var(--iris);
-  filter: drop-shadow(0 0 4px var(--iris));
-}
-
-/* Toasts / dialogs / forms / panels / notices */
-.toast {
-  border-radius: 18px;
-  background: var(--glass-strong);
-  backdrop-filter: blur(20px);
-}
-.toast-node {
-  background: var(--iris);
-  box-shadow: 0 0 10px var(--iris);
-}
-.toast-action {
-  border-color: rgb(255 255 255 / 0.5);
-  color: var(--pearl);
-}
-.dialog {
-  border-radius: 30px;
-  background: linear-gradient(180deg, #1e1830, #120e1c);
-  box-shadow: 0 50px 140px -30px #000, 0 0 0 1px rgb(232 224 255 / 0.1);
-}
-.dialog::backdrop {
-  background: rgb(6 4 12 / 0.7);
-  backdrop-filter: blur(10px);
-}
-.dialog-head h2 {
-  font-family: var(--font-display);
-  font-weight: 700;
-}
-.input {
-  border-radius: var(--radius-control);
-  background: var(--glass);
-  border-color: var(--line-2);
-}
-.input:focus {
-  border-color: var(--iris);
-  box-shadow: 0 0 0 3px rgb(179 163 255 / 0.22);
-}
-.panel {
-  border-radius: var(--radius-panel);
-  border-color: var(--line);
-  background: linear-gradient(180deg, rgb(34 27 50 / 0.82), rgb(18 14 28 / 0.86));
-  box-shadow: var(--shadow-float);
-  backdrop-filter: blur(16px);
-}
-.notice {
-  border-radius: 18px;
-  border-color: rgb(159 220 255 / 0.3);
-  background: rgb(159 220 255 / 0.06);
-}
-.notice svg {
-  color: var(--frost);
-}
-
-/* Primary action: champagne-gold metal (one per view) */
-.btn-primary {
-  --b-bg: var(--gold-fill);
-  --b-fg: var(--on-gold);
-  --b-edge: rgb(255 246 226 / 0.95);
-  box-shadow: 0 14px 40px -14px rgb(242 214 162 / 0.55), inset 0 1px 0 #fff;
-}
-.btn-primary::before {
-  background: radial-gradient(160px circle at var(--px, 50%) var(--py, 120%), rgb(255 255 255 / 0.55), transparent 60%);
-}
-
-/* Legacy colours left in ui.css, brought into the palette */
-.btn::before {
-  background: radial-gradient(160px circle at var(--px, 50%) var(--py, 120%), rgb(242 214 162 / 0.22), transparent 62%);
-}
-.btn-danger {
-  --b-bg: rgb(255 122 143 / 0.12);
-  --b-edge: rgb(255 122 143 / 0.45);
-  --b-fg: #ffd6dd;
-}
-.form-error {
-  border-color: rgb(255 122 143 / 0.45);
-  background: rgb(255 122 143 / 0.08);
-  color: #ffd6dd;
-}
-.notice-ember {
-  border-color: rgb(255 159 200 / 0.45);
-  background: rgb(255 159 200 / 0.08);
-}
-.notice-ember svg {
-  color: var(--rose);
-}
-.notice-aurum {
-  border-color: rgb(242 214 162 / 0.45);
-  background: rgb(242 214 162 / 0.07);
-}
-.notice-aurum svg {
-  color: var(--gold);
-}
-.art-provisional {
-  color: var(--lilac);
-  background: rgb(10 8 17 / 0.6);
-}
-.switch[aria-checked='true'] {
-  border-color: rgb(179 163 255 / 0.6);
-}
-.badge-free {
-  background: rgb(10 8 17 / 0.62);
-}
-.chip[aria-pressed='true'] {
-  color: var(--on-gold);
-  background: var(--gold-fill);
-  border-color: rgb(255 246 226 / 0.95);
-}
-.chip[aria-pressed='true'] .chip-node {
-  background: #7a5520;
-  border-color: #7a5520;
-}
-.chip[aria-pressed='true'] .chip-count {
-  color: #6b4d1e;
-}
-.segmented button[aria-checked='true'] {
-  background: var(--gold-fill);
-  color: var(--on-gold);
-  border-color: rgb(255 246 226 / 0.95);
-}
-
-/* ════════════════════════════════════════════════════════════════════════════
- * REACTIVE LANGUAGE — how controls answer. Press physics, ripples and the drawn focus ring
- * live in src/styles/reactive.css; this is the visual side of each control's states.
- * ════════════════════════════════════════════════════════════════════════════ */
-
-/* Primary (gold): a slow sheen crosses the metal on hover — living light, once per hover. */
+/* Primary (gold): a slow sheen crosses the light on hover — once per hover. */
 .btn-primary::after {
   content: '';
   position: absolute;
@@ -473,34 +20,44 @@
     transition: translate 900ms var(--ease-out);
   }
   .btn-primary:hover {
-    box-shadow: 0 18px 50px -14px rgb(242 214 162 / 0.7), 0 0 0 1px rgb(255 246 226 / 0.6), inset 0 1px 0 #fff;
+    box-shadow:
+      0 18px 50px -14px rgb(242 214 162 / 0.72),
+      0 0 0 1px rgb(255 246 226 / 0.6),
+      inset 0 1px 0 #fff;
   }
-  .btn-chrome:hover,
-  .btn-ghost:hover {
-    --b-edge: rgb(242 214 162 / 0.42);
+  .btn:not(.btn-primary):not(.btn-quiet):not(.btn-danger):hover {
+    --b-edge: rgb(244 240 251 / 0.42);
+    --b-bg: rgb(255 255 255 / 0.07);
+  }
+  .btn-aurum:hover {
+    --b-edge: rgb(242 214 162 / 0.85);
+    --b-bg: rgb(242 214 162 / 0.1);
+  }
+  .icon-btn:not(:disabled):hover {
+    border-color: rgb(244 240 251 / 0.36);
   }
 }
 :root[data-motion='reduce'] .btn-primary::after {
   display: none;
 }
 
-/* Chips: hover warms the edge; selecting blooms the node. */
-@media (hover: hover) and (pointer: fine) {
-  .chip:not([aria-pressed='true']):not(:disabled):hover {
-    border-color: rgb(242 214 162 / 0.45);
-    background: var(--glass-2);
-  }
-}
+/* Chips: selecting blooms the node. */
 .chip[aria-pressed='true'] .chip-node {
   animation: node-bloom 520ms var(--ease-spring, ease-out);
 }
 @keyframes node-bloom {
-  0% { scale: 0.4; box-shadow: 0 0 0 0 rgb(122 85 32 / 0.5); }
-  60% { scale: 1.45; box-shadow: 0 0 0 5px rgb(122 85 32 / 0); }
-  100% { scale: 1; }
+  0% {
+    scale: 0.4;
+  }
+  60% {
+    scale: 1.5;
+  }
+  100% {
+    scale: 1;
+  }
 }
 
-/* Segmented: a gold thumb travels to the choice (static fallback until measured). */
+/* Segmented: a glass thumb with an iris rim travels to the choice (static until measured). */
 .segmented {
   position: relative;
   isolation: isolate;
@@ -514,9 +71,11 @@
   width: var(--ind-w);
   height: var(--ind-h);
   translate: var(--ind-x) var(--ind-y);
-  border-radius: var(--radius-pill);
-  background: var(--gold-fill);
-  box-shadow: 0 8px 24px -10px var(--gold-glow), inset 0 1px 0 #fff;
+  border-radius: 9px;
+  background: rgb(255 255 255 / 0.09);
+  box-shadow:
+    inset 0 0 0 1px rgb(179 163 255 / 0.45),
+    0 6px 20px -10px var(--iris-glow);
   transition:
     translate 460ms cubic-bezier(0.3, 1.25, 0.4, 1),
     width 460ms cubic-bezier(0.3, 1.25, 0.4, 1),
@@ -533,8 +92,12 @@
 .segmented:has(button[aria-checked='true'][data-pressing])::before {
   scale: 0.96;
 }
+/* the label's colour changes as the thumb arrives, not before it (5th = color in the press list) */
+.segmented[data-indicator='ready'] button {
+  transition-delay: 0s, 0s, 0s, 0s, 140ms, 0s, 0s, 0s, 0s;
+}
 
-/* Tabs: one underline that slides between tabs. */
+/* Tabs: one iris underline that slides between tabs. */
 .tabs {
   position: relative;
 }
@@ -546,12 +109,12 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 3px;
+  height: 2px;
   width: calc(var(--ind-w) - 1.2rem);
   translate: calc(var(--ind-x) + 0.6rem) 0;
-  border-radius: 3px;
-  background: var(--gold-fill);
-  box-shadow: 0 0 14px var(--gold-glow);
+  border-radius: 2px;
+  background: var(--iris);
+  box-shadow: 0 0 12px var(--iris-glow);
   transition:
     translate 460ms cubic-bezier(0.3, 1.25, 0.4, 1),
     width 460ms cubic-bezier(0.3, 1.25, 0.4, 1);
@@ -574,17 +137,10 @@
     background var(--t-mid);
 }
 .switch:active:not(:disabled) .switch-knob {
-  width: 28px;
+  width: 26px;
 }
 .switch[aria-checked='true']:active:not(:disabled) .switch-knob {
-  transform: translateX(18px);
-}
-.switch[aria-checked='true'] {
-  background: linear-gradient(90deg, #7a5a2a, var(--gold));
-  border-color: rgb(242 214 162 / 0.7);
-}
-.switch[aria-checked='true'] .switch-knob {
-  background: #fffaf0;
+  transform: translateX(16px);
 }
 
 /* Slider: the thumb swells under the pointer. */
@@ -593,30 +149,50 @@
 }
 .slider:hover::-webkit-slider-thumb,
 .slider:active::-webkit-slider-thumb {
-  scale: 1.18;
-}
-.slider::-webkit-slider-runnable-track {
-  background: linear-gradient(90deg, var(--gold) var(--pct), var(--plum-3) var(--pct));
-}
-.slider::-moz-range-track {
-  background: linear-gradient(90deg, var(--gold) var(--pct), var(--plum-3) var(--pct));
+  scale: 1.2;
 }
 
-/* Icon buttons: a soft champagne edge on hover. */
+/* ───────────── Seed cards: hover / focus / lit from the world ───────────── */
+.pod {
+  transition: translate var(--t-mid) var(--ease-out);
+}
 @media (hover: hover) and (pointer: fine) {
-  .icon-btn:not(:disabled):hover {
-    border-color: rgb(242 214 162 / 0.38);
+  .pod:hover {
+    translate: 0 -4px;
   }
 }
-
-/* Pods: the save toggle is gold once something lives in My World. */
+.pod[data-world-lit] {
+  translate: 0 -4px;
+}
+.pod-specimen {
+  transition: box-shadow var(--t-mid) var(--ease-out);
+}
+.pod:is(:hover, :focus-within, [data-world-lit]) .pod-ribs::before {
+  background: var(--rim-lit);
+  opacity: 1;
+}
+.pod:is(:hover, [data-world-lit]) .pod-specimen {
+  box-shadow:
+    0 30px 70px -30px rgb(242 214 162 / 0.42),
+    0 0 0 1px rgb(242 214 162 / 0.12);
+}
+.pod[data-world-lit] .pod-title a {
+  color: #fff6e4;
+}
+.pod-title a {
+  transition: color var(--t-mid);
+}
 @media (hover: hover) and (pointer: fine) {
+  .pod:hover .pod-title a {
+    color: #fff6e4;
+  }
   .pod-save:not([aria-pressed='true']):hover {
     color: var(--gold);
-    background: rgb(10 8 17 / 0.72);
+    background: rgb(7 6 12 / 0.75);
     border-color: rgb(242 214 162 / 0.6);
   }
 }
+/* saved: gold, like everything that lives in My World */
 .pod-save[aria-pressed='true'],
 .pod-save[aria-pressed='true']:hover {
   color: var(--on-gold);
@@ -628,16 +204,17 @@
   animation: save-pop 560ms var(--ease-spring, ease-out);
 }
 @keyframes save-pop {
-  0% { scale: 0.5; rotate: -12deg; }
-  60% { scale: 1.22; rotate: 4deg; }
-  100% { scale: 1; rotate: 0deg; }
-}
-.pod-title a {
-  transition: color var(--t-mid);
-}
-@media (hover: hover) and (pointer: fine) {
-  .pod:hover .pod-title a {
-    color: #fff8ea;
+  0% {
+    scale: 0.5;
+    rotate: -12deg;
+  }
+  60% {
+    scale: 1.22;
+    rotate: 4deg;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg;
   }
 }
 
@@ -666,16 +243,15 @@
   -webkit-user-select: none;
 }
 .row-track[data-dragging] .pod {
-  transform: none;
+  translate: none;
 }
 .row-vein {
   position: relative;
   display: block;
   width: min(200px, 38%);
-  height: 2px;
+  height: 1px;
   margin: -0.55rem 0 0;
-  border-radius: 2px;
-  background: var(--line);
+  background: var(--line-2);
   overflow: hidden;
   opacity: 0;
   transition: opacity var(--t-mid);
@@ -688,8 +264,7 @@
   inset: 0 auto 0 0;
   width: calc(var(--row-thumb, 1) * 100%);
   translate: calc(var(--row-pos, 0) * (1 / var(--row-thumb, 1) - 1) * 100%) 0;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--gold), #fff3da);
+  background: var(--gold);
   box-shadow: 0 0 8px var(--gold-glow);
 }
 html.fx-low .row[data-scrollable] .row-track {
@@ -733,12 +308,8 @@ html.fx-low .row[data-scrollable] .row-track {
 .dialog[data-state='closing']::backdrop {
   opacity: 0;
 }
-/* the label's colour changes as the thumb arrives, not before it (5th = color in the press list) */
-.segmented[data-indicator='ready'] button {
-  transition-delay: 0s, 0s, 0s, 0s, 140ms, 0s, 0s, 0s, 0s;
-}
 
-/* Touch screens: chips and small buttons keep the 44px target (skin rules load after ui.css). */
+/* Touch screens: chips and small buttons keep the 44px target. */
 @media (pointer: coarse) {
   .chip,
   .btn-sm {

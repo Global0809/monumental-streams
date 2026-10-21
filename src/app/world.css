@@ -1,0 +1,320 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * THE WORLD LAYER — the persistent stage, its static fallback and the legibility veil.
+ * Everything here is decorative and pointer-transparent; the DOM above is the truth.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+@property --la-hue {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #f2d6a2;
+}
+
+.la-stage {
+  --la-hue: var(--hue-home);
+  /* where the world lives: the open side, right of the editorial column */
+  --la-x: calc(var(--index-w) + (100% - var(--index-w)) * 0.7);
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-stage);
+  isolation: isolate;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--night);
+  transition: --la-hue var(--t-world) var(--ease-world);
+}
+.la-stage > * {
+  position: absolute;
+  inset: 0;
+}
+/* the 3D stage (the engine owns it) sits between the static world and the veil */
+.la-stage > :not(.la-fallback, .la-veil) {
+  z-index: 1;
+}
+
+.la-stage[data-tint='home'] {
+  --la-hue: var(--hue-home);
+}
+.la-stage[data-tint='world'] {
+  --la-hue: var(--hue-world);
+}
+.la-stage[data-tint='time-machine'] {
+  --la-hue: var(--hue-time-machine);
+}
+.la-stage[data-tint='live'] {
+  --la-hue: var(--hue-live);
+}
+.la-stage[data-tint='movies'] {
+  --la-hue: var(--hue-movies);
+}
+.la-stage[data-tint='music'] {
+  --la-hue: var(--hue-music);
+}
+.la-stage[data-tint='sports'] {
+  --la-hue: var(--hue-sports);
+}
+.la-stage[data-tint='gaming'] {
+  --la-hue: var(--hue-gaming);
+}
+.la-stage[data-tint='news'] {
+  --la-hue: var(--hue-news);
+}
+.la-stage[data-tint='fashion'] {
+  --la-hue: var(--hue-fashion);
+}
+.la-stage[data-tint='culture'] {
+  --la-hue: var(--hue-culture);
+}
+.la-stage[data-tint='kids'] {
+  --la-hue: var(--hue-kids);
+}
+.la-stage[data-tint='my-world'] {
+  --la-hue: var(--hue-my-world);
+}
+
+/* ───────────── Static world (CSS only) ───────────── */
+.la-fallback {
+  z-index: 0;
+  opacity: 1;
+  transition: opacity 1.2s var(--ease-out);
+}
+/* the 3D world has taken over: the static one steps back */
+.la-stage[data-live] .la-fallback {
+  opacity: 0;
+}
+.la-fallback > * {
+  position: absolute;
+}
+
+/* The field: violet depth behind the spine, iris haze low left, frost high right. */
+.la-field {
+  inset: 0;
+  background:
+    radial-gradient(60% 75% at var(--la-x) 42%, rgb(52 36 104 / 0.5), transparent 68%), radial-gradient(55% 60% at 4% 104%, rgb(91 63 214 / 0.2), transparent 68%),
+    radial-gradient(42% 40% at 96% -4%, rgb(159 220 255 / 0.09), transparent 64%), radial-gradient(30% 22% at var(--la-x) 104%, rgb(242 214 162 / 0.07), transparent 70%),
+    linear-gradient(180deg, #07060c 0%, #0b0913 55%, #07060c 100%);
+}
+
+/* The destination's light: the organ glow (strongest in a category chamber). */
+.la-tint {
+  inset: 0;
+  opacity: 0.55;
+  background:
+    radial-gradient(28% 36% at var(--la-x) 46%, color-mix(in oklab, var(--la-hue) 26%, transparent), transparent 72%),
+    radial-gradient(60% 50% at var(--la-x) 50%, color-mix(in oklab, var(--la-hue) 7%, transparent), transparent 70%);
+  transition: opacity var(--t-world) var(--ease-world);
+}
+
+/* The Monumental spine: stacked bone-white vertebrae, transverse processes and a gold cord.
+   Seen in slight perspective, fading at both ends. */
+.la-spine {
+  --v: clamp(34px, 3.4vw, 50px); /* one vertebra + its disc */
+  top: -12vh;
+  bottom: -12vh;
+  left: var(--la-x);
+  width: clamp(150px, 15vw, 260px);
+  translate: -50% 0;
+  transform: perspective(1100px) rotateX(26deg) rotateZ(-8deg);
+  transform-origin: 50% 60%;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 24%, #000 66%, transparent 96%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 24%, #000 66%, transparent 96%);
+  transition:
+    transform var(--t-world) var(--ease-world),
+    opacity var(--t-world) var(--ease-world),
+    translate var(--t-world) var(--ease-world);
+}
+.la-spine > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.la-spine-column {
+  left: 27%;
+  right: 27%;
+  background-image:
+    radial-gradient(ellipse 44% 11% at 50% 24%, rgb(255 248 232 / 0.5), transparent 75%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgb(239 230 214 / 0.36) 0 54%, rgb(239 230 214 / 0.1) 64%, transparent 71%),
+    radial-gradient(ellipse 34% 8% at 50% 0%, rgb(242 214 162 / 0.55), transparent 80%);
+  background-size: 100% var(--v);
+  background-repeat: repeat-y;
+  filter: drop-shadow(0 0 14px rgb(239 230 214 / 0.08));
+}
+.la-spine-processes {
+  left: 0;
+  right: 0;
+  background-image: radial-gradient(ellipse 50% 6% at 50% 52%, rgb(239 230 214 / 0.22) 0 50%, transparent 78%), radial-gradient(ellipse 8% 22% at 50% 78%, rgb(239 230 214 / 0.1), transparent 80%);
+  background-size: 100% var(--v);
+  background-repeat: repeat-y;
+}
+.la-spine-cord {
+  left: calc(50% - 1px);
+  width: 2px;
+  background: linear-gradient(180deg, transparent, rgb(242 214 162 / 0.55) 25%, rgb(255 246 226 / 0.75) 50%, rgb(242 214 162 / 0.55) 75%, transparent);
+  box-shadow: 0 0 24px 4px rgb(242 214 162 / 0.16);
+  animation: la-cord calc(var(--beat-dur) * 4) ease-in-out infinite;
+}
+@keyframes la-cord {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Seeds: a quiet constellation orbiting the spine — gold rim light on night. */
+.la-seeds {
+  inset: 0;
+  opacity: 0.85;
+  background-image:
+    radial-gradient(circle at calc(var(--la-x) - 14%) 24%, rgb(255 240 210 / 0.95) 0 1.6px, rgb(242 214 162 / 0.3) 2.6px, transparent 9px),
+    radial-gradient(circle at calc(var(--la-x) + 12%) 18%, rgb(255 240 210 / 0.8) 0 1.3px, rgb(242 214 162 / 0.25) 2.4px, transparent 8px),
+    radial-gradient(circle at calc(var(--la-x) + 19%) 41%, rgb(255 240 210 / 0.9) 0 2px, rgb(242 214 162 / 0.28) 3px, transparent 11px),
+    radial-gradient(circle at calc(var(--la-x) - 21%) 52%, rgb(255 240 210 / 0.75) 0 1.4px, rgb(242 214 162 / 0.22) 2.4px, transparent 8px),
+    radial-gradient(circle at calc(var(--la-x) + 8%) 63%, rgb(255 240 210 / 0.85) 0 1.8px, rgb(242 214 162 / 0.28) 3px, transparent 10px),
+    radial-gradient(circle at calc(var(--la-x) - 9%) 74%, rgb(255 240 210 / 0.7) 0 1.2px, rgb(242 214 162 / 0.2) 2.2px, transparent 7px),
+    radial-gradient(circle at calc(var(--la-x) + 24%) 70%, rgb(200 188 255 / 0.8) 0 1.4px, rgb(179 163 255 / 0.25) 2.6px, transparent 9px),
+    radial-gradient(circle at calc(var(--la-x) - 27%) 31%, rgb(200 188 255 / 0.7) 0 1.2px, rgb(179 163 255 / 0.2) 2.4px, transparent 8px),
+    radial-gradient(circle at calc(var(--la-x) + 4%) 11%, rgb(255 240 210 / 0.6) 0 1px, transparent 6px),
+    radial-gradient(circle at calc(var(--la-x) + 30%) 29%, rgb(255 240 210 / 0.55) 0 1px, transparent 6px),
+    radial-gradient(circle at calc(var(--la-x) - 31%) 83%, rgb(255 240 210 / 0.5) 0 1px, transparent 6px),
+    radial-gradient(circle at calc(var(--la-x) + 16%) 88%, rgb(159 220 255 / 0.6) 0 1.2px, transparent 7px);
+  transition:
+    opacity var(--t-world) var(--ease-world),
+    transform var(--t-world) var(--ease-world);
+}
+
+/* The night globe (World): a moonlit rim with faint parallels. */
+.la-globe {
+  left: var(--la-x);
+  top: 50%;
+  width: min(62vmin, 640px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  opacity: 0;
+  scale: 0.86;
+  background:
+    radial-gradient(circle at 34% 30%, rgb(169 196 255 / 0.12), transparent 52%), repeating-radial-gradient(ellipse 100% 34% at 50% 50%, transparent 0 11%, rgb(169 196 255 / 0.07) 11.2% 11.6%),
+    radial-gradient(circle, rgb(18 16 34 / 0.9) 60%, rgb(10 9 20 / 0.95) 70.5%, transparent 71%);
+  transition:
+    opacity var(--t-world) var(--ease-world),
+    scale var(--t-world) var(--ease-world);
+}
+.la-globe-rim {
+  position: absolute;
+  inset: 14.5%;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1px rgb(169 196 255 / 0.35),
+    inset 10px -6px 40px -10px rgb(169 196 255 / 0.4),
+    0 0 80px -10px rgb(169 196 255 / 0.25);
+}
+
+/* Your core (My World): a warm gold heart the saved seeds orbit. */
+.la-core {
+  left: var(--la-x);
+  top: 48%;
+  width: min(30vmin, 300px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  opacity: 0;
+  scale: 0.6;
+  background: radial-gradient(circle at 42% 38%, rgb(255 248 232 / 0.85), rgb(242 214 162 / 0.55) 22%, rgb(217 178 115 / 0.18) 46%, transparent 68%);
+  filter: blur(0.5px);
+  transition:
+    opacity var(--t-world) var(--ease-world),
+    scale var(--t-world) var(--ease-world);
+}
+
+/* ── Arrangements re-form the static world too ── */
+.la-stage[data-arrangement='world'] .la-globe,
+.la-stage[data-arrangement='personal'] .la-core {
+  opacity: 1;
+  scale: 1;
+}
+.la-stage[data-arrangement='world'] .la-spine {
+  opacity: 0;
+  transform: perspective(1100px) rotateX(26deg) rotateZ(-8deg) scale(0.6);
+}
+.la-stage[data-arrangement='world'] .la-seeds {
+  transform: scale(0.82);
+}
+/* time: the spine lays down into a helix of decades */
+.la-stage[data-arrangement='time'] .la-spine {
+  transform: perspective(1100px) rotateX(18deg) rotateZ(-62deg) scale(1.08);
+}
+.la-stage[data-arrangement='category'] .la-spine,
+.la-stage[data-arrangement='personal'] .la-spine {
+  opacity: 0.5;
+  transform: perspective(1100px) rotateX(26deg) rotateZ(-8deg) scale(0.82);
+}
+.la-stage[data-arrangement='category'] .la-tint {
+  opacity: 1;
+}
+.la-stage[data-arrangement='category'] .la-seeds {
+  transform: scale(0.9);
+}
+.la-stage:is([data-arrangement='focus'], [data-arrangement='quiet']) .la-spine {
+  opacity: 0.45;
+}
+.la-stage:is([data-arrangement='focus'], [data-arrangement='quiet']) .la-seeds {
+  opacity: 0.45;
+}
+.la-stage[data-arrangement='quiet'] .la-tint {
+  opacity: 0.25;
+}
+/* a destination previewed from the navigation glows through */
+.la-stage[data-preview] .la-tint {
+  opacity: 1;
+}
+
+/* ───────────── Veil: legibility for the editorial column ───────────── */
+.la-veil {
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgb(7 6 12 / 0.9) 0, rgb(7 6 12 / 0.66) calc(var(--index-w) + 30%), rgb(7 6 12 / 0.14) 70%, rgb(7 6 12 / 0.34) 100%),
+    linear-gradient(180deg, rgb(7 6 12 / 0.2) 0, transparent 30%, transparent 62%, rgb(7 6 12 / 0.75) 100%);
+  transition:
+    opacity var(--t-world) var(--ease-world),
+    background-color var(--t-world) var(--ease-world);
+}
+.la-stage[data-arrangement='quiet'] .la-veil,
+.la-stage[data-arrangement='focus'] .la-veil {
+  background-color: rgb(7 6 12 / 0.25);
+}
+/* watching: the world dims and recedes behind the player */
+.la-stage[data-arrangement='watch'] .la-veil,
+:root[data-state='watching'] .la-veil {
+  background-color: rgb(7 6 12 / 0.8);
+}
+:root[data-state='watching'] .la-spine-cord {
+  animation-play-state: paused;
+}
+
+/* Phones and narrow tablets: the world sits behind content at reduced density. */
+@media (max-width: 767px) {
+  .la-stage {
+    --la-x: 72%;
+  }
+  .la-spine {
+    width: 128px;
+    opacity: 0.7;
+  }
+  .la-veil {
+    background: linear-gradient(180deg, rgb(7 6 12 / 0.3) 0, rgb(7 6 12 / 0.55) 40%, rgb(7 6 12 / 0.86) 100%);
+  }
+}
+
+/* Reduced motion and low-tier devices: a still world, cut not flown. */
+:root[data-motion='reduce'] .la-spine-cord,
+html.fx-low .la-spine-cord {
+  animation: none;
+  opacity: 0.8;
+}
+:root[data-motion='reduce'] .la-stage,
+:root[data-motion='reduce'] .la-stage * {
+  transition: none !important;
+}

@@ -56,6 +56,16 @@ export function episodeGroups(cat: Catalogue, programme: Programme): EpisodeGrou
   return groups;
 }
 
+/**
+ * Rough width (em) of a title's longest word in the expanded display face (Archivo Expanded),
+ * so a display title can cap its size and never break a word: font-size ≤ column ÷ this.
+ */
+export function longestWordEm(title: string): number {
+  const width = (ch: string) => (/[MW]/.test(ch) ? 1.2 : /[A-Z]/.test(ch) ? 0.92 : /[mw]/.test(ch) ? 0.9 : /[a-z]/.test(ch) ? 0.6 : /[0-9]/.test(ch) ? 0.7 : 0.36);
+  const em = (w: string) => [...w].reduce((s, ch) => s + width(ch), 0);
+  return Math.max(4, ...title.split(/\s+/).map(em));
+}
+
 /** "Teaser", "Episode 2", "Reel 3", "Film 1", "Feature"… — what this entry is within its programme. */
 export function entryLabel(v: Video): string {
   const n = v.order && v.order > 0 ? ` ${v.order}` : '';

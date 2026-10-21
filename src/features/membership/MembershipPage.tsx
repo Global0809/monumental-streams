@@ -2,21 +2,23 @@
  * MEMBERSHIP (under My World). Honest about everything: prices are development examples until
  * approved, only live benefits are called live, "what Premium unlocks" is computed from the
  * catalogue, and membership is only ever reported as active when the server says so.
+ *
+ * The world stays quiet here, with one real outcome: while "What Premium unlocks today" is in
+ * view, exactly those stories are the seeds lit in the field.
  */
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { useSearchParams } from 'react-router';
 import type { MembershipConfig, MembershipStatus, Video } from '../../../shared/types.ts';
 import { useChapters } from '../../app/chapters.ts';
 import { dateLabel, plural } from '../../lib/format.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
 import { auth, refreshSession, useSession } from '../../state/session.ts';
-import { useReducedMotion } from '../../systems/motion.ts';
-import { canAutoplay, releasePreview, requestPreview } from '../../systems/previews.ts';
 import { sound } from '../../systems/sound/engine.ts';
 import { Button, ButtonLink } from '../../ui/controls.tsx';
 import { EmptyState, Pulse, toast } from '../../ui/feedback.tsx';
 import { Icon } from '../../ui/Icon.tsx';
-import { Art, SectionHeader, VideoPod } from '../../ui/Pod.tsx';
+import { SectionHeader, VideoPod } from '../../ui/Pod.tsx';
+import { useArrangement } from '../../stage/store.ts';
 import {
   BILLING_LABEL,
   billingErrorMessage,
@@ -102,36 +104,34 @@ export default function MembershipPage() {
   };
 
   const unlocks = useMemo(() => cat.videos.filter((v) => cat.effectiveAccess(v) === 'premium'), [cat]);
+  const unlocksRef = useRef<HTMLElement>(null);
+  const unlocksInView = useInView(unlocksRef);
+  useArrangement({ kind: 'quiet' }, unlocksInView && unlocks.length ? unlocks.map((v) => v.id) : null);
   const action = planAction(state, session.membership, config?.billing ?? null);
 
   return (
     <div className="page mem">
       {checkout ? <CheckoutReturnBanner kind={checkout} onDismiss={dismissReturn} /> : null}
 
-      <header className="mem-hero">
-        <VaultBackdrop />
-        <div className="wrap mem-hero-inner">
-          <div className="mem-hero-copy">
-            <MyWorldCrumbs here="Membership" tab="membership" />
-            <h1 className="page-title mem-title">
-              <em>Membership</em>
-            </h1>
-            <p className="mem-tier">{membership.tierName}</p>
-            <p className="page-lede">
-              Premium opens the gold-sealed stories across Monumental. This page shows exactly what that means today, what is only planned, and where your
-              membership stands &mdash; it is also summarised in My World.
-            </p>
-          </div>
-          <section id="mem-status" className="mem-status panel" aria-labelledby="mem-status-h" data-state={state}>
-            <StatusPanel state={state} busy={busy} onPortal={openPortal} onPlans={toPlans} />
-            {error?.where === 'status' && busy === null ? (
-              <p className="form-error" role="alert">
-                {error.message}
-              </p>
-            ) : null}
-          </section>
-        </div>
+      <header className="wrap mem-head">
+        <MyWorldCrumbs here="Membership" tab="membership" />
+        <h1 className="title-monument mem-title">Membership</h1>
+        <p className="lede mem-lede">
+          {membership.tierName} opens the gold-sealed stories across Monumental. Here is exactly what that means today, what is only planned, and where your
+          membership stands.
+        </p>
       </header>
+
+      <section id="mem-status" className="wrap mem-status-wrap" aria-labelledby="mem-status-h">
+        <div className="mem-status panel" data-state={state}>
+          <StatusPanel state={state} busy={busy} onPortal={openPortal} onPlans={toPlans} />
+          {error?.where === 'status' && busy === null ? (
+            <p className="form-error" role="alert">
+              {error.message}
+            </p>
+          ) : null}
+        </div>
+      </section>
 
       <div className="wrap">
         <section id="mem-plans" ref={plansRef} className="section mem-section" aria-labelledby="mem-plans-h">
@@ -155,7 +155,7 @@ export default function MembershipPage() {
           {config?.billing.mode === 'setup-pending' ? <SetupPending plans={membership.plans} /> : null}
           <ul className="mem-plans">
             {membership.plans.map((p) => (
-              <li key={p.id} className="mem-plan panel">
+              <li key={p.id} className="mem-plan">
                 <h3 className="mem-plan-name">{p.label}</h3>
                 <PlanPrice text={p.displayPrice} />
                 {p.provisional ? (
@@ -185,12 +185,12 @@ export default function MembershipPage() {
           ) : null}
         </section>
 
-        <section id="mem-unlocks" className="section mem-section" aria-labelledby="mem-unlocks-h">
+        <section id="mem-unlocks" ref={unlocksRef} className="section mem-section" aria-labelledby="mem-unlocks-h">
           <SectionHeader kicker="Computed from the catalogue" title="What Premium unlocks today" id="mem-unlocks-h">
             <UnlockSummary list={unlocks} />
           </SectionHeader>
           {unlocks.length ? (
-            <ul className="grid-pods">
+            <ul className="grid-pods mem-unlocks">
               {unlocks.map((v) => (
                 <li key={v.id}>
                   <VideoPod
@@ -226,63 +226,17 @@ export default function MembershipPage() {
   );
 }
 
-/* ───────────── Hero backdrop: the vault door ───────────── */
-
-function VaultBackdrop() {
-  const cat = useCatalogue();
-  const art = cat.artFor('art:premium-vault');
-  const ref = useRef<HTMLVideoElement>(null);
-  const reduced = useReducedMotion();
-  const [playing, setPlaying] = useState(false);
-
+/** True while the element is meaningfully on screen. */
+function useInView(ref: RefObject<HTMLElement | null>) {
+  const [inView, setInView] = useState(false);
   useEffect(() => {
-    const v = ref.current;
-    if (!v || !art?.preview) return;
-    let visible = false;
-    const sync = () => {
-      if (visible && canAutoplay()) {
-        if (!v.getAttribute('src')) v.src = window.matchMedia('(max-width: 767px)').matches && art.previewSmall ? art.previewSmall : art.preview!;
-        requestPreview(v);
-      } else {
-        releasePreview(v);
-      }
-    };
-    const io = new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
-      sync();
-    });
-    io.observe(v);
-    window.addEventListener('ms:previews', sync);
-    return () => {
-      io.disconnect();
-      window.removeEventListener('ms:previews', sync);
-      releasePreview(v);
-      v.removeAttribute('src');
-      v.load();
-    };
-  }, [art?.preview, art?.previewSmall, reduced]);
-
-  return (
-    <div className="mem-backdrop" aria-hidden="true">
-      <Art art="art:premium-vault" alt="" sizes="large" eager className="mem-backdrop-art" />
-      {art?.preview ? (
-        <video
-          ref={ref}
-          className="mem-backdrop-loop"
-          data-playing={playing}
-          muted
-          loop
-          playsInline
-          preload="none"
-          tabIndex={-1}
-          onPlaying={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
-        />
-      ) : null}
-      <span className="mem-backdrop-shade" />
-      {art?.provisional ? <span className="mem-art-note">Provisional art · studio concept loop</span> : null}
-    </div>
-  );
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { rootMargin: '-25% 0px -25% 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref]);
+  return inView;
 }
 
 /* ───────────── Status panel ───────────── */
@@ -348,10 +302,12 @@ function StatusPanel({ state, busy, onPortal, onPlans }: { state: VaultState; bu
             in before you can join. Accounts are free.
           </p>
           <div className="mem-actions">
-            <ButtonLink to="/account?mode=register&next=/membership" variant="aurum" icon="user">
+            <ButtonLink to="/account?mode=register&next=/membership" variant="primary" icon="user">
               Create an account
             </ButtonLink>
-            <ButtonLink to="/account?mode=signin&next=/membership">Sign in</ButtonLink>
+            <ButtonLink to="/account?mode=signin&next=/membership" variant="quiet">
+              Sign in
+            </ButtonLink>
           </div>
         </>
       );
@@ -529,7 +485,7 @@ function PlanButton({
 
 function SetupPending({ plans }: { plans: MembershipConfig['plans'] }) {
   return (
-    <div className="mem-setup panel panel-pad" role="note" aria-label="Payments are not connected">
+    <div className="mem-setup" role="note" aria-label="Payments are not connected">
       <h3 className="mem-setup-title">Payments aren&rsquo;t connected yet</h3>
       <p className="muted">
         You can&rsquo;t buy a membership on this server: no payment provider is configured, so no checkout opens and nothing can be charged. To switch
@@ -733,6 +689,7 @@ function DevPreview({ signedIn, current }: { signedIn: boolean; current: Members
   };
   return (
     <section id="mem-dev" className="section mem-dev" aria-labelledby="mem-dev-h">
+      <p className="eyebrow mem-dev-eyebrow">Development server only · not part of the product</p>
       <h2 id="mem-dev-h" className="mem-dev-title">
         <Icon name="spark" size={16} />
         Development preview

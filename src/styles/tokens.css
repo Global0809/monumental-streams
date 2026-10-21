@@ -1,12 +1,15 @@
 /*
- * MONUMENTAL STREAMS — CHROME BLOOM · GOLD
- * Design tokens. Deep violet night, glossy lavender chrome bloom, champagne-gold metal for
- * the marque, active states and the one primary action per view.
- * Biomechanical forms (the living membrane, the chrome logotype) carried by large imagery,
- * big confident type and calm glass surfaces — cinematic first, never a dashboard.
+ * MONUMENTAL STREAMS — THE LIVING ARCHIVE
+ * Design tokens. One living world lives behind every route (src/stage/); the interface is an
+ * editorial layer over it. Night is deep violet-black and the world is lit, not painted:
+ *   gold  — seed rims, the current destination, the one primary action per view
+ *   iris  — interaction, focus, selection, progress
+ *   frost — time
+ * Each destination owns one hue (--hue-<section>), shared with its organ in the 3D world
+ * (mirrored for the engine in src/styles/hues.ts — a unit test keeps the two in step).
  *
- * The semantic names below are the system. The older anatomical names at the bottom are
- * aliases kept so every component re-skins from one place.
+ * The semantic names below are the system. The anatomical names at the bottom are aliases
+ * kept so every component re-skins from one place.
  */
 @import '@fontsource-variable/archivo/index.css';
 @import '@fontsource-variable/jetbrains-mono/index.css';
@@ -36,83 +39,137 @@
 :root {
   color-scheme: dark;
 
-  /* Night — surfaces */
-  --night: #0a0811;
-  --night-2: #100c1a;
-  --plum: #17121f;
-  --plum-2: #1e1829;
-  --plum-3: #2a2238;
-  --glass: rgb(255 255 255 / 0.055);
-  --glass-2: rgb(255 255 255 / 0.09);
-  --glass-strong: rgb(24 18 34 / 0.72);
-  --line: rgb(232 224 255 / 0.12);
-  --line-2: rgb(232 224 255 / 0.22);
+  /* ── Night: the space the world floats in ── */
+  --night: #07060c;
+  --night-2: #0d0b15;
+  --plum: #15111d;
+  --plum-2: #1c1727;
+  --plum-3: #282136;
+  /* glass appears only where text sits over the moving world */
+  --glass: rgb(255 255 255 / 0.045);
+  --glass-2: rgb(255 255 255 / 0.085);
+  --glass-strong: rgb(12 10 19 / 0.76);
+  --veil: rgb(7 6 12 / 0.72);
+  --line: rgb(236 228 255 / 0.11);
+  --line-2: rgb(236 228 255 / 0.2);
+  /* the hairline luminous rim of a seed / card (border-image style, used through masks) */
+  --rim: linear-gradient(155deg, rgb(255 244 222 / 0.62), rgb(179 163 255 / 0.22) 38%, rgb(255 255 255 / 0.05) 62%, rgb(242 214 162 / 0.34));
+  --rim-lit: linear-gradient(155deg, rgb(255 246 226 / 0.95), rgb(242 214 162 / 0.55) 40%, rgb(179 163 255 / 0.4) 70%, rgb(255 246 226 / 0.75));
 
-  /* Pearl — text */
-  --pearl: #f3effc;
-  --lilac: #cdc5e4; /* 11.6:1 on night */
-  --lilac-dim: #a79dc4; /* 7.3:1 on night — smallest permitted for text */
+  /* ── Text ── */
+  --pearl: #f4f0fb;
+  --lilac: #cfc7e4; /* 12:1 on night */
+  --lilac-dim: #a99fc5; /* 7.6:1 on night — the smallest permitted for text */
+  --marrow: #efe6d6; /* bone-white vertebrae: warm, never pure white */
 
-  /* Light — accents */
-  --iris: #b3a3ff; /* primary accent: focus, progress, links, free */
+  /* ── Light ── */
+  --iris: #b3a3ff; /* interaction: focus, selection, progress, links */
   --iris-2: #8f7bff;
   --iris-deep: #3a2a86;
   --iris-glow: rgb(160 140 255 / 0.38);
-  --frost: #9fdcff; /* time, history, eras */
+  --frost: #9fdcff; /* time */
   --frost-glow: rgb(159 220 255 / 0.3);
-  --gold: #f2d6a2; /* premium */
-  --gold-glow: rgb(242 214 162 / 0.3);
-  --rose: #ff9fc8; /* live, warnings, attention */
+  --gold: #f2d6a2; /* seed rims, current destination, the one primary action */
+  --gold-2: #d9b273;
+  --gold-glow: rgb(242 214 162 / 0.32);
+  --rose: #ff9fc8; /* attention */
+  --signal: #ff5a6e; /* live — shown only as an outline while nothing is live */
   --danger: #ff7a8f;
 
-  --chrome: linear-gradient(180deg, #ffffff 0%, #ebe6f7 36%, #8a82a1 49%, #2b2539 52%, #b9b1cd 70%, #ffffff 100%);
-  --chrome-soft: linear-gradient(180deg, #ffffff, #d9d0f2);
-  --gold-chrome: linear-gradient(180deg, #fff8e6 0%, #f4dcae 30%, #c9a062 47%, #5a3d17 51%, #b88f52 66%, #f6e2b8 86%, #fff6df 100%);
-  --gold-fill: linear-gradient(180deg, #fff5dc 0%, #f2d6a2 55%, #d8b072 100%);
-  --on-gold: #251804;
-  --pearl-fill: linear-gradient(180deg, #ffffff 0%, #e6dffa 100%);
-  --on-pearl: #170f25;
+  /* ── Destination hues (one per section; organs in the world share them) ── */
+  --hue-home: #f2d6a2;
+  --hue-world: #a9c4ff;
+  --hue-time-machine: #9fdcff;
+  --hue-live: #ff5a6e;
+  --hue-movies: #ffb45e;
+  --hue-music: #b3a3ff;
+  --hue-sports: #ff8f86;
+  --hue-gaming: #74e4f2;
+  --hue-news: #eef0f6;
+  --hue-fashion: #f2b8a2;
+  --hue-culture: #6fcfae;
+  --hue-kids: #f9c6ec;
+  --hue-my-world: #f2d6a2;
+  --prism: linear-gradient(120deg, #f9c6ec, #c9b8ff 35%, #a8e6ff 65%, #fff1b8);
 
-  /* Typography */
+  /* ── Metal (legacy gradients, re-tuned; new work prefers flat light + rims) ── */
+  --chrome: linear-gradient(180deg, #ffffff 0%, #efeaf8 40%, #c9c0de 62%, #ffffff 100%);
+  --chrome-soft: linear-gradient(180deg, #ffffff, #ddd5f2);
+  --gold-chrome: linear-gradient(180deg, #fff8e6 0%, #f4dcae 38%, #d9b273 58%, #f6e2b8 82%, #fff6df 100%);
+  --gold-fill: linear-gradient(180deg, #fff3d8 0%, #f2d6a2 58%, #dcb67a 100%);
+  --on-gold: #241704;
+  --pearl-fill: linear-gradient(180deg, #ffffff 0%, #e8e1fa 100%);
+  --on-pearl: #160f24;
+
+  /* ── Typography ── */
   --font-display: 'Archivo Expanded', 'Archivo Variable', system-ui, sans-serif;
   --font-body: 'Archivo Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-code: 'JetBrains Mono Variable', ui-monospace, 'Cascadia Mono', monospace;
 
-  --step--2: clamp(0.72rem, 0.7rem + 0.08vw, 0.78rem);
-  --step--1: clamp(0.84rem, 0.81rem + 0.13vw, 0.92rem);
-  --step-0: clamp(0.98rem, 0.95rem + 0.16vw, 1.08rem);
+  /* Monumental route titles (Archivo Expanded 300–400): ~88–168px across desktops */
+  --type-monument: clamp(2.75rem, 0.9rem + 7.4vw, 10.5rem);
+  /* Utility page titles */
+  --type-title: clamp(2.4rem, 1.1rem + 4.4vw, 6rem);
+  /* Story titles (Archivo Expanded 500–600) */
+  --type-story: clamp(1.5rem, 1.1rem + 1.6vw, 2.6rem);
+  --type-eyebrow: 12px;
+
+  --step--2: clamp(0.75rem, 0.73rem + 0.08vw, 0.8rem);
+  --step--1: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem); /* UI: 14–15px */
+  --step-0: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem); /* body: 16–17px */
   --step-1: clamp(1.15rem, 1.09rem + 0.3vw, 1.34rem);
   --step-2: clamp(1.38rem, 1.26rem + 0.55vw, 1.75rem);
   --step-3: clamp(1.7rem, 1.48rem + 1vw, 2.4rem);
   --step-4: clamp(2.1rem, 1.7rem + 1.9vw, 3.5rem);
-  --step-5: clamp(2.7rem, 1.9rem + 3.6vw, 5.6rem);
-  --step-6: clamp(3.2rem, 1.8rem + 6.4vw, 8.4rem);
+  --step-5: clamp(2.6rem, 1.6rem + 3.6vw, 5.4rem);
+  --step-6: clamp(3rem, 1.4rem + 6.4vw, 8.4rem);
+  --lh-body: 1.6;
+  --measure: 62ch;
+  --track-monument: -0.04em;
+  --track-eyebrow: 0.18em;
 
-  /* Shape */
-  --nav-h: 76px;
-  --tabbar-h: 0px;
+  /* ── Space (4-based rhythm) ── */
+  --space-3xs: 4px;
+  --space-2xs: 8px;
+  --space-xs: 12px;
+  --space-s: 16px;
+  --space-m: 24px;
+  --space-l: 32px;
+  --space-xl: 48px;
+  --space-2xl: 72px;
+  --space-3xl: clamp(80px, 9vw, 128px);
+  --section-gap: clamp(4rem, 8vw, 7.5rem);
+
+  /* ── Shape ── */
+  --nav-h: 56px; /* phone top bar (0 from tablet up: the index sits on the left) */
+  --tabbar-h: 0px; /* phone bottom bar */
+  --index-w: 236px; /* desktop vertebral index */
+  --index-rail: 76px; /* tablet / collapsed rail */
   --gutter: clamp(16px, 3.4vw, 56px);
-  --radius-card: 26px;
-  --radius-panel: 28px;
-  --radius-control: 16px;
+  --radius-card: 14px;
+  --radius-panel: 20px;
+  --radius-control: 12px;
   --radius-pill: 999px;
   --hit: 44px;
   /* vertical padding that grows a one-line text link to a >= 44px tap box (pair with the
      negative margin so layout does not move): resolved per element, so 1lh is its own line */
   --tap-pad: max(0px, (var(--hit) + 2px - 1lh) / 2);
 
-  /* Motion */
+  /* ── Motion ── */
   --beat-dur: 1s;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-world: cubic-bezier(0.45, 0.05, 0.15, 1); /* camera-like: purposeful, 0.9–1.4s */
   --t-fast: 160ms;
   --t-mid: 320ms;
   --t-slow: 700ms;
+  --t-world: 1100ms;
 
-  --shadow-card: 0 30px 70px -36px rgb(0 0 0 / 0.9);
-  --shadow-float: 0 20px 60px -20px rgb(5 2 15 / 0.85), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --shadow-card: 0 28px 60px -34px rgb(0 0 0 / 0.95);
+  --shadow-float: 0 24px 64px -24px rgb(3 2 8 / 0.9), inset 0 1px 0 rgb(255 255 255 / 0.06);
   --focus-ring: 0 0 0 2px var(--night), 0 0 0 4px var(--iris), 0 0 22px 2px var(--iris-glow);
 
+  --z-stage: 0;
   --z-content: 1;
   --z-chrome: 20;
   --z-player: 40;
@@ -120,7 +177,7 @@
   --z-dialog: 80;
   --z-cursor: 100;
 
-  /* ── Aliases (legacy anatomical names → Chrome Bloom) ── */
+  /* ── Aliases (legacy anatomical names → Living Archive) ── */
   --abyss: var(--night);
   --abyss-2: var(--night-2);
   --tissue: var(--plum);
@@ -149,16 +206,26 @@
   --radius-joint: var(--radius-control);
   --topbar-h: var(--nav-h);
   --spine-w: 0px;
+  --side-w: var(--index-w);
   --ease-tendon: var(--ease-out);
   --ease-valve: var(--ease-inout);
   --shadow-pod: var(--shadow-card);
 }
 
+@media (min-width: 768px) {
+  :root {
+    --nav-h: 0px;
+  }
+}
+@media (max-width: 1179px) {
+  :root {
+    --index-w: var(--index-rail);
+  }
+}
 @media (max-width: 767px) {
   :root {
-    --nav-h: 60px;
-    --tabbar-h: 72px;
-    --radius-card: 22px;
+    --tabbar-h: 64px;
+    --index-w: 0px;
   }
 }
 
@@ -166,4 +233,5 @@
   --t-fast: 1ms;
   --t-mid: 1ms;
   --t-slow: 1ms;
+  --t-world: 1ms;
 }

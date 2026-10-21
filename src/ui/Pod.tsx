@@ -1,15 +1,18 @@
 /**
- * Specimen pods — how content lives inside the organism. A pod is a glass capsule with a
- * ribbed spine; it wakes (plays its preview loop) on hover or keyboard focus, shows its
- * access state, footage labelling, progress vein, and why it is here (reasons).
+ * Seed cards — how stories appear in the editorial layer. Every story is also a SEED in the
+ * living world (src/stage); its card is the same seed seen up close: the poster behind a
+ * hairline luminous rim, the title below, at most one access mark. A card wakes (plays its
+ * preview loop) on hover or keyboard focus, lights its seed in the world, shows footage
+ * labelling, a progress vein and why it is here (reasons).
  */
-import { useCallback, useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type KeyboardEvent, type MouseEvent, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import type { ID, Reason, Video } from '../../shared/types.ts';
 import { runtimeLabel, runtimeSpoken, settingLabel, FOOTAGE_LABEL, dateLabel } from '../lib/format.ts';
 import { useCatalogue } from '../state/catalogue.tsx';
 import { libraryActions, isSaved, useLibrary } from '../state/library.ts';
 import { useSession } from '../state/session.ts';
+import { setHovered, stageStore } from '../stage/store.ts';
 import { isReducedMotion } from '../systems/motion.ts';
 import { canPreview, releasePreview, requestPreview } from '../systems/previews.ts';
 import { sound } from '../systems/sound/engine.ts';
@@ -105,8 +108,22 @@ export function ReasonChips({ reasons, max = 2, linked = true }: { reasons: Reas
   );
 }
 
-/* ───────────── Video pod ───────────── */
+/* ───────────── Seed card (video) ───────────── */
 
+/** True while the living world has this story's seed under the pointer (or the card itself is hovered). */
+function useSeedLit(id: ID) {
+  return useSyncExternalStore(
+    stageStore.subscribe,
+    () => stageStore.get().hovered === id,
+    () => false,
+  );
+}
+
+/**
+ * A story as a SEED: its poster behind a hairline luminous rim, the title below, at most one
+ * access mark. Hovering or focusing the card lights its seed in the world (setHovered), and a
+ * seed lit from the world lights its card — the DOM and the world answer each other.
+ */
 export function VideoPod({ video, reasons, size = 'md', priority, footer }: { video: Video; reasons?: Reason[]; size?: 'sm' | 'md' | 'lg'; priority?: boolean; footer?: ReactNode }) {
   const cat = useCatalogue();
   const lib = useLibrary();
@@ -121,6 +138,8 @@ export function VideoPod({ video, reasons, size = 'md', priority, footer }: { vi
   const pct = progress && !progress.done && progress.dur ? Math.min(100, (progress.pos / progress.dur) * 100) : progress?.done ? 100 : 0;
   const playable = cat.isPlayable(video);
   const cursorLabel = playable ? (access.locked ? 'Preview' : 'Watch') : 'Details';
+  const footage = video.footage[0] ? FOOTAGE_LABEL[video.footage[0]] : null;
+  const lit = useSeedLit(video.id);
 
   const wake = () => {
     const v = vidRef.current;
@@ -132,20 +151,52 @@ export function VideoPod({ video, reasons, size = 'md', priority, footer }: { vi
     const v = vidRef.current;
     if (v) releasePreview(v);
   };
-  useEffect(() => () => sleep(), []);
+  const reach = () => {
+    wake();
+    setHovered(video.id);
+  };
+  const release = () => {
+    sleep();
+    if (stageStore.get().hovered === video.id) setHovered(null);
+  };
+  useEffect(
+    () => () => {
+      sleep();
+      if (stageStore.get().hovered === video.id) setHovered(null);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [video.id],
+  );
 
   const toggleSave = (e: MouseEvent<HTMLButtonElement>) => {
     const now = libraryActions.toggleSave(video.id);
-    announceSave({ saved: now, title: video.title, from: e.currentTarget, undo: () => libraryActions.toggleSave(video.id) });
+    announceSave({ saved: now, title: video.title, from: e.currentTarget, id: video.id, undo: () => libraryActions.toggleSave(video.id) });
   };
 
   return (
-    <article className={`pod pod-${size}`} data-access={access.key} onPointerEnter={wake} onPointerLeave={sleep} onFocus={wake} onBlur={sleep}>
+    <article
+      className={`pod pod-${size}`}
+      data-access={access.key}
+      data-seed={video.id}
+      data-world-lit={lit || undefined}
+      onPointerEnter={reach}
+      onPointerLeave={release}
+      onFocus={reach}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) release();
+      }}
+    >
       <Link to={href} className="pod-specimen" tabIndex={-1} aria-hidden="true" draggable={false} data-cursor="view" data-cursor-label={cursorLabel}>
         <Art art={video.art} eager={priority} />
         {art?.previewSmall ? <video ref={vidRef} className="pod-preview" muted loop playsInline preload="none" aria-hidden="true" tabIndex={-1} /> : null}
         <span className="pod-ribs" aria-hidden="true" />
-        {runtime ? <span className="pod-runtime mono">{runtimeLabel(runtime)}</span> : null}
+        {access.key !== 'free' ? (
+          <span className={`pod-mark pod-mark-${access.key}`}>
+            {access.key === 'premium' || access.key === 'early' ? <Icon name={access.locked ? 'lock' : 'diamond'} size={11} strokeWidth={2} /> : null}
+            {access.label}
+          </span>
+        ) : null}
+        {runtime ? <span className="pod-runtime timecode">{runtimeLabel(runtime)}</span> : null}
         {pct > 0 ? (
           <span className="pod-vein" aria-hidden="true">
             <span style={{ width: `${pct}%` }} />
@@ -153,10 +204,6 @@ export function VideoPod({ video, reasons, size = 'md', priority, footer }: { vi
         ) : null}
       </Link>
       <div className="pod-body">
-        <div className="pod-badges">
-          <AccessBadge video={video} />
-          <FootageBadges video={video} max={1} />
-        </div>
         <h3 className="pod-title">
           {/* this link's ::after covers the whole card, so it is what the pointer meets: it carries the card cursor */}
           <Link to={href} draggable={false} data-cursor="view" data-cursor-label={cursorLabel} onClick={() => sound.play('transition')}>
@@ -167,15 +214,16 @@ export function VideoPod({ video, reasons, size = 'md', priority, footer }: { vi
             </span>
           </Link>
         </h3>
-        <p className="pod-meta mono">
+        <p className="pod-meta">
           {place ? <span>{place}</span> : null}
           <span>{settingLabel(video)}</span>
+          {footage ? <span className="pod-footage">{footage}</span> : null}
         </p>
         {reasons ? <ReasonChips reasons={reasons} /> : null}
         {footer}
       </div>
       <button type="button" className="pod-save" aria-pressed={saved} aria-label={saved ? `Remove ${video.title} from saved` : `Save ${video.title}`} data-cursor="save" data-cursor-label={saved ? 'Saved' : 'Save to My World'} onClick={toggleSave}>
-        <Icon name={saved ? 'saved' : 'save'} size={18} />
+        <Icon name={saved ? 'saved' : 'save'} size={17} />
       </button>
     </article>
   );

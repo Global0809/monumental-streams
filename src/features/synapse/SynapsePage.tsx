@@ -2,23 +2,31 @@
  * CONNECTIONS — /synapse/:kind/:slug (kind ∈ video, programme, place, period, movement,
  * person, interest, theme; routes too). Also the person, movement, theme and interest page.
  *
- * Hero: the entity (kind, name, summary, key facts, honesty notes, one way onward) beside its
- * neural web. Then the always-rendered text alternative, "Why these are connected", grouped
- * by kind; then the stories in this web.
+ * An editorial layer over the living world, which takes the `focus` arrangement: a story's own
+ * seed comes forward with its connected stories linked by filaments; a programme gathers its
+ * members; any other entity draws the stories connected to it into a ring in front. Those seeds
+ * are the highlight, and cards, web nodes and the text list all light their seeds (and back).
+ *
+ * First the entity (kind, name, summary, one way onward, honesty notes, key facts) with the
+ * world in the open side; then its neural web (every kind of node, not only stories); then the
+ * always-rendered text alternative, "Why these are connected", grouped by kind; then the stories
+ * in this web.
  */
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useSyncExternalStore } from 'react';
 import { Link, Navigate, useLocation, useParams, useSearchParams } from 'react-router';
 import type { Entity, EntityKind } from '../../../shared/catalogue.ts';
 import { connectionsFor, relatedVideos } from '../../../shared/relations.ts';
 import type { ID, Movement, Period, Person, Place, Programme, Reason, Video } from '../../../shared/types.ts';
 import { useChapters } from '../../app/chapters.ts';
-import { PROVENANCE_LABEL, plural } from '../../lib/format.ts';
+import { FOOTAGE_LABEL, PROVENANCE_LABEL, plural } from '../../lib/format.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
+import type { Arrangement } from '../../stage/contract.ts';
+import { setHovered, stageStore, useArrangement } from '../../stage/store.ts';
 import { useReducedMotion } from '../../systems/motion.ts';
 import { ButtonLink } from '../../ui/controls.tsx';
 import { EmptyState } from '../../ui/feedback.tsx';
 import { Icon } from '../../ui/Icon.tsx';
-import { AccessBadge, Art, FootageBadges, ReasonChips, SectionHeader, VideoPod } from '../../ui/Pod.tsx';
+import { Art, ReasonChips, SectionHeader, VideoPod, useAccessState } from '../../ui/Pod.tsx';
 import { KIND_LABEL, KIND_PLURAL, PROGRAMME_STATUS, entityHeader, resolveEntity, synapseHref, type EntityHeader, type SynKind } from './entity.ts';
 import { KIND_ORDER } from './layout.ts';
 import { NeuralGraph } from './NeuralGraph.tsx';
@@ -28,6 +36,7 @@ import './synapse.css';
 const GROUP_CAP = 6;
 
 const CHAPTERS = [
+  { id: 'syn-top', label: 'Overview' },
   { id: 'syn-web', label: 'The web' },
   { id: 'syn-why', label: 'Why connected' },
   { id: 'syn-stories', label: 'Stories' },
@@ -49,6 +58,15 @@ export default function SynapsePage() {
   useChapters(resolved?.canonical ? CHAPTERS : []);
 
   const header = useMemo(() => (resolved ? entityHeader(cat, resolved.entity, resolved.kind) : null), [cat, resolved]);
+  const web = useMemo(() => (resolved && id ? webStories(cat, id, resolved.kind) : []), [cat, id, resolved]);
+
+  // the world: this entity in focus, its connected stories drawn in and lit
+  const kindNow = resolved?.kind;
+  const storyIds = web.map((x) => x.video.id);
+  const arrangement: Arrangement =
+    !id || !kindNow ? { kind: 'quiet' } : kindNow === 'video' ? { kind: 'focus', video: id, related: storyIds } : kindNow === 'programme' ? { kind: 'focus', programme: id } : { kind: 'focus', related: storyIds };
+  const highlight = !id || !kindNow ? null : kindNow === 'video' ? [id, ...storyIds] : kindNow === 'programme' ? [...new Set([...cat.videosForProgramme(id).map((v) => v.id), ...storyIds])] : storyIds;
+  useArrangement(arrangement, highlight);
 
   if (resolved && !resolved.canonical) return <Navigate to={`${synapseHref(cat, resolved.entity.id)}${location.search}`} replace />;
   if (!resolved || !header || !id) return <Unknown slug={slug} />;
@@ -62,11 +80,25 @@ export default function SynapsePage() {
 
   return (
     <div className="page wrap syn-page">
-      <NeuralGraph centreId={id} centreArt={header.art} depth={depth} onDepth={setDepth} reduced={reduced} lead={<Lead header={header} kind={resolved.kind} entity={resolved.entity} />} details={<Details header={header} />} />
+      <section id="syn-top" className="syn-hero" aria-labelledby="syn-h1">
+        <Lead header={header} kind={resolved.kind} entity={resolved.entity} />
+        <Details header={header} />
+      </section>
+      <section id="syn-web" className="syn-section" aria-labelledby="syn-web-h">
+        <NeuralGraph centreId={id} centreArt={header.art} depth={depth} onDepth={setDepth} reduced={reduced} />
+      </section>
       <WhyConnected id={id} />
-      <StoriesInWeb id={id} kind={resolved.kind} />
+      <StoriesInWeb id={id} kind={resolved.kind} items={web} />
     </div>
   );
+}
+
+/** The stories in an entity's web, each with the reason it is there. */
+function webStories(cat: ReturnType<typeof useCatalogue>, id: ID, kind: SynKind): { video: Video; reasons: Reason[] }[] {
+  if (kind === 'video') return relatedVideos(cat, id, 12).map((r) => ({ video: r.video, reasons: r.reasons }));
+  return connectionsFor(cat, id, { kinds: ['video'], limit: 12 })
+    .map((c) => ({ video: cat.get(c.target) as Video | undefined, reasons: c.reasons }))
+    .filter((x): x is { video: Video; reasons: Reason[] } => !!x.video);
 }
 
 /* ───────────── Entity header ───────────── */
@@ -80,24 +112,18 @@ function Lead({ header: h, kind, entity }: { header: EntityHeader; kind: SynKind
         <span aria-hidden="true">/</span>
         <span aria-current="page">Connections</span>
       </nav>
-      {h.art ? (
-        <div className="syn-head-art">
-          <Art art={h.art} sizes="small" eager alt="" />
-        </div>
-      ) : null}
       <p className="kicker syn-kicker">
         <span className="syn-dot" data-kind={kind} aria-hidden="true" />
         <b>Connections</b> · {h.kindLabel}
       </p>
-      <h1 className="page-title syn-title" data-long={h.title.length > 28 || undefined}>
+      <h1 id="syn-h1" className="page-title syn-title" data-long={h.title.length > 28 || undefined}>
         {h.title}
       </h1>
-      {h.lede ? <p className="syn-lede">{h.lede}</p> : null}
-      {video ? (
-        <div className="syn-badges">
-          <AccessBadge video={video} />
-          <FootageBadges video={video} max={3} />
-          <span className="badge">{PROVENANCE_LABEL[video.provenance]}</span>
+      {h.lede ? <p className="lede syn-lede">{h.lede}</p> : null}
+      {video ? <VideoMeta video={video} /> : null}
+      {h.art ? (
+        <div className="syn-head-art">
+          <Art art={h.art} sizes="small" eager alt="" />
         </div>
       ) : null}
       {h.notices.map((n, i) => (
@@ -125,11 +151,22 @@ function Lead({ header: h, kind, entity }: { header: EntityHeader; kind: SynKind
   );
 }
 
+/** Honest labelling of a story, as text: access (when not free), footage and provenance. */
+function VideoMeta({ video }: { video: Video }) {
+  const access = useAccessState(video);
+  return (
+    <p className="syn-meta">
+      {access.key !== 'free' ? <span className="syn-mark">{access.label}</span> : null}
+      <span>{[...video.footage.map((f) => FOOTAGE_LABEL[f]), PROVENANCE_LABEL[video.provenance]].join(' · ')}</span>
+    </p>
+  );
+}
+
 function Details({ header: h }: { header: EntityHeader }) {
   if (!h.facts.length && !(h.body && h.body !== h.lede)) return null;
   return (
     <div className="syn-details">
-      <h2 className="kicker syn-details-title">Key facts</h2>
+      <h2 className="syn-details-title">Key facts</h2>
       {h.body && h.body !== h.lede ? (
         <div className="syn-body">
           {h.body.split('\n\n').map((p, i) => (
@@ -191,8 +228,22 @@ function metaFor(cat: ReturnType<typeof useCatalogue>, id: ID, kind: EntityKind)
   }
 }
 
+/** A story row in the list lights its seed in the world while pointed at or focused. */
+function seedProps(id: ID) {
+  const on = () => setHovered(id);
+  const off = () => {
+    if (stageStore.get().hovered === id) setHovered(null);
+  };
+  return { 'data-seed': id, onPointerEnter: on, onPointerLeave: off, onFocus: on, onBlur: off };
+}
+
 function WhyConnected({ id }: { id: ID }) {
   const cat = useCatalogue();
+  const lit = useSyncExternalStore(
+    stageStore.subscribe,
+    () => stageStore.get().hovered,
+    () => null,
+  );
   const conns = useMemo(() => connectionsFor(cat, id, { limit: 48 }), [cat, id]);
   const groups = useMemo(() => {
     const by = new Map<EntityKind, typeof conns>();
@@ -219,7 +270,7 @@ function WhyConnected({ id }: { id: ID }) {
               const synHref = synapseHref(cat, c.target);
               const label = cat.label(c.target);
               return (
-                <li key={c.target} className="syn-link">
+                <li key={c.target} className="syn-link" data-world-lit={(g.kind === 'video' && lit === c.target) || undefined} {...(g.kind === 'video' ? seedProps(c.target) : {})}>
                   <div className="syn-link-head">
                     <Link to={entityHref} className="syn-link-name" data-cursor={g.kind === 'video' ? 'play' : 'open'}>
                       {label}
@@ -269,14 +320,8 @@ function WhyConnected({ id }: { id: ID }) {
 
 /* ───────────── Stories in this web ───────────── */
 
-function StoriesInWeb({ id, kind }: { id: ID; kind: SynKind }) {
+function StoriesInWeb({ id, kind, items }: { id: ID; kind: SynKind; items: { video: Video; reasons: Reason[] }[] }) {
   const cat = useCatalogue();
-  const items = useMemo(() => {
-    if (kind === 'video') return relatedVideos(cat, id, 12).map((r) => ({ video: r.video, reasons: r.reasons }));
-    return connectionsFor(cat, id, { kinds: ['video'], limit: 12 })
-      .map((c) => ({ video: cat.get(c.target) as Video | undefined, reasons: c.reasons }))
-      .filter((x): x is { video: Video; reasons: Reason[] } => !!x.video);
-  }, [cat, id, kind]);
   return (
     <section id="syn-stories" className="section" aria-labelledby="syn-stories-h">
       <SectionHeader id="syn-stories-h" kicker="Watch the web" title="Stories in this web">

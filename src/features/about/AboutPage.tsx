@@ -2,6 +2,7 @@
  * ABOUT — an editorial long-read: the platform, the concept, honesty notes, live integration
  * status, maintained activity, credits & licences, content counts and the accessibility
  * statement. Every number and credit on this page is derived from the catalogue or the server.
+ * The world stays a quiet field behind the read; the page paints nothing of its own.
  */
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
@@ -14,7 +15,7 @@ import { refreshSession, useSession } from '../../state/session.ts';
 import { ButtonLink } from '../../ui/controls.tsx';
 import { Pulse } from '../../ui/feedback.tsx';
 import { Icon } from '../../ui/Icon.tsx';
-import { Art } from '../../ui/Pod.tsx';
+import { useArrangement } from '../../stage/store.ts';
 import { SECTIONS } from '../../../shared/sections.ts';
 import type { IconName } from '../../ui/Icon.tsx';
 import { BILLING_LABEL } from '../membership/status.ts';
@@ -42,6 +43,7 @@ const STATUS_WORD: Record<Programme['status'], string> = {
 export default function AboutPage() {
   const cat = useCatalogue();
   useChapters(CHAPTERS);
+  useArrangement({ kind: 'quiet' });
 
   useEffect(() => {
     document.title = 'About · Monumental Streams';
@@ -51,26 +53,20 @@ export default function AboutPage() {
   }, []);
 
   const gateway = cat.places.find((p) => p.gateway);
-  const heroArt = cat.artFor('art:living-membrane');
 
   return (
     <div className="page about">
       <header className="about-hero">
-        <div className="about-backdrop" aria-hidden="true">
-          <Art art="art:living-membrane" alt="" sizes="large" eager className="about-backdrop-art" />
-          <span className="about-backdrop-shade" />
-          {heroArt?.provisional ? <span className="about-art-note">Provisional art · studio concept loop</span> : null}
-        </div>
         <div className="wrap about-hero-inner">
-          <p className="kicker">About</p>
-          <h1 className="page-title about-title">
+          <p className="eyebrow">About</p>
+          <h1 className="title-monument about-title">
             Stream the <em>world</em>.
           </h1>
           <p className="about-lines">
             <span>Explore what you love. Discover where it lives.</span>
             <span>All lives. All stories. One platform.</span>
           </p>
-          <p className="page-lede">
+          <p className="lede about-hero-lede">
             A streaming and cultural-discovery platform. Watch stories, then follow the connections they open — across people, places, disciplines, movements and
             time.{gateway ? ` ${gateway.name} is the launch gateway.` : ''}
           </p>
@@ -200,7 +196,7 @@ function Honesty() {
                     <Link to={cat.href(p.id)} className="about-link-strong">
                       {p.title}
                     </Link>
-                    <span className={`badge ${p.status === 'available' ? 'badge-free' : 'badge-planned'}`}>{STATUS_WORD[p.status]}</span>
+                    <span className={`about-status ${p.status === 'available' ? 'is-available' : ''}`}>{STATUS_WORD[p.status]}</span>
                   </div>
                   <p className="muted">{p.statusNote}</p>
                 </li>
@@ -233,7 +229,7 @@ function Honesty() {
             {FOOTAGE_ORDER.map((k) => (
               <div key={k}>
                 <dt>
-                  <span className={`badge badge-footage badge-f-${k}`}>{FOOTAGE_LABEL[k]}</span>
+                  <span className="about-legend-term">{FOOTAGE_LABEL[k]}</span>
                   <span className="about-count">{plural(foot[k] ?? 0, 'video')}</span>
                 </dt>
                 <dd className="muted">{FOOTAGE_NOTE[k]}</dd>

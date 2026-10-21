@@ -11,6 +11,7 @@ import type { Catalogue, EntityKind } from '../../../shared/catalogue.ts';
 import { MOOD_LABELS } from '../../../shared/relations.ts';
 import type { ID, Mood, Place, Video } from '../../../shared/types.ts';
 import { timecode } from '../../lib/format.ts';
+import type { Arrangement } from '../../stage/contract.ts';
 
 export const MINUTE_OPTIONS = [10, 15, 30, 45, 60, 90] as const;
 export const DEFAULT_MINUTES = 30;
@@ -220,6 +221,16 @@ export function budgetLabel(total: number, budget: number): string {
  * this viewer can watch, their combined runtime, and how many more need a membership.
  */
 export function poolStats(cat: Catalogue, dial: Dial, premium: boolean, now?: Date): { count: number; seconds: number; locked: number } {
+  const { strict, open } = pool(cat, dial, premium, now);
+  return { count: open.length, seconds: open.reduce((s, v) => s + (cat.runtime(v) ?? 0), 0), locked: strict.length - open.length };
+}
+
+/** The stories GO would draw from for the dialled settings (what the world lights while you turn the knobs). */
+export function poolIds(cat: Catalogue, dial: Dial, premium: boolean, now?: Date): ID[] {
+  return pool(cat, dial, premium, now).open.map((v) => v.id);
+}
+
+function pool(cat: Catalogue, dial: Dial, premium: boolean, now?: Date): { strict: Video[]; open: Video[] } {
   const scope = dial.where ? cat.placeScope(dial.where) : null;
   const strict = playableStories(cat, now).filter(
     (v) =>
@@ -231,7 +242,7 @@ export function poolStats(cat: Catalogue, dial: Dial, premium: boolean, now?: Da
     const a = cat.effectiveAccess(v, now);
     return a === 'free' || (a === 'premium' && premium);
   });
-  return { count: open.length, seconds: open.reduce((s, v) => s + (cat.runtime(v) ?? 0), 0), locked: strict.length - open.length };
+  return { strict, open };
 }
 
 /** "Mood (chill)", "Interest (Music)", "Where (Miami)" for the constraints a plan had to widen. */
@@ -239,4 +250,19 @@ export function relaxedLabels(cat: Catalogue, dial: Dial, relaxed: ('mood' | 'in
   return relaxed.map((c) =>
     c === 'mood' ? `mood (${dial.mood ? MOOD_LABELS[dial.mood] : 'any'})` : c === 'interest' ? `interest (${dial.interest ? cat.label(dial.interest) : 'any'})` : `place (${dial.where ? cat.label(dial.where) : 'anywhere'})`,
   );
+}
+
+/* ───────────── The world ───────────── */
+
+/**
+ * What the living world shows for the instrument. While dialling (no plan on screen): a calm
+ * field with the stories GO would draw from lit. With a plan: its first stop comes forward and
+ * the other stops gather around it, joined by filaments — the journey, lit in the world.
+ */
+export function worldFor(planStops: ID[] | null, pool: ID[]): { arrangement: Arrangement; highlight: ID[] | null } {
+  if (planStops && planStops.length) {
+    const [first, ...rest] = planStops;
+    return { arrangement: { kind: 'focus', video: first, related: rest }, highlight: planStops };
+  }
+  return { arrangement: { kind: 'quiet' }, highlight: pool.length ? pool : null };
 }

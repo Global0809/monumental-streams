@@ -6,7 +6,7 @@
     "description": "Start where Monumental starts. Everything set in Miami-Dade County, from the City of Miami and its neighbourhoods to the separate City of Miami Beach, gathered here automatically as new stories arrive.",
     "rule": { "places": ["place:miami-dade-county"] },
     "featured": true,
-    "art": "art:miami-isometric"
+    "art": "art:still-roads-to-romance"
   },
   {
     "id": "collection:free-to-watch",
@@ -14,7 +14,7 @@
     "title": "Free to Watch",
     "description": "Everything you can press play on right now, no membership needed.",
     "rule": { "access": "free", "playableOnly": true },
-    "art": "art:catalogue-player"
+    "art": "art:still-apollo-11-1969"
   },
   {
     "id": "collection:wavemakers-route",
@@ -30,7 +30,7 @@
     "title": "Open Archive",
     "description": "Public-domain films from libraries and archives, from a 1905 subway ride under Manhattan to Apollo 11's launch, each credited with its source and shown for what it is.",
     "rule": { "provenance": ["archive"] },
-    "art": "art:time-machine"
+    "art": "art:still-nyc-subway-1905"
   },
   {
     "id": "collection:open-cinema",
@@ -38,7 +38,7 @@
     "title": "Open Cinema",
     "description": "Open movies released under Creative Commons licences, credited exactly as their makers ask.",
     "rule": { "provenance": ["open-cinema"] },
-    "art": "art:bauhaus-categories"
+    "art": "art:still-tears-of-steel"
   },
   {
     "id": "collection:studio-specimens",
@@ -54,7 +54,7 @@
     "title": "Before 1950",
     "description": "Stories set in the first half of the twentieth century, matched by when they take place, not when they were made.",
     "rule": { "periods": ["period:1900s", "period:1910s", "period:1920s", "period:1930s", "period:1940s"] },
-    "art": "art:deco-atlas"
+    "art": "art:still-kingston-1920"
   },
   {
     "id": "collection:monumental-originals",

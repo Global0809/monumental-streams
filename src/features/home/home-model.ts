@@ -1,13 +1,13 @@
 /**
  * Pure helpers for Home. Every number, place, decade and category shown on Home is derived
- * here from the shared catalogue and the viewer's library — nothing is hand-listed, so new
- * videos appear in the World preview, the Time Machine preview and the category band on
- * their own.
+ * here from the shared catalogue and the viewer's library. Nothing is hand-listed, so a new
+ * video appears in the category index, the World and Time Machine invitations and the seeds
+ * they light, on its own.
  */
 import type { Catalogue } from '../../../shared/catalogue.ts';
 import { activeInterests, activeJourneys, continueWatching, savedIds, savedPlaceIds } from '../../../shared/library.ts';
-import { categorySections, sectionById, videosForSection, type Section } from '../../../shared/sections.ts';
-import type { Library, Movement, Period, Place, ProgressEntry, Route, Video } from '../../../shared/types.ts';
+import { categorySections, sectionById, videosForSection, type Section, type SectionId } from '../../../shared/sections.ts';
+import type { ID, Library, Period, Place, ProgressEntry, Route, Video } from '../../../shared/types.ts';
 
 /* ───────────────────────── Small labels ───────────────────────── */
 
@@ -79,17 +79,45 @@ export function portalLines(s: PortalStats): Record<'atlas' | 'time' | 'somewher
   };
 }
 
-/** The platform at a glance, for the hero: what exists in the catalogue today. */
-export function platformStats(cat: Catalogue, now?: Date) {
-  return {
-    stories: cat.videos.length,
-    playable: cat.videos.filter((v) => cat.isPlayable(v, now)).length,
-    places: cat.places.filter((p) => cat.videosForPlace(p.id, false).length > 0).length,
-    decades: cat.periodCoverage().filter((c) => c.count > 0).length,
-  };
+/* ───────────────────────── The constellation index ───────────────────────── */
+
+export interface OrganEntry {
+  section: Section;
+  /** Stories the shared catalogue holds for it today (videosForSection). */
+  count: number;
+  /** The seeds it lights in the world. */
+  ids: ID[];
+  /** Live is a broadcast space, not a shelf of stories. */
+  live: boolean;
 }
 
-/* ───────────────────────── World preview ───────────────────────── */
+/**
+ * The nine organs that orbit the Monumental spine, in the world's order: the eight
+ * categories in navigation order, then Live closing the ring. Counts come from
+ * videosForSection; Live never claims stories.
+ */
+export function organIndex(cat: Catalogue): OrganEntry[] {
+  const entries = categorySections().map((section) => {
+    const videos = videosForSection(cat, section);
+    return { section, count: videos.length, ids: videos.map((v) => v.id), live: false };
+  });
+  return [...entries, { section: sectionById('live'), count: 0, ids: [], live: true }];
+}
+
+/** Video id → the category sections it belongs to (lights the index from a seed in the world). */
+export function seedSections(cat: Catalogue): Map<ID, SectionId[]> {
+  const out = new Map<ID, SectionId[]>();
+  for (const s of categorySections()) {
+    for (const v of videosForSection(cat, s)) {
+      const list = out.get(v.id);
+      if (list) list.push(s.id);
+      else out.set(v.id, [s.id]);
+    }
+  }
+  return out;
+}
+
+/* ───────────────────────── World invitation ───────────────────────── */
 
 /** Angular distance between two coordinates, in degrees (haversine). */
 export function arcDegrees([lat1, lon1]: [number, number], [lat2, lon2]: [number, number]): number {
@@ -100,26 +128,26 @@ export function arcDegrees([lat1, lon1]: [number, number], [lat2, lon2]: [number
   return (2 * Math.asin(Math.min(1, Math.sqrt(h)))) / r;
 }
 
-/** Fine-grained places lift to the city that contains them, so the preview pins cities. */
+/** Fine-grained places lift to the city that contains them, so destinations are cities. */
 const LIFT: ReadonlySet<Place['kind']> = new Set(['neighbourhood', 'borough', 'district']);
 
 export interface WorldHub {
-  /** The place the pin opens (gateway first, then the place with the most stories). */
+  /** The place the destination opens (gateway first, then the place with the most stories). */
   place: Place;
-  /** Nearby places folded into this pin (they sit too close together to pick apart). */
+  /** Nearby places folded into this destination (too close together to pick apart on a globe). */
   nearby: Place[];
-  /** Every story set at the pin or its nearby places, deduplicated. */
+  /** Every story set at the destination or its nearby places, deduplicated. */
   videos: Video[];
   playable: number;
   gateway: boolean;
-  /** Catalogued routes that start or end within the pin. */
+  /** Catalogued routes that start or end within the destination. */
   routes: Route[];
 }
 
 /**
- * Destinations for the World preview: every place with a story set there, lifted to its city
- * and merged with neighbours closer than `mergeDegrees` (Miami Beach and Coral Gables sit
- * inside one pin with Miami at globe scale). Sorted gateway first, then by story count.
+ * Destinations with stories: every place with a story set there, lifted to its city and
+ * merged with neighbours closer than `mergeDegrees` (Miami Beach sits inside Miami at globe
+ * scale). Sorted gateway first, then by story count.
  */
 export function worldHubs(cat: Catalogue, opts: { mergeDegrees?: number; now?: Date } = {}): WorldHub[] {
   const merge = opts.mergeDegrees ?? 2.5;
@@ -175,37 +203,22 @@ export function sortStories(cat: Catalogue, videos: Video[], now?: Date): Video[
   );
 }
 
-/** Great-circle connections the preview can draw: both ends need coordinates. */
-export function worldArcs(cat: Catalogue): { route: Route; from: [number, number]; to: [number, number] }[] {
-  const out: { route: Route; from: [number, number]; to: [number, number] }[] = [];
-  const seen = new Set<string>();
-  for (const r of cat.routes) {
-    const a = cat.get(r.from) as Place | undefined;
-    const b = cat.get(r.to) as Place | undefined;
-    if (!a?.coords || !b?.coords) continue;
-    // a programme leg retraces a migration route; draw each pair of places once
-    const key = [a.id, b.id].sort().join('|');
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push({ route: r, from: a.coords, to: b.coords });
-  }
-  return out;
+export interface WorldInvitation {
+  /** Stories with a place on the globe — the seeds that settle there. */
+  placed: ID[];
+  hubs: WorldHub[];
 }
 
-/**
- * Where a pin sits, in words: "Gateway · United States", "City · Jamaica", "Territory".
- * The short form keeps one part — the country, or the gateway / kind for a top-level place.
- */
-export function hubContext(cat: Catalogue, hub: WorldHub, short = false): string {
-  const p = hub.place;
-  const kind = p.kind === 'constituent-country' ? 'Country' : p.kind[0].toUpperCase() + p.kind.slice(1);
-  const country = cat.placeAncestors(p.id).find((a) => a.kind === 'country' || a.kind === 'territory');
-  const where = country && country.id !== p.id ? country.name : null;
-  if (short) return hub.gateway ? 'Gateway' : (where ?? kind);
-  return [hub.gateway ? 'Gateway' : kind, where].filter(Boolean).join(' · ');
+/** What Home says (and lights) about the World: the stories it places and its destinations. */
+export function worldInvitation(cat: Catalogue, now?: Date): WorldInvitation {
+  const coords = new Set(cat.places.filter((p) => Array.isArray(p.coords)).map((p) => p.id));
+  return {
+    placed: cat.videos.filter((v) => v.places.some((id) => coords.has(id))).map((v) => v.id),
+    hubs: worldHubs(cat, { now }),
+  };
 }
 
-/* ───────────────────────── Time Machine preview ───────────────────────── */
+/* ───────────────────────── Time Machine invitation ───────────────────────── */
 
 export interface DecadeStop {
   period: Period;
@@ -215,75 +228,32 @@ export interface DecadeStop {
 
 export const decadeStops = (cat: Catalogue): DecadeStop[] => cat.periodCoverage();
 
-/** The decade the preview opens on: the one with the most stories (earliest on a tie). */
+/** The decade with the most stories (earliest on a tie). */
 export function liveliestDecade(stops: DecadeStop[]): DecadeStop | null {
   let best: DecadeStop | null = null;
   for (const s of stops) if (!best || s.count > best.count) best = s;
   return best;
 }
 
-export interface DecadePreview {
-  period: Period;
-  videos: Video[];
-  playable: number;
-  movements: Movement[];
-  /** Places the decade's stories are set in, lifted to cities, most stories first. */
-  places: Place[];
+export interface TimeInvitation {
+  /** Stories with a historical setting — the seeds that unspool along the helix. */
+  dated: ID[];
+  /** Decades that hold stories, in time order. */
+  decades: DecadeStop[];
+  span: { from: number; to: number } | null;
 }
 
-export function decadePreview(cat: Catalogue, periodId: string, now?: Date): DecadePreview | null {
-  const period = cat.get(periodId) as Period | undefined;
-  if (!period) return null;
-  const videos = sortStories(cat, cat.videosForPeriod(periodId), now);
-  const tally = new Map<string, { place: Place; n: number }>();
-  for (const v of videos) {
-    // a story set in both London and Brixton counts once for London
-    const mine = new Map<string, Place>();
-    for (const id of v.places) {
-      const p = cat.get(id) as Place | undefined;
-      if (!p) continue;
-      const lifted = LIFT.has(p.kind) || p.kind === 'venue' ? (cat.placeAncestors(p.id).find((a) => a.kind === 'city') ?? p) : p;
-      mine.set(lifted.id, lifted);
-    }
-    for (const place of mine.values()) {
-      const cur = tally.get(place.id);
-      if (cur) cur.n += 1;
-      else tally.set(place.id, { place, n: 1 });
-    }
-  }
+export function timeInvitation(cat: Catalogue): TimeInvitation {
+  const dated = cat.videos.filter((v) => v.setting);
   return {
-    period,
-    videos,
-    playable: videos.filter((v) => cat.isPlayable(v, now)).length,
-    movements: cat.movementsForPeriod(periodId),
-    places: [...tally.values()].sort((a, b) => b.n - a.n || a.place.name.localeCompare(b.place.name)).map((t) => t.place),
+    dated: dated.map((v) => v.id),
+    decades: decadeStops(cat).filter((s) => s.count > 0),
+    span: yearSpan(dated),
   };
 }
 
-/** Index of the stop a pointer at fraction `x` (0–1 across the strip) lands on. */
-export function stopAt(x: number, count: number): number {
-  if (count <= 0) return -1;
-  return Math.min(count - 1, Math.max(0, Math.floor(x * count)));
-}
-
-/* ───────────────────────── Category band ───────────────────────── */
-
-export interface CategoryTile {
-  section: Section;
-  count: number;
-  playable: number;
-  /** A few real stories from the category, playable first, for the hover peek. */
-  sample: Video[];
-}
-
-export function categoryTiles(cat: Catalogue, now?: Date): CategoryTile[] {
-  return categorySections().map((section) => {
-    const videos = sortStories(cat, videosForSection(cat, section), now);
-    return { section, count: videos.length, playable: videos.filter((v) => cat.isPlayable(v, now)).length, sample: videos.slice(0, 3) };
-  });
-}
-
-export const liveSection = () => sectionById('live');
+/** The ids of a decade's stories (what the decade link lights). */
+export const decadeIds = (cat: Catalogue, periodId: ID): ID[] => cat.videosForPeriod(periodId).map((v) => v.id);
 
 /* ───────────────────────── My World summary ───────────────────────── */
 

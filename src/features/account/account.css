@@ -1,106 +1,54 @@
-/* ═════════════ ACCOUNT — a centred glass card over the living membrane ═════════════ */
+/* ═════════════ ACCOUNT — one glass card in the editorial column, over a quiet world ═════════════
+ * The form is the only glass (fields over the moving world need it); "what an account adds"
+ * sits beside it as plain text on hairlines. */
 
 .acct {
-  position: relative;
-  isolation: isolate;
-  padding-top: 0;
   padding-bottom: clamp(4rem, 9vw, 7rem);
 }
-
-/* Backdrop: imagery under the masthead, fading into the page bloom */
-.acct-backdrop {
-  position: absolute;
-  top: calc(var(--nav-h) * -1);
-  left: 0;
-  right: 0;
-  z-index: -1;
-  height: min(96vh, 900px);
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(180deg, black 0%, black 48%, transparent 100%);
-  mask-image: linear-gradient(180deg, black 0%, black 48%, transparent 100%);
-}
-.acct-backdrop-art {
-  position: absolute !important;
-  inset: 0;
-  background-color: transparent;
-}
-.acct-backdrop-art img {
-  object-position: 50% 40%;
-}
-.acct-backdrop-art .art-provisional {
-  opacity: 1;
-  top: calc(var(--nav-h) + 1rem);
-  right: var(--gutter);
-  bottom: auto;
-  left: auto;
-  padding: 3px 10px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  text-transform: none;
-  color: var(--lilac);
-  background: color-mix(in srgb, var(--night) 64%, transparent);
-  backdrop-filter: blur(8px);
-}
-.acct-backdrop-shade {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(46% 60% at 50% 46%, color-mix(in srgb, var(--night) 40%, transparent), transparent 80%),
-    linear-gradient(180deg, color-mix(in srgb, var(--night) 70%, transparent) 0%, color-mix(in srgb, var(--night) 30%, transparent) 30%, color-mix(in srgb, var(--night) 45%, transparent) 100%);
-}
-
 .acct-stage {
   display: grid;
-  justify-items: center;
-  gap: clamp(4.5rem, 9vw, 7rem);
-  padding-top: clamp(2rem, 8vh, 5.5rem);
+  grid-template-columns: minmax(0, 34rem) minmax(0, 26rem);
+  align-items: start;
+  gap: clamp(2.5rem, 6vw, 5rem);
+  padding-top: clamp(0.5rem, 3vw, 2rem);
 }
 
 /* The card */
 .acct-card {
   display: grid;
-  gap: 1.25rem;
-  width: min(100%, 580px);
-  padding: clamp(1.6rem, 4.2vw, 2.9rem);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--plum-2) 70%, transparent), color-mix(in srgb, var(--night-2) 80%, transparent));
-  backdrop-filter: blur(26px) saturate(1.2);
-  -webkit-backdrop-filter: blur(26px) saturate(1.2);
-  border-color: var(--line-2);
+  gap: 1.15rem;
+  padding: clamp(1.4rem, 3.6vw, 2.5rem);
 }
 .acct-title {
-  margin: 0;
-  font-size: clamp(2.4rem, 1.6rem + 2.6vw, 4rem);
+  margin: 0 0 0 -0.03em;
+  font-size: clamp(2.4rem, 1.5rem + 2.8vw, 4.2rem);
 }
 .acct-switch {
   color: var(--lilac);
 }
 .acct-switch a {
+  display: inline-block;
+  padding: var(--tap-pad) 0;
+  margin: calc(var(--tap-pad) * -1) 0;
   color: var(--iris);
   font-weight: 600;
 }
-
-/* Notices and errors on palette */
 .acct-notice-attn {
-  border-color: color-mix(in srgb, var(--rose) 42%, transparent);
-  background: color-mix(in srgb, var(--rose) 7%, transparent);
+  border-color: rgb(255 159 200 / 0.42);
+  background: rgb(255 159 200 / 0.07);
 }
 .acct-notice-attn svg {
   color: var(--rose);
 }
 .acct .form-error {
-  border-color: color-mix(in srgb, var(--danger) 48%, transparent);
-  background: color-mix(in srgb, var(--danger) 9%, transparent);
   color: var(--pearl);
 }
 
 /* Form: large, calm inputs */
 .acct-form {
   display: grid;
-  gap: 1.3rem;
-  margin-top: 0.5rem;
+  gap: 1.25rem;
+  margin-top: 0.4rem;
 }
 .acct-form .form-error:focus {
   outline: none;
@@ -116,13 +64,13 @@
 }
 .acct-field .field-hint {
   color: var(--lilac-dim);
-  font-size: 0.84rem;
+  font-size: var(--step--1);
 }
 .acct .input {
-  min-height: 58px;
-  padding: 0 1.2rem;
+  min-height: 54px;
+  padding: 0 1.1rem;
   border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--night) 50%, transparent);
+  background: rgb(7 6 12 / 0.55);
   font-size: var(--step-0);
 }
 .acct .input[aria-invalid='true'] {
@@ -132,44 +80,41 @@
   position: relative;
 }
 .acct-field.has-after .input {
-  padding-right: 5.75rem;
+  padding-right: 5.5rem;
 }
 .acct-reveal {
   position: absolute;
   top: 50%;
-  right: 7px;
+  right: 5px;
   min-width: var(--hit);
   min-height: 44px;
-  padding: 0 1rem;
+  padding: 0 0.9rem;
   transform: translateY(-50%);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line-2);
-  background: var(--glass-2);
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
   color: var(--lilac);
   font-size: var(--step--1);
   font-weight: 600;
-  transition:
-    color var(--t-fast),
-    border-color var(--t-fast);
+  transition: color var(--t-fast);
 }
 .acct-reveal:hover,
 .acct-reveal[aria-pressed='true'] {
   color: var(--pearl);
-  border-color: color-mix(in srgb, var(--iris) 50%, transparent);
 }
 .acct-field-error {
   display: flex;
   align-items: center;
   gap: 0.4rem;
   color: var(--danger);
-  font-size: 0.86rem;
+  font-size: var(--step--1);
 }
 .acct-meter {
   height: 3px;
   margin-top: -0.6rem;
+  overflow: hidden;
   border-radius: 3px;
   background: var(--glass-2);
-  overflow: hidden;
 }
 .acct-meter span {
   display: block;
@@ -181,180 +126,149 @@
     background var(--t-mid);
 }
 .acct-meter.is-ok span {
-  background: var(--pearl-fill);
+  background: var(--iris);
   box-shadow: 0 0 10px var(--iris-glow);
 }
 .acct-submit {
   justify-self: stretch;
-  margin-top: 0.4rem;
+  margin-top: 0.3rem;
 }
 .acct-fine {
   max-width: 56ch;
   color: var(--lilac-dim);
-  font-size: 0.86rem;
+  font-size: var(--step--1);
 }
 .acct-inline-btn {
-  padding: 0;
+  padding: var(--tap-pad) 0;
+  margin: calc(var(--tap-pad) * -1) 0;
   border: 0;
   background: none;
   color: var(--iris);
+  font: inherit;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 0.2em;
-}
-
-/* What an account adds: calm, unboxed */
-.acct-why {
-  display: grid;
-  gap: clamp(1.5rem, 3vw, 2.25rem);
-  width: min(100%, 1000px);
-}
-.acct-why-title {
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  text-align: center;
-}
-.acct-why-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 2rem clamp(2rem, 4vw, 3.5rem);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.acct-why-list > li {
-  display: grid;
-  grid-template-columns: 48px minmax(0, 1fr);
-  gap: 1rem;
-  align-items: start;
-}
-.acct-why-node {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid var(--line-2);
-  background: var(--glass);
-  backdrop-filter: blur(10px);
-  color: var(--iris);
-}
-.acct-why-list > li:nth-child(2) .acct-why-node {
-  color: var(--gold);
-}
-.acct-why-list > li:nth-child(4) .acct-why-node {
-  color: var(--frost);
-}
-.acct-why-item {
-  margin: 0.55rem 0 0.3rem;
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-.acct-why p {
-  color: var(--lilac);
-  font-size: var(--step--1);
-}
-.acct-why a {
-  color: var(--iris);
 }
 
 /* Signed in */
 .acct-profile-head {
   display: flex;
   align-items: center;
-  gap: 1.1rem;
-  min-width: 0;
-  margin-top: 0.5rem;
-}
-.acct-profile-head > div {
+  gap: 1rem;
   min-width: 0;
 }
 .acct-avatar {
   display: grid;
-  place-items: center;
   flex: none;
-  width: 72px;
-  height: 72px;
+  place-items: center;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   border: 1px solid var(--line-2);
-  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--iris) 34%, transparent), var(--plum) 74%);
   color: var(--pearl);
   font-size: var(--step-1);
-  box-shadow: 0 0 34px -10px var(--iris-glow);
 }
 .acct-name {
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+  font-size: var(--step-2);
+  font-weight: 520;
   overflow-wrap: anywhere;
 }
 .acct-email {
-  margin-top: 0.2rem;
-  color: var(--lilac-dim);
-  font-size: 0.9rem;
+  color: var(--lilac);
   overflow-wrap: anywhere;
 }
 .acct-facts {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
-  gap: 1rem 1.5rem;
-  margin: 0.25rem 0 0;
-  padding: 1.25rem 0;
-  border-block: 1px solid var(--line);
+  margin: 0;
+}
+.acct-facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--line);
 }
 .acct-facts dt {
   color: var(--lilac-dim);
-  font-size: 0.84rem;
-  font-weight: 500;
+  font-size: var(--step--1);
 }
 .acct-facts dd {
-  margin: 0.3rem 0 0;
+  margin: 0;
   color: var(--pearl);
 }
 .acct-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
-.acct-note p b {
-  color: var(--pearl);
+.acct-note {
+  align-items: flex-start;
 }
-.acct-note a {
+.acct-note p {
+  color: var(--lilac);
+}
+
+/* What an account adds: plain text on hairlines, beside the card */
+.acct-why {
+  display: grid;
+  gap: 1rem;
+  padding-top: clamp(0.5rem, 2vw, 1.5rem);
+}
+.acct-why-title {
+  font-size: var(--step-1);
+  font-weight: 520;
+  letter-spacing: -0.01em;
+}
+.acct-why-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.acct-why-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+}
+.acct-why-node {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--line-2);
+  color: var(--iris);
+}
+.acct-why-item {
+  margin-bottom: 0.25rem;
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-weight: 600;
+}
+.acct-why .muted {
+  font-size: var(--step--1);
+}
+.acct-why a {
   color: var(--iris);
 }
 
+@media (max-width: 1023px) {
+  .acct-stage {
+    grid-template-columns: minmax(0, 36rem);
+  }
+}
 @media (max-width: 767px) {
   .acct-stage {
-    padding-top: clamp(1.5rem, 6vh, 3rem);
+    gap: 2.5rem;
+    padding-top: 0.25rem;
   }
-  .acct-why-title {
-    text-align: left;
+  .acct-card {
+    padding: 1.25rem 1rem;
   }
-  .acct-why-list {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-@media (max-width: 420px) {
   .acct-actions > .btn {
     flex: 1 1 auto;
-  }
-}
-
-/* Touch: the reveal toggle and inline retry meet the 44px target. */
-@media (pointer: coarse) {
-  .acct-reveal {
-    min-height: var(--hit);
-  }
-  .acct-inline-btn {
-    display: inline-block;
-    min-width: var(--hit);
-    padding-block: var(--tap-pad);
-    margin-block: calc(var(--tap-pad) * -1);
   }
 }

@@ -1,15 +1,16 @@
 /**
- * The flat map — the 2D SVG fallback and a first-class option. Same nodes and routes as the
- * globe, drawn over Natural Earth land in equirectangular space (viewBox 0 0 360 180). Zoom with
- * the buttons, the wheel, a pinch or +/−; pan by dragging or with the arrow keys. Every node is
- * a real link, so the map is fully keyboard navigable.
+ * The flat map — the 2D alternative to the living globe (and its fallback where the stage
+ * cannot run). The same places and routes, seen through the same lens, drawn over Natural Earth
+ * land in equirectangular space (viewBox 0 0 360 180). Zoom with the buttons, the wheel, a pinch
+ * or +/−; pan by dragging or with the arrow keys. Every node is a real link, so the map is fully
+ * keyboard navigable, and pointing at one lights the same place everywhere else (setHotPlace).
  */
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent } from 'react';
 import { Link } from 'react-router';
 import { sound } from '../../systems/sound/engine.ts';
 import { loadLand, type LandPaths } from './data.ts';
 import { eqX, eqY, mapArc, placeLabels, textWidth, type StageNode, type StageRoute } from './model.ts';
-import { ZoomControls } from './parts.tsx';
+import { setHotPlace, ZoomControls } from './parts.tsx';
 
 interface Box {
   x: number;
@@ -339,10 +340,10 @@ export default function MapView({ nodes, routes, focus, focusKey, reduced, hrefF
                 aria-current={n.state === 3 ? 'page' : undefined}
                 data-cursor="open"
                 data-cursor-label={n.name}
-                onPointerEnter={() => setHot(n.id)}
-                onPointerLeave={() => setHot((h) => (h === n.id ? null : h))}
-                onFocus={() => setHot(n.id)}
-                onBlur={() => setHot((h) => (h === n.id ? null : h))}
+                onPointerEnter={() => (setHot(n.id), setHotPlace(n.id))}
+                onPointerLeave={() => (setHot((h) => (h === n.id ? null : h)), setHotPlace(null))}
+                onFocus={() => (setHot(n.id), setHotPlace(n.id))}
+                onBlur={() => (setHot((h) => (h === n.id ? null : h)), setHotPlace(null))}
                 onClick={() => sound.play('select')}
               >
                 <circle cx={x} cy={y} r={r + 9 * upp} className="atlas-mnode-hit" />
@@ -383,6 +384,7 @@ export default function MapView({ nodes, routes, focus, focusKey, reduced, hrefF
         </g>
       </svg>
       {!land ? <p className="atlas-map-note">Drawing the coastline…</p> : null}
+      <p className="atlas-map-credit">Land from Natural Earth, public domain</p>
       <ZoomControls onIn={() => zoomAt(0.65)} onOut={() => zoomAt(1.5)} onReset={() => animateTo(boxFor(focus, px.w / px.h))} resetLabel={focusKey === 'world' ? 'Back to the whole world' : 'Recentre on the selection'} />
     </div>
   );

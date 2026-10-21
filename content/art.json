@@ -342,5 +342,77 @@
     "kind": "still",
     "provisional": false,
     "credit": "Polygoon-Profilti (producent) / Nederlands Instituut voor Beeld en Geluid (beheerder) — CC BY-SA 3.0 NL"
+  },
+  {
+    "id": "art:organ-live",
+    "stem": "organ-live",
+    "alt": "A dormant beacon: a teardrop glass membrane outlined in faint signal red holds an unlit bone core inside a lantern cage of bone ribs, on a vertebral stalk, with two still red rings around it on a dark wine-violet field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
+  },
+  {
+    "id": "art:organ-movies",
+    "stem": "organ-movies",
+    "alt": "An iris aperture of overlapping bone blades set in a collar of vertebrae, with warm amber light glowing through its opening, orbited by a tilted ring of filmstrip frames with sprocket holes and lit amber cells, on a dark field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
+  },
+  {
+    "id": "art:organ-music",
+    "stem": "organ-music",
+    "alt": "A vertebral spine with a harp-like bone arm strung with glowing violet strings, a tendon coiled around the spine and three rippling glass drum membranes held in bone hoops, on a deep violet field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
+  },
+  {
+    "id": "art:organ-sports",
+    "stem": "organ-sports",
+    "alt": "A seamed bone ball inside a coral-rose glass membrane, circled by braided tendon arcs trailing coral light, hovering above a bowl of curved bone ribs like an arena, on a dark field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
+  },
+  {
+    "id": "art:organ-gaming",
+    "stem": "organ-gaming",
+    "alt": "A sphere of floating voxels, bone-white blocks with glowing cyan edges and frosted glass cubes, blooming open around a bright core, on a dark teal field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
+  },
+  {
+    "id": "art:organ-news",
+    "stem": "organ-news",
+    "alt": "A grooved bone printing drum with toothed gears on a vertebral axle, pearl paper ribbons printed with abstract lines of type curling up from it, and an antenna mast sending out pale broadcast rings, on a dark field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
+  },
+  {
+    "id": "art:organ-fashion",
+    "stem": "organ-fashion",
+    "alt": "A dress-form mannequin: a bone spine inside a crinoline cage of hoops and ribs, a bodice woven from glowing fibres and a sheer rose-gold drape falling from the shoulder, on a dark field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
+  },
+  {
+    "id": "art:organ-culture",
+    "stem": "organ-culture",
+    "alt": "A branching growth of bone, like coral or a neuron, rising from a vertebral socket, its tips glowing verdigris and linked by thin arcs of light, on a dark green field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
+  },
+  {
+    "id": "art:organ-kids",
+    "stem": "organ-kids",
+    "alt": "A chunky spiral banded in soft pastel candy colours rising from a cloud of round pebbles, surrounded by iridescent soap bubbles and twinkling sparks, on a dark violet field.",
+    "kind": "generated",
+    "provisional": false,
+    "credit": "Monumental generative artwork"
   }
 ]

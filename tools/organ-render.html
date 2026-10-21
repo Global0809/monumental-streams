@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Organ render</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #0a0811;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+      .label {
+        position: absolute;
+        font: 600 12px/1 system-ui, sans-serif;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #cdc5e4;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Render harness for the procedural organs: a pure scene (organ, light, brand night), no UI.
+         Served by the Vite dev server: /tools/organ-render.html?organ=movies&w=1600&h=900 -->
+    <canvas id="organ" role="img" aria-label="Procedural organ sculpture"></canvas>
+    <script type="module" src="./organ-render.ts"></script>
+  </body>
+</html>

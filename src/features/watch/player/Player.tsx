@@ -49,6 +49,8 @@ export interface PlayerProps {
   picks: Video[];
   chapters: Cue[];
   autoplay: boolean;
+  /** Told after every phase change (the page composes around it: poster → theatre). */
+  onPhase?: (phase: Phase) => void;
 }
 
 export type Phase = 'poster' | 'active' | 'ended';
@@ -92,7 +94,7 @@ const fsElement = () => document.fullscreenElement ?? (document as FsDocument).w
 const canFullscreen = () =>
   !!(document.fullscreenEnabled || (document as FsDocument).webkitFullscreenEnabled || 'webkitEnterFullscreen' in HTMLVideoElement.prototype);
 
-export const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ video, linkTime, next, picks, chapters, autoplay }, ref) {
+export const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ video, linkTime, next, picks, chapters, autoplay, onPhase }, ref) {
   const cat = useCatalogue();
   const prefs = usePrefs();
   const { session } = useSession();
@@ -153,7 +155,9 @@ export const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ vi
   const [cueText, setCueText] = useState<string[]>([]);
   const [iosFs, setIosFs] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+  const onPhaseRef = useRef(onPhase);
+  onPhaseRef.current = onPhase;
+  useEffect(() => onPhaseRef.current?.(phase), [phase]);
 
   const activeTrack = prefs.captions.enabled ? (tracks.find((t) => t.lang === prefs.captions.lang) ?? tracks[0] ?? null) : null;
 
@@ -406,7 +410,7 @@ export const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ vi
   const toggleSave = useCallback(
     (from?: Element | null) => {
       const now = libraryActions.toggleSave(video.id);
-      announceSave({ saved: now, title: video.title, from: from ?? saveRef.current, undo: () => libraryActions.toggleSave(video.id) });
+      announceSave({ saved: now, title: video.title, from: from ?? saveRef.current, id: video.id, undo: () => libraryActions.toggleSave(video.id) });
       return now;
     },
     [video.id, video.title],
@@ -543,7 +547,6 @@ export const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ vi
         patch({ paused: false });
         if (!startedRef.current) {
           startedRef.current = true;
-          setHasStarted(true);
           lastSaveRef.current = Date.now();
           libraryActions.recordHistory(video.id);
         }
@@ -1199,15 +1202,6 @@ export const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ vi
             Use Monumental controls
           </button>
         </div>
-      ) : null}
-
-      {video.context && ready && !hasStarted && !mediaError && phase !== 'ended' ? (
-        <aside className="pl-context" aria-labelledby="pl-context-title">
-          <p className="pl-context-title" id="pl-context-title">
-            <Icon name="info" size={16} strokeWidth={2} /> Before you watch
-          </p>
-          <p className="pl-context-text">{video.context}</p>
-        </aside>
       ) : null}
 
       <ShortcutsDialog open={help} onClose={() => setHelp(false)} />

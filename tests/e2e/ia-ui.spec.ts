@@ -71,7 +71,7 @@ test.describe('saving → My World', () => {
 test.describe('cards', () => {
   test('anywhere over a card lights and tilts its image; the card link carries the card cursor', async ({ page }) => {
     await page.goto('/search?q=coney');
-    const pod = page.locator('.cat-grid .pod').first();
+    const pod = page.locator('.srch-grid .pod').first();
     await expect(pod).toBeVisible();
     const face = pod.locator('.pod-specimen');
     await face.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
@@ -93,8 +93,8 @@ test.describe('search sections', () => {
     const movies = sections.getByRole('button', { name: /^Movies/ });
     const everything = sections.getByRole('button', { name: /^Everything/ });
     await expect(everything).toHaveAttribute('aria-pressed', 'true');
-    const all = Number((await page.locator('.cat-count b').innerText()).trim());
-    const moviesCount = Number((await movies.locator('.cat-section-count').innerText()).replace(/\D+/g, ''));
+    const all = Number((await page.locator('.srch-count b').innerText()).trim());
+    const moviesCount = Number((await movies.locator('.srch-section-count').innerText()).replace(/\D+/g, ''));
     expect(moviesCount).toBeGreaterThan(0);
     expect(moviesCount).toBeLessThan(all);
 
@@ -102,7 +102,7 @@ test.describe('search sections', () => {
     await expect(page).toHaveURL(/\/search\?interest=film$/);
     await expect(movies).toHaveAttribute('aria-pressed', 'true');
     await expect(everything).toHaveAttribute('aria-pressed', 'false');
-    await expect(page.locator('.cat-count b')).toHaveText(String(moviesCount));
+    await expect(page.locator('.srch-count b')).toHaveText(String(moviesCount));
     await expect(page.getByRole('link', { name: 'Open Movies' })).toHaveAttribute('href', '/movies');
     // the same choice shows in the facet panel and the active-filter bar
     await expect(page.getByRole('group', { name: /^Interests/ }).getByRole('button', { name: /^Film/ })).toHaveAttribute('aria-pressed', 'true');
@@ -114,7 +114,7 @@ test.describe('search sections', () => {
     // pressing the lit section again lets go of it
     await page.getByRole('group', { name: 'Sections' }).getByRole('button', { name: /^Movies/ }).click();
     await expect(page).toHaveURL(/\/search$/);
-    await expect(page.locator('.cat-count b')).toHaveText(String(all));
+    await expect(page.locator('.srch-count b')).toHaveText(String(all));
   });
 
   test('sections with nothing in them yet say so honestly (disabled with a zero count)', async ({ page }) => {
@@ -122,7 +122,7 @@ test.describe('search sections', () => {
     const sections = page.getByRole('group', { name: 'Sections' });
     for (const label of ['Movies', 'Music', 'Sports', 'Gaming', 'News', 'Fashion', 'Culture', 'Kids']) {
       const b = sections.getByRole('button', { name: new RegExp(`^${label}`) });
-      const n = Number((await b.locator('.cat-section-count').innerText()).replace(/\D+/g, ''));
+      const n = Number((await b.locator('.srch-section-count').innerText()).replace(/\D+/g, ''));
       if (n === 0) await expect(b).toBeDisabled();
       else await expect(b).toBeEnabled();
     }
@@ -132,7 +132,7 @@ test.describe('search sections', () => {
     await page.goto('/search?section=music');
     await expect(page).toHaveURL(/\/search\?interest=music$/);
     await expect(page.getByRole('group', { name: 'Sections' }).getByRole('button', { name: /^Music/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.locator('.cat-section-note')).toContainText('Music');
+    await expect(page.locator('.srch-section-note')).toContainText('Music');
   });
 });
 
@@ -154,14 +154,14 @@ test.describe('rows', () => {
     await page.waitForTimeout(400);
     await expect(page).toHaveURL(/\/search$/); // the drag did not follow the link
 
-    const card = page.locator('.cat-quick-link').nth(1);
+    const card = page.locator('.srch-quick-link').nth(1);
     await card.click();
     await expect(page).toHaveURL(/\/collection\//);
   });
 
   test('arrow keys walk the cards; Home and End jump to the ends', async ({ page }) => {
     await page.goto('/search');
-    const links = page.locator('.cat-quick-link');
+    const links = page.locator('.srch-quick-link');
     await expect(links.first()).toBeVisible();
     const n = await links.count();
     expect(n).toBeGreaterThan(2);

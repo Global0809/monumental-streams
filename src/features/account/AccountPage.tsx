@@ -2,6 +2,8 @@
  * ACCOUNT — sign in, create an account, or see who you are. An account is what lets
  * My World travel between devices and what Premium attaches to; guests lose nothing,
  * because the guest library merges into the account automatically.
+ *
+ * The world stays a quiet field here: nothing on this page is about a story.
  */
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
@@ -11,7 +13,7 @@ import { sound } from '../../systems/sound/engine.ts';
 import { Button, ButtonLink } from '../../ui/controls.tsx';
 import { Pulse, toast } from '../../ui/feedback.tsx';
 import { Icon, type IconName } from '../../ui/Icon.tsx';
-import { Art } from '../../ui/Pod.tsx';
+import { useArrangement } from '../../stage/store.ts';
 import { STATUS_LABEL } from '../membership/status.ts';
 import { MyWorldCrumbs } from '../you/Crumbs.tsx';
 import { authErrorMessage, parseMode, PASSWORD_MIN, safeNext, validate, type FormValues, type Mode } from './validate.ts';
@@ -21,6 +23,7 @@ export default function AccountPage() {
   const { session, status } = useSession();
   const [params] = useSearchParams();
   const mode = parseMode(params.get('mode'));
+  useArrangement({ kind: 'quiet' });
 
   useEffect(() => {
     document.title = `${session.user ? 'Your account' : mode === 'register' ? 'Create an account' : 'Sign in'} · Monumental Streams`;
@@ -35,17 +38,6 @@ export default function AccountPage() {
     );
   }
   return session.user ? <SignedIn /> : <AuthForms mode={mode} />;
-}
-
-/* ───────────── Backdrop: the living membrane behind the glass ───────────── */
-
-function Backdrop() {
-  return (
-    <div className="acct-backdrop" aria-hidden="true">
-      <Art art="art:living-membrane" alt="" sizes="large" eager className="acct-backdrop-art" />
-      <span className="acct-backdrop-shade" />
-    </div>
-  );
 }
 
 /* ───────────── What an account adds ───────────── */
@@ -168,7 +160,6 @@ function AuthForms({ mode }: { mode: Mode }) {
 
   return (
     <div className="page acct">
-      <Backdrop />
       <div className="wrap acct-stage">
         <section className="acct-card panel" aria-labelledby="acct-title">
           <MyWorldCrumbs here={register ? 'Create an account' : 'Sign in'} />
@@ -369,7 +360,6 @@ function SignedIn() {
 
   return (
     <div className="page acct">
-      <Backdrop />
       <div className="wrap acct-stage">
         <section className="acct-card panel" aria-labelledby="acct-profile-h">
           <MyWorldCrumbs here="Account" />

@@ -1,0 +1,237 @@
+/* The Awakening: the spine assembles over the living world, then the wordmark settles. */
+.wake {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: grid;
+  align-items: center;
+  padding: max(var(--gutter), env(safe-area-inset-top)) var(--gutter) max(var(--gutter), env(safe-area-inset-bottom));
+  overflow: hidden;
+  color: var(--pearl);
+  transition: opacity var(--t-slow) var(--ease-out);
+}
+.wake[data-stage='leaving'] {
+  opacity: 0;
+  pointer-events: none;
+}
+.wake-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(50% 70% at 78% 50%, transparent, rgb(7 6 12 / 0.55) 80%), linear-gradient(90deg, rgb(7 6 12 / 0.7), rgb(7 6 12 / 0.15) 65%, rgb(7 6 12 / 0.35));
+}
+
+/* ── The spine ── */
+.wake-spine {
+  position: absolute;
+  left: 78%;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(6px, 1.1vh, 11px);
+  translate: -50% -50%;
+  rotate: -8deg;
+  transition:
+    scale var(--t-slow) var(--ease-out),
+    filter var(--t-slow) var(--ease-out);
+}
+/* the living world is up: its own spine takes over */
+.wake[data-world='live'] .wake-spine {
+  opacity: 0;
+  scale: 1.1;
+  filter: blur(10px);
+  transition:
+    opacity 1.4s var(--ease-out),
+    scale 1.4s var(--ease-out),
+    filter 1.4s var(--ease-out);
+}
+.wake[data-stage='leaving'] .wake-spine {
+  scale: 1.08;
+  filter: blur(6px);
+}
+.wake-vertebra {
+  --w: calc(44px + var(--i) * 2.6px);
+  position: relative;
+  width: clamp(var(--w), calc(var(--w) * 1.25), 90px);
+  height: clamp(16px, 2.4vh, 26px);
+  border-radius: 12px 12px 15px 15px / 9px 9px 14px 14px;
+  border: 1px solid rgb(239 230 214 / 0.42);
+  background: radial-gradient(120% 110% at 50% 0%, rgb(255 248 232 / 0.6), rgb(239 230 214 / 0.24) 58%, rgb(239 230 214 / 0.1));
+  box-shadow: 0 0 0 0 transparent;
+  animation:
+    wake-drop 760ms cubic-bezier(0.2, 1.25, 0.35, 1) calc(var(--i) * 85ms) both,
+    wake-flash 1100ms var(--ease-out) calc(var(--i) * 85ms + 420ms) both;
+}
+/* transverse processes */
+.wake-vertebra::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -38%;
+  right: -38%;
+  height: 2px;
+  translate: 0 -50%;
+  z-index: -1;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgb(239 230 214 / 0.4) 28%, rgb(239 230 214 / 0.4) 72%, transparent);
+}
+@keyframes wake-drop {
+  from {
+    opacity: 0;
+    translate: 0 -42vh;
+    rotate: 10deg;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+}
+@keyframes wake-flash {
+  0% {
+    border-color: var(--hue, var(--gold));
+    box-shadow: 0 0 34px 4px color-mix(in oklab, var(--hue, var(--gold)) 60%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+.wake-cord {
+  position: absolute;
+  top: -6%;
+  bottom: -6%;
+  left: calc(50% - 1px);
+  width: 2px;
+  z-index: -2;
+  background: linear-gradient(180deg, transparent, rgb(242 214 162 / 0.9) 18%, rgb(255 246 226 / 1) 50%, rgb(242 214 162 / 0.9) 82%, transparent);
+  box-shadow: 0 0 26px 5px rgb(242 214 162 / 0.3);
+  transform-origin: 50% 100%;
+  scale: 1 0;
+  transition: scale 1.1s var(--ease-world);
+}
+.wake:is([data-stage='reveal'], [data-stage='ready'], [data-stage='leaving']) .wake-cord {
+  scale: 1 1;
+}
+
+/* ── The words ── */
+.wake-core {
+  position: relative;
+  display: grid;
+  gap: 1.4rem;
+  max-width: min(60rem, 66vw);
+  padding-left: clamp(0px, 4vw, 72px);
+}
+.wake-eyebrow {
+  color: var(--gold);
+}
+.wake-word {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+  font-weight: 300;
+}
+.wake-mark {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 0.6rem + 5vw, 7rem);
+  font-weight: 300;
+  line-height: 0.88;
+  letter-spacing: var(--track-monument);
+  color: var(--pearl);
+  text-shadow: 0 0 80px rgb(7 6 12 / 0.8);
+}
+.wake-streams {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.62em;
+  color: var(--gold);
+  padding-left: 0.2em;
+}
+.wake-tag {
+  max-width: 40ch;
+  font-size: var(--step-1);
+  line-height: 1.5;
+  color: var(--lilac);
+}
+.wake-tag-lead {
+  color: var(--pearl);
+}
+.wake-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+}
+/* the words arrive once the spine has assembled; actions are there (and focused) from the start */
+.wake :is(.wake-eyebrow, .wake-word, .wake-tag) {
+  transition:
+    opacity 900ms var(--ease-out),
+    translate 900ms var(--ease-out),
+    letter-spacing 1400ms var(--ease-world);
+}
+.wake[data-stage='assemble'] :is(.wake-eyebrow, .wake-word, .wake-tag) {
+  opacity: 0;
+  translate: 0 18px;
+}
+.wake[data-stage='assemble'] .wake-mark {
+  letter-spacing: 0.08em;
+}
+.wake .wake-mark {
+  transition: letter-spacing 1600ms var(--ease-world);
+}
+.wake[data-stage='reveal'] .wake-tag {
+  transition-delay: 300ms;
+}
+.wake-actions {
+  animation: rise 600ms var(--ease-out) 300ms both;
+}
+
+.wake-skip {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: var(--hit);
+  padding: 0 14px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-control);
+  background: rgb(7 6 12 / 0.5);
+  color: var(--lilac);
+  font-size: 14px;
+  font-weight: 500;
+}
+.wake-skip:hover {
+  color: var(--pearl);
+  border-color: rgb(242 214 162 / 0.5);
+}
+
+@media (max-width: 767px) {
+  .wake {
+    align-items: end;
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+  }
+  .wake-spine {
+    left: 72%;
+    top: 40%;
+    opacity: 0.55;
+  }
+  .wake-core {
+    max-width: none;
+    padding-left: 0;
+  }
+  .wake-actions .btn {
+    flex: 1 1 auto;
+  }
+}
+
+:root[data-motion='reduce'] .wake-vertebra {
+  animation: none;
+}
+:root[data-motion='reduce'] .wake-cord {
+  scale: 1 1;
+}
+:root[data-motion='reduce'] .wake-actions {
+  animation: none;
+}

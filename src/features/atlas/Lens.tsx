@@ -1,11 +1,13 @@
 /**
- * The lens — the World's filter bar. Category (a primary-navigation section, then one of its
- * facets), era (a decade strip whose bars show how many stories are set then), access and
- * "stories only". Every change rewrites the URL, so the globe, the map, the list and the
- * panel all re-light from the same state, and refresh / back / a shared link restore it.
+ * The lens — how you look at the world. Category (a primary-navigation section, then one of
+ * its facets), era (decades, each with a small frost bar for how many stories are set then),
+ * access and "stories only". Every change rewrites the URL; the page turns that into the
+ * world's highlight (the matching seeds glow on the globe) and re-ranks its own lists, so
+ * refresh, back and a shared link restore the same view.
  *
  * Single choices are radio groups with roving focus (arrow keys, Home, End); a keyboard move
- * replaces the history entry instead of stacking one per key press.
+ * replaces the history entry instead of stacking one per key press. On phones and portrait
+ * tablets the whole lens folds behind one "Filter" toggle so the stories come first.
  */
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import type { SectionId } from '../../../shared/sections.ts';
@@ -15,8 +17,8 @@ import { plural } from '../../lib/format.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
 import { sound } from '../../systems/sound/engine.ts';
 import { Segmented } from '../../ui/controls.tsx';
-import { Icon, type IconName } from '../../ui/Icon.tsx';
-import { activeFilterCount, isFiltering, sectionOf, type AccessFilter, type EraDensity, type WorldFilters } from './filters.ts';
+import { Icon } from '../../ui/Icon.tsx';
+import { activeFilterCount, filterLabels, isFiltering, NO_FILTERS, sectionOf, type AccessFilter, type EraDensity, type WorldFilters } from './filters.ts';
 import './lens.css';
 
 export type LensChange = (next: WorldFilters, opts?: { replace?: boolean }) => void;
@@ -27,7 +29,6 @@ interface RadioOption<T extends string> {
   /** Spoken after the label ("2 stories"). */
   detail?: string;
   count?: number;
-  icon?: IconName;
   empty?: boolean;
 }
 
@@ -36,7 +37,7 @@ function useRevealChecked(ref: React.RefObject<HTMLElement | null>, key: unknown
   useEffect(() => {
     const el = ref.current?.querySelector<HTMLElement>('[aria-checked="true"]');
     const sc = el?.closest<HTMLElement>('.wl-scroll');
-    if (!el || !sc) return;
+    if (!el || !sc || sc.scrollWidth <= sc.clientWidth) return;
     const a = el.getBoundingClientRect();
     const b = sc.getBoundingClientRect();
     if (a.right > b.right - 8) sc.scrollLeft += a.right - b.right + 32;
@@ -44,8 +45,8 @@ function useRevealChecked(ref: React.RefObject<HTMLElement | null>, key: unknown
   }, [ref, key]);
 }
 
-/** A radiogroup of chips with roving focus. */
-function RadioChips<T extends string>({ label, value, options, onChange, className = '' }: { label: string; value: T; options: RadioOption<T>[]; onChange: (v: T, keyboard: boolean) => void; className?: string }) {
+/** A radiogroup of quiet text chips with roving focus. */
+function RadioChips<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: RadioOption<T>[]; onChange: (v: T, keyboard: boolean) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   useRevealChecked(ref, value);
   const onKey = (e: KeyboardEvent) => {
@@ -63,7 +64,7 @@ function RadioChips<T extends string>({ label, value, options, onChange, classNa
     ref.current?.querySelectorAll<HTMLElement>('[role="radio"]')[n]?.focus();
   };
   return (
-    <div ref={ref} className={`wl-radios ${className}`} role="radiogroup" aria-label={label} onKeyDown={onKey}>
+    <div ref={ref} className="wl-radios" role="radiogroup" aria-label={label} onKeyDown={onKey}>
       {options.map((o) => {
         const on = o.value === value;
         return (
@@ -75,14 +76,12 @@ function RadioChips<T extends string>({ label, value, options, onChange, classNa
             tabIndex={on ? 0 : -1}
             className="wl-chip"
             data-empty={o.empty || undefined}
-            data-react="light"
             onClick={() => {
               if (on) return;
               sound.play('select');
               onChange(o.value, false);
             }}
           >
-            {o.icon ? <Icon name={o.icon} size={15} /> : <span className="wl-chip-node" aria-hidden="true" />}
             <span className="wl-chip-label">{o.label}</span>
             {o.count !== undefined ? (
               <span className="wl-chip-count">
@@ -125,39 +124,38 @@ function EraStrip({ value, density, onChange }: { value: ID | null; density: Era
   };
   return (
     <div ref={ref} className="wl-era" role="radiogroup" aria-label="Era" onKeyDown={onKey}>
-      <button type="button" role="radio" aria-checked={value === null} tabIndex={value === null ? 0 : -1} className="wl-era-any" onClick={() => pick(null)}>
-        Any era
+      <button type="button" role="radio" aria-checked={value === null} tabIndex={value === null ? 0 : -1} className="wl-era-cell wl-era-any" onClick={() => pick(null)}>
+        <span className="wl-era-bar" aria-hidden="true" />
+        <span className="wl-era-label">Any era</span>
       </button>
-      <div className="wl-era-track">
-        {density.map((d) => {
-          const on = d.period.id === value;
-          const h = d.stories ? 0.28 + 0.72 * (d.stories / max) : 0;
-          return (
-            <button
-              key={d.period.id}
-              type="button"
-              role="radio"
-              aria-checked={on}
-              tabIndex={on ? 0 : -1}
-              className="wl-era-cell"
-              data-empty={!d.stories && !d.movements ? true : undefined}
-              onClick={() => pick(d.period.id)}
-              title={`${d.period.label}: ${plural(d.stories, 'story', 'stories')}, ${plural(d.movements, 'movement')}`}
-            >
-              <span className="wl-era-bar" aria-hidden="true">
-                <span style={{ ['--h' as string]: h }} />
-                {d.movements ? <i /> : null}
+      {density.map((d) => {
+        const on = d.period.id === value;
+        const h = d.stories ? 0.25 + 0.75 * (d.stories / max) : 0;
+        return (
+          <button
+            key={d.period.id}
+            type="button"
+            role="radio"
+            aria-checked={on}
+            tabIndex={on ? 0 : -1}
+            className="wl-era-cell"
+            data-empty={!d.stories && !d.movements ? true : undefined}
+            onClick={() => pick(d.period.id)}
+            title={`${d.period.label}: ${plural(d.stories, 'story', 'stories')}, ${plural(d.movements, 'movement')}`}
+          >
+            <span className="wl-era-bar" aria-hidden="true">
+              <span style={{ ['--h' as string]: h }} />
+              {d.movements ? <i /> : null}
+            </span>
+            <span className="wl-era-label">
+              <span aria-hidden="true">{d.period.label}</span>
+              <span className="sr-only">
+                {d.period.label}, {plural(d.stories, 'story', 'stories')}, {plural(d.movements, 'movement')}
               </span>
-              <span className="wl-era-label">
-                <span aria-hidden="true">{d.period.label}</span>
-                <span className="sr-only">
-                  {d.period.label}, {plural(d.stories, 'story', 'stories')}, {plural(d.movements, 'movement')}
-                </span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -181,10 +179,10 @@ export interface LensProps {
 export function Lens({ filters, sectionCounts, facetCounts, density, allStories, onChange }: LensProps) {
   const cat = useCatalogue();
   const [open, setOpen] = useState(false);
-  const moreId = useId();
+  const bodyId = useId();
   const section = sectionOf(filters.section);
   const active = activeFilterCount(filters);
-  const secondary = [filters.era, filters.access !== 'all', filters.storiesOnly].filter(Boolean).length;
+  const labels = filterLabels(cat, filters);
 
   const sectionOptions = useMemo<RadioOption<SectionId | 'all'>[]>(
     () => [
@@ -240,70 +238,67 @@ export function Lens({ filters, sectionCounts, facetCounts, density, allStories,
       <h2 id="wl-title" className="sr-only">
         Filter the world
       </h2>
-      <div className="wl-main">
-        <div className="wl-scroll wl-cats">
-          <RadioChips
-            label="Category"
-            value={filters.section ?? 'all'}
-            options={sectionOptions}
-            onChange={(v, k) => set({ section: v === 'all' ? null : v, facet: null }, k)}
-          />
-        </div>
-        <div className="wl-actions">
-          <button type="button" className="wl-more-btn" aria-expanded={open} aria-controls={moreId} onClick={() => (sound.play(open ? 'close' : 'open'), setOpen(!open))}>
-            <Icon name="filter" size={16} />
-            <span>Era, access and more</span>
-            {secondary ? <span className="wl-more-n">{secondary}</span> : null}
-            <Icon name="down" size={16} />
-          </button>
-          {active ? (
-            <button
-              type="button"
-              className="wl-clear"
-              aria-label="Clear all filters"
-              onClick={() => (sound.play('unsave'), onChange({ section: null, facet: null, era: null, access: 'all', storiesOnly: false }))}
-            >
-              <Icon name="close" size={14} />
-              Clear
-              <span className="wl-clear-n" aria-hidden="true">
-                {active}
-              </span>
-            </button>
-          ) : null}
-        </div>
+      <div className="wl-fold">
+        <button type="button" className="wl-toggle" aria-expanded={open} aria-controls={bodyId} onClick={() => (sound.play(open ? 'close' : 'open'), setOpen(!open))}>
+          <Icon name="filter" size={16} />
+          <span>Filter</span>
+          {active ? <span className="wl-toggle-n">{active}</span> : null}
+          <Icon name="down" size={16} />
+        </button>
+        <p className="wl-fold-now" aria-hidden="true">
+          {labels.length ? labels.map((l) => l.label).join(' · ') : 'Everything, every era'}
+        </p>
       </div>
 
-      {facetOptions.length ? (
-        <div className="wl-facets wl-scroll">
-          <span className="wl-facets-lead" aria-hidden="true">
-            {section?.label}
-            <Icon name="right" size={14} />
-          </span>
-          <RadioChips label={`${section?.label} focus`} value={filters.facet ?? 'all'} options={facetOptions} onChange={(v, k) => set({ facet: v === 'all' ? null : v }, k)} className="wl-radios-facets" />
+      <div id={bodyId} className="wl-body">
+        <div className="wl-row">
+          <div className="wl-cats">
+            <RadioChips label="Category" value={filters.section ?? 'all'} options={sectionOptions} onChange={(v, k) => set({ section: v === 'all' ? null : v, facet: null }, k)} />
+          </div>
         </div>
-      ) : null}
 
-      <div id={moreId} className="wl-more">
-        <div className="wl-scroll wl-era-wrap">
-          <EraStrip value={filters.era} density={density} onChange={(era, k) => set({ era }, k)} />
-        </div>
-        <div className="wl-tail">
-          <Segmented label="Access" hideLabel value={filters.access} options={ACCESS_OPTIONS} onChange={(access) => set({ access })} />
-          <button
-            type="button"
-            role="switch"
-            aria-checked={filters.storiesOnly}
-            className="wl-switch"
-            onClick={() => {
-              sound.play(filters.storiesOnly ? 'close' : 'open');
-              set({ storiesOnly: !filters.storiesOnly });
-            }}
-          >
-            <span className="wl-switch-track" aria-hidden="true">
-              <span />
+        {facetOptions.length ? (
+          <div className="wl-row wl-row-facets">
+            <span className="wl-label" aria-hidden="true">
+              {section?.label}
             </span>
-            Stories only
-          </button>
+            <div className="wl-scroll">
+              <RadioChips label={`${section?.label} focus`} value={filters.facet ?? 'all'} options={facetOptions} onChange={(v, k) => set({ facet: v === 'all' ? null : v }, k)} />
+            </div>
+          </div>
+        ) : null}
+
+        <div className="wl-row">
+          <div className="wl-scroll wl-era-wrap">
+            <EraStrip value={filters.era} density={density} onChange={(era, k) => set({ era }, k)} />
+          </div>
+        </div>
+
+        <div className="wl-row wl-tail">
+          <div className="wl-tail-controls">
+            <Segmented label="Access" hideLabel value={filters.access} options={ACCESS_OPTIONS} onChange={(access) => set({ access })} />
+            <button
+              type="button"
+              role="switch"
+              aria-checked={filters.storiesOnly}
+              className="wl-switch"
+              onClick={() => {
+                sound.play(filters.storiesOnly ? 'close' : 'open');
+                set({ storiesOnly: !filters.storiesOnly });
+              }}
+            >
+              <span className="wl-switch-track" aria-hidden="true">
+                <span />
+              </span>
+              Stories only
+            </button>
+            {active ? (
+              <button type="button" className="wl-clear" aria-label="Clear all filters" onClick={() => (sound.play('unsave'), onChange(NO_FILTERS))}>
+                <Icon name="close" size={14} />
+                Clear
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
     </section>

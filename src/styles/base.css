@@ -10,63 +10,55 @@ html {
   scroll-padding-top: calc(var(--topbar-h) + 16px);
   /* phones: keyboard focus and in-page jumps must clear the fixed tab bar too */
   scroll-padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 16px);
-  background: var(--abyss);
-  /* Chrome scrollbar (Firefox) */
-  scrollbar-color: #5a4f78 var(--night);
+  /* the night itself; the living world (src/stage) and its static fallback sit above it */
+  background: var(--night);
+  /* Vertebral scrollbar (Firefox): a slim bone thumb on the night */
+  scrollbar-color: rgb(207 199 228 / 0.32) transparent;
   scrollbar-width: thin;
 }
 
 body {
   margin: 0;
   min-height: 100dvh;
-  color: var(--bone);
-  background: var(--night);
+  color: var(--pearl);
+  /* transparent: the world shows through every route */
+  background: transparent;
   font-family: var(--font-body);
   font-size: var(--step-0);
-  line-height: 1.6;
+  line-height: var(--lh-body);
   font-feature-settings: 'ss01', 'cv11';
-  /* Syne has no italic: never fake one — emphasis is carried by light, not slant */
+  /* Archivo's italics are not loaded: never fake one — emphasis is carried by light, not slant */
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
 }
 
-/* The bloom: soft violet and lavender light behind everything — fixed, static, decorative. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(900px 620px at 8% 72%, rgb(91 63 214 / 0.28), transparent 65%),
-    radial-gradient(760px 520px at 88% 4%, rgb(199 183 255 / 0.13), transparent 62%),
-    radial-gradient(600px 460px at 70% 110%, rgb(120 90 255 / 0.12), transparent 60%);
-}
-
-/* Chrome scrollbar: a polished lavender capsule in a night channel */
+/* ───── Scrollbar: a slim bone capsule riding a dark channel; gold when held ───── */
 ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--night);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  border: 3px solid var(--night);
+  border: 3.5px solid transparent;
   border-radius: 99px;
-  background: linear-gradient(90deg, #4c4268, #8a7fb0 45%, #5a4f78);
+  background: rgb(207 199 228 / 0.3) padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(90deg, #6e5fb0, #c9bdff 45%, #7d6dd0);
+  background: rgb(239 230 214 / 0.62) padding-box;
+}
+::-webkit-scrollbar-thumb:active {
+  background: var(--gold) padding-box;
 }
 ::-webkit-scrollbar-corner {
-  background: var(--abyss);
+  background: transparent;
 }
 
 ::selection {
-  background: rgb(160 140 255 / 0.4);
+  background: rgb(160 140 255 / 0.42);
   color: #fff;
 }
 
@@ -92,30 +84,35 @@ button {
 
 a {
   color: inherit;
-  text-decoration-color: rgb(179 163 255 / 0.55);
-  text-underline-offset: 0.2em;
+  text-decoration-color: rgb(179 163 255 / 0.5);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
 }
 a:hover {
-  text-decoration-color: var(--ichor);
+  text-decoration-color: var(--iris);
 }
 
+/* Headings: Archivo Expanded for titles, the body face from h4 down. */
 h1,
 h2,
 h3,
 h4 {
   margin: 0;
-  line-height: 1.04;
-  font-weight: 700;
-  letter-spacing: -0.025em;
+  line-height: 1.06;
+  font-weight: 560;
+  letter-spacing: -0.02em;
   text-wrap: balance;
+  overflow-wrap: break-word;
 }
-/* Display headings have no italic: emphasis is light, not slant. */
-:where(h1, h2, h3, .page-title, .section-title) em {
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+}
+/* Titles have no italic: emphasis is light, not slant. */
+:where(h1, h2, h3, .page-title, .section-title, .title-monument) em {
   font-style: normal;
-  background: var(--chrome-soft);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--gold);
 }
 
 p {
@@ -123,12 +120,25 @@ p {
   text-wrap: pretty;
 }
 
-/* Focus is drawn twice on the same pixels: the box-shadow ring (with its ichor glow) and an
-   outline. Components that restyle box-shadow (chrome/primary buttons, checked segments,
-   pods) would otherwise silently erase the ring; the outline survives them. Components with
-   their own focus treatment opt out of both explicitly. */
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.6em;
+  height: 1.6em;
+  padding: 0 0.4em;
+  border-radius: 5px;
+  border: 1px solid var(--line-2);
+  font-family: var(--font-code);
+  font-size: 0.72em;
+  color: var(--lilac);
+  background: rgb(255 255 255 / 0.03);
+}
+
+/* Focus is drawn twice on the same pixels: the box-shadow ring (with its iris glow) and an
+   outline. Components that restyle box-shadow would otherwise silently erase the ring; the
+   outline survives them. Components with their own focus treatment opt out explicitly. */
 :focus-visible {
-  outline: 2px solid var(--ichor);
+  outline: 2px solid var(--iris);
   outline-offset: 2px;
   box-shadow: var(--focus-ring);
   border-radius: 10px;
@@ -138,7 +148,7 @@ svg :focus-visible {
   outline: none;
 }
 
-/* Organic cursor active: hide the native pointer except where precision matters. */
+/* Custom cursor active: hide the native pointer except where precision matters. */
 html.cursor-organic,
 html.cursor-organic * {
   cursor: none !important;
@@ -184,29 +194,77 @@ html.cursor-organic [data-native-cursor] * {
   top: 12px;
   z-index: calc(var(--z-dialog) + 1);
   padding: 12px 18px;
-  border-radius: var(--radius-pill);
-  background: var(--pearl-fill);
+  border-radius: var(--radius-control);
+  background: var(--pearl);
   color: var(--on-pearl);
   font-weight: 600;
+  text-decoration: none;
   transform: translateY(-160%);
-  transition: transform var(--t-mid) var(--ease-tendon);
+  transition: transform var(--t-mid) var(--ease-out);
 }
 .skip-link:focus {
   transform: translateY(0);
 }
 
-/* Eyebrow: one per section at most. */
-.kicker {
+/* ───── Type system ───── */
+
+/* Eyebrow: 12px, 600, tracked caps — one per section at most. */
+.kicker,
+.eyebrow {
   font-family: var(--font-body);
-  font-size: var(--step--2);
+  font-size: var(--type-eyebrow);
   font-weight: 600;
-  letter-spacing: 0.16em;
+  line-height: 1.4;
+  letter-spacing: var(--track-eyebrow);
   text-transform: uppercase;
   color: var(--lilac-dim);
 }
-.kicker b {
-  color: var(--iris);
+.kicker b,
+.eyebrow b {
+  color: var(--gold);
   font-weight: 600;
+}
+
+/* Monumental route title: Archivo Expanded 300–400, tight, lit not painted. */
+.title-monument {
+  font-family: var(--font-display);
+  font-size: var(--type-monument);
+  font-weight: 330;
+  line-height: 0.9;
+  letter-spacing: var(--track-monument);
+  color: var(--pearl);
+  text-shadow: 0 0 60px rgb(7 6 12 / 0.6);
+}
+/* Story title: the same face at 500–600. */
+.title-story {
+  font-family: var(--font-display);
+  font-size: var(--type-story);
+  font-weight: 560;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  color: var(--pearl);
+}
+/* Editorial lede and body copy: Archivo 17/1.6 in a readable measure. */
+.lede {
+  max-width: var(--measure);
+  font-size: var(--step-1);
+  line-height: 1.5;
+  color: var(--lilac);
+}
+.prose {
+  max-width: var(--measure);
+  font-size: var(--step-0);
+  line-height: var(--lh-body);
+  color: var(--lilac);
+}
+.prose > * + * {
+  margin-top: 1em;
+}
+/* Timecodes: JetBrains Mono, tabular. */
+.timecode {
+  font-family: var(--font-code);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
 }
 
 .mono {
@@ -216,25 +274,22 @@ html.cursor-organic [data-native-cursor] * {
 
 .serif {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 560;
   letter-spacing: -0.025em;
 }
 
 .display {
   font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 340;
+  letter-spacing: var(--track-monument);
 }
 
 .chrome-text {
-  background: var(--chrome);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--pearl);
 }
 
 .muted {
-  color: var(--bone-dim);
+  color: var(--lilac);
 }
 
 .wrap {
@@ -248,22 +303,86 @@ html.cursor-organic [data-native-cursor] * {
   margin-top: var(--stack, 1rem);
 }
 
+/* A destination hue on any element: style="--hue: var(--hue-music)" or data-hue="music". */
+[data-hue='home'] {
+  --hue: var(--hue-home);
+}
+[data-hue='world'] {
+  --hue: var(--hue-world);
+}
+[data-hue='time-machine'] {
+  --hue: var(--hue-time-machine);
+}
+[data-hue='live'] {
+  --hue: var(--hue-live);
+}
+[data-hue='movies'] {
+  --hue: var(--hue-movies);
+}
+[data-hue='music'] {
+  --hue: var(--hue-music);
+}
+[data-hue='sports'] {
+  --hue: var(--hue-sports);
+}
+[data-hue='gaming'] {
+  --hue: var(--hue-gaming);
+}
+[data-hue='news'] {
+  --hue: var(--hue-news);
+}
+[data-hue='fashion'] {
+  --hue: var(--hue-fashion);
+}
+[data-hue='culture'] {
+  --hue: var(--hue-culture);
+}
+[data-hue='kids'] {
+  --hue: var(--hue-kids);
+}
+[data-hue='my-world'] {
+  --hue: var(--hue-my-world);
+}
+
 @keyframes breathe {
-  0%, 100% { opacity: 0.55; transform: scale(1); }
-  12% { opacity: 1; transform: scale(1.06); }
-  24% { opacity: 0.7; transform: scale(1); }
-  36% { opacity: 0.9; transform: scale(1.03); }
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  12% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  24% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  36% {
+    opacity: 0.9;
+    transform: scale(1.03);
+  }
 }
 
 @keyframes flow {
-  to { stroke-dashoffset: -200; }
+  to {
+    stroke-dashoffset: -200;
+  }
 }
 
 @keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes shimmer {
-  to { background-position: -200% 0; }
+  to {
+    background-position: -200% 0;
+  }
 }

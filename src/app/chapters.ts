@@ -1,7 +1,7 @@
 /**
- * Page chapters. A page declares its sections (useChapters) and the spine's spinal cord
- * renders them as nodes along its length: the cord fills with ichor as you scroll, the
- * active chapter glows, and clicking (or keyboard-activating) a node jumps to it.
+ * Page chapters. A page declares its sections (useChapters) and the chapter rail renders them
+ * as vertebrae along a cord: the cord fills with gold as you scroll, the active chapter is
+ * lit, and clicking (or keyboard-activating) a vertebra jumps to it.
  */
 import { useEffect } from 'react';
 import { createStore, useStore } from '../lib/store.ts';

@@ -1,31 +1,38 @@
 /**
- * The app shell. A floating glass masthead (see nav.tsx) over full-bleed pages, a phone tab bar,
- * a "more" sheet, and the systems that make it feel alive: cursor, sound, intro, toasts.
- * Main content is a single landmark; route changes are announced and focus moves to the new
- * page's heading.
+ * The app shell of THE LIVING ARCHIVE.
+ *
+ *   z 0   the living world (StageLayer: 3D stage, static fallback, legibility veil)
+ *   z 1   the editorial layer: vertebral index, phone bars, chapter rail, <main>, footer
+ *   z 60+ the awakening, dialogs (menu sheet, search), toasts, the cursor
+ *
+ * The shell gives every route a world arrangement before the page refines it (world.ts),
+ * applies persisted preferences to the live systems, keeps identity in sync, announces
+ * route changes and moves focus to the new page's heading.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, Outlet, ScrollRestoration, useLocation } from 'react-router';
 import { useCatalogue } from '../state/catalogue.tsx';
 import { attachAdapter, usePrefs } from '../state/library.ts';
 import { refreshSession, useSession } from '../state/session.ts';
+import { stageStore } from '../stage/store.ts';
 import { Cursor } from '../systems/cursor/Cursor.tsx';
 import { setMotionPref } from '../systems/motion.ts';
 import { setPreviewMode } from '../systems/previews.ts';
 import { sound } from '../systems/sound/engine.ts';
 import { Toaster, toast, Dialog } from '../ui/feedback.tsx';
-import { Awakening, shouldAwaken } from '../features/entry/Awakening.tsx';
+import { Awakening, shouldAwaken } from './Awakening.tsx';
 import { ChapterRail } from './nav.tsx';
-import { MenuSheetContent, PhoneBar, PhoneTabs, Sidebar } from './sidebar.tsx';
+import { MenuSheetContent, PhoneBar, PhoneTabs, SpineIndex } from './navigation.tsx';
 import { SearchPalette } from './SearchPalette.tsx';
-import './sidebar.css';
+import { StageLayer } from './StageLayer.tsx';
+import { useWorldDirector } from './world.ts';
 import './shell.css';
 
 function Footer() {
   return (
     <footer className="footer wrap">
       <div className="footer-mark">
-        <p className="display chrome-text footer-word">MONUMENTAL STREAMS</p>
+        <p className="footer-word">MONUMENTAL STREAMS</p>
         <p className="footer-line">All lives. All stories. One platform.</p>
       </div>
       <nav className="footer-links" aria-label="Footer">
@@ -34,9 +41,7 @@ function Footer() {
         <Link to="/catalogue?prov=archive">Open archive</Link>
         <Link to="/my-world?tab=settings">Sound, motion & accessibility</Link>
       </nav>
-      <p className="footer-fine mono">
-        Preview build · Miami gateway · demonstration media is labelled as such · no original episodes are published yet
-      </p>
+      <p className="footer-fine">Preview build · Miami gateway · demonstration media is labelled as such · no original episodes are published yet</p>
     </footer>
   );
 }
@@ -98,9 +103,10 @@ function RouteAnnouncer() {
 }
 
 export function Shell() {
-  useCatalogue(); // shell only renders once the catalogue exists
+  const cat = useCatalogue(); // shell only renders once the catalogue exists
   const prefs = usePreferenceSystems();
   useIdentitySync();
+  useWorldDirector(cat);
   const [more, setMore] = useState(false);
   const [searching, setSearching] = useState(false);
   const [awake, setAwake] = useState(() => !shouldAwaken());
@@ -133,16 +139,27 @@ export function Shell() {
     setSearching(true);
   };
 
+  /** What the cursor reticle names when it rests on something in the world. */
+  const stageLabel = useCallback(
+    (kind: string) => {
+      const s = stageStore.get();
+      if (kind === 'seed' && s.hovered) return cat.label(s.hovered);
+      if (kind === 'place' && s.hoveredPlace) return cat.label(s.hoveredPlace);
+      if (kind === 'organ') return 'Enter';
+      if (kind === 'vertebra' || kind === 'decade') return 'Travel';
+      return '';
+    },
+    [cat],
+  );
+
   return (
     <>
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-      <Cursor enabled={prefs.cursor === 'organic'} />
+      <StageLayer />
+      <Cursor enabled={prefs.cursor === 'organic'} stage={{ label: stageLabel, subscribe: stageStore.subscribe }} />
       {!awake ? <Awakening onDone={() => setAwake(true)} /> : null}
-      <div className="body-plan" inert={!awake || undefined}>
-        <Sidebar onSearch={openSearch} />
-        <PhoneBar onSearch={openSearch} onMenu={() => setMore(true)} />
+      <div className="body-plan" inert={!awake || undefined} data-awakening={!awake || undefined}>
+        <SpineIndex onSearch={openSearch} />
+        <PhoneBar onSearch={openSearch} />
         <ChapterRail />
         <main id="main" className="main" tabIndex={-1}>
           <Outlet />
@@ -150,7 +167,7 @@ export function Shell() {
         <Footer />
         <PhoneTabs onMenu={() => setMore(true)} />
       </div>
-      <Dialog open={more} onClose={() => setMore(false)} title="Menu">
+      <Dialog open={more} onClose={() => setMore(false)} title="Menu" variant="sheet">
         <MenuSheetContent onSearch={openSearch} />
       </Dialog>
       <SearchPalette open={searching} onClose={() => setSearching(false)} />
@@ -160,4 +177,3 @@ export function Shell() {
     </>
   );
 }
-

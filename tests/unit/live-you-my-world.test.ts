@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { constellation, ORBIT_SIZE, RING_ORDER } from '../../src/features/you/constellation.ts';
-import { firstName, greeting, initials, parseTab, TAB_LABELS, YOU_TABS } from '../../src/features/you/helpers.ts';
+import { firstName, greeting, initials, orbitSubset, parseTab, TAB_LABELS, YOU_TABS } from '../../src/features/you/helpers.ts';
 
 describe('My World tabs', () => {
   it('offers the nine sections in order, Settings and Membership included', () => {
@@ -32,52 +31,21 @@ describe('greeting', () => {
   });
 });
 
-describe('constellation', () => {
-  const empty = { continue: [], saved: [], places: [], journeys: [] };
+// The orbit itself is drawn by the living world (personal arrangement, src/stage); My World
+// only decides which saved seeds a hovered journey, place or counter singles out.
+describe('orbitSubset (what a hovered item lights in the personal orbit)', () => {
+  const orbit = ['video:a', 'video:b', 'video:c'];
 
-  it('draws every ring, even empty ones, and no nodes for an empty library', () => {
-    const { rings, nodes } = constellation(empty);
-    expect(rings.map((r) => r.id)).toEqual(RING_ORDER);
-    expect(rings.every((r) => r.count === 0)).toBe(true);
-    expect(nodes).toEqual([]);
-    // rings nest outward in order and stay inside the drawing
-    for (let i = 1; i < rings.length; i++) expect(rings[i].r).toBeGreaterThan(rings[i - 1].r);
-    expect(rings[rings.length - 1].r).toBeLessThan(ORBIT_SIZE / 2);
+  it('lights only the saved seeds the item is about', () => {
+    expect(orbitSubset(['video:c', 'video:x', 'video:a'], orbit)).toEqual(['video:c', 'video:a']);
+    expect(orbitSubset(new Set(['video:b']), orbit)).toEqual(['video:b']);
+    expect(orbitSubset(['video:b', 'video:b'], orbit)).toEqual(['video:b']);
   });
 
-  it('places one node per real item on its ring', () => {
-    const { nodes } = constellation({
-      ...empty,
-      continue: [{ id: 'video:a', label: 'A', progress: 0.4 }],
-      saved: [
-        { id: 'video:b', label: 'B' },
-        { id: 'video:c', label: 'C' },
-      ],
-      places: [{ id: 'place:london', label: 'London', stamp: true }],
-    });
-    expect(nodes.map((n) => [n.id, n.ring])).toEqual([
-      ['video:a', 'continue'],
-      ['video:b', 'saved'],
-      ['video:c', 'saved'],
-      ['place:london', 'places'],
-    ]);
-    const c = ORBIT_SIZE / 2;
-    for (const n of nodes) {
-      const r = Math.hypot(n.x - c, n.y - c);
-      expect(r).toBeGreaterThan(100);
-      expect(r).toBeLessThan(c);
-    }
-    // two saved stories sit opposite each other
-    const [b, cc] = nodes.filter((n) => n.ring === 'saved');
-    expect(Math.abs(cc.angle - b.angle)).toBeCloseTo(180);
-    expect(nodes.find((n) => n.id === 'place:london')?.stamp).toBe(true);
-    expect(nodes[0].progress).toBe(0.4);
-  });
-
-  it('caps a crowded ring and reports what it left out', () => {
-    const many = Array.from({ length: 30 }, (_, i) => ({ id: `video:${i}`, label: String(i) }));
-    const { rings, nodes } = constellation({ ...empty, saved: many }, 12);
-    expect(nodes).toHaveLength(12);
-    expect(rings.find((r) => r.id === 'saved')).toMatchObject({ count: 30, hidden: 18 });
+  it('changes nothing when none or all of the orbit is involved', () => {
+    expect(orbitSubset(['video:x'], orbit)).toBeNull();
+    expect(orbitSubset([], orbit)).toBeNull();
+    expect(orbitSubset(['video:a', 'video:b', 'video:c', 'video:x'], orbit)).toBeNull();
+    expect(orbitSubset(['video:a'], [])).toBeNull();
   });
 });

@@ -1,28 +1,44 @@
 /**
- * /watch/:slug — the player is the hero: a rounded 16:9 stage at the top; beneath it the
- * story's record: what it is, when it is set versus made versus published, why it
- * matters, where it connects, who made it and under what licence, what comes next and
- * why other stories are connected to it.
+ * /watch/:slug — a story, and the place it is watched.
+ *
+ * The living world holds the story in FOCUS: its seed in front, the stories it connects to in a
+ * ring around it, joined by light filaments (useArrangement → focus, ring = Up next + related).
+ * The page is an editorial layer over that world:
+ *
+ *   poster   (before playback, desktop) — the frame sits where the seed is, on the open side of
+ *            the world, with the story's title, one meta line and its context on the editorial
+ *            side. The world's filaments run out from behind the frame to the related seeds.
+ *   theatre  (once playback has started) — the frame takes the stage (FLIP, a cut under reduced
+ *            motion) while the shell turns the world to `watch`: it dims and its motion stops.
+ *
+ * Below: what the story is, where it connects, its chapters, the record (set in / made /
+ * published, provenance, licence), Up next and the related stories as seed cards — hovering
+ * any of them lights its seed and filament in the world, and a seed under the pointer in the
+ * world lights its card.
  */
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type Ref } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import type { Category, Movement, Period, Person, Place, Programme, Theme, Video, VideoKind } from '../../../shared/types.ts';
 import { MOOD_LABELS, relatedVideos } from '../../../shared/relations.ts';
 import { discoveryWith, searchCatalogue } from '../../../shared/search.ts';
 import { useChapters } from '../../app/chapters.ts';
 import { dateLabel, FOOTAGE_LABEL, plural, PROVENANCE_LABEL, runtimeLabel, settingLabel, timecode } from '../../lib/format.ts';
+import { useArrangement } from '../../stage/store.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
 import { isSaved, libraryActions, useLibrary } from '../../state/library.ts';
+import { useReducedMotion } from '../../systems/motion.ts';
 import { sound } from '../../systems/sound/engine.ts';
 import { Icon } from '../../ui/Icon.tsx';
 import { Button, ButtonLink } from '../../ui/controls.tsx';
 import { EmptyState } from '../../ui/feedback.tsx';
 import { announceSave } from '../../ui/save.ts';
-import { AccessBadge, Art, SectionHeader, useAccessState, VideoPod } from '../../ui/Pod.tsx';
-import { Player, type PlayerHandle, type UpNext } from './player/Player.tsx';
+import { Art, SectionHeader, useAccessState, VideoPod } from '../../ui/Pod.tsx';
+import { entryLabel, longestWordEm } from '../programme/programme-model.ts';
+import { Player, type Phase, type PlayerHandle, type UpNext } from './player/Player.tsx';
 import { nextInQueue, parseQueue, queuePosition, watchHref } from './player/queue.ts';
 import { parseStartParam } from './player/time.ts';
 import { useChapterCues } from './player/useVtt.ts';
+import { releaseSeed, seedHover, useSeedLit } from './seed.ts';
 import './watch.css';
 
 const KIND_LABEL: Record<VideoKind, string> = {
@@ -33,6 +49,11 @@ const KIND_LABEL: Record<VideoKind, string> = {
   reel: 'Reel',
   'archive-film': 'Archive film',
 };
+
+/** Related stories shown as seed cards (and placed in the world's ring). */
+const RELATED_SHOWN = 6;
+/** Theatre / poster composition only applies where the editorial side has room (the index is on screen). */
+const WIDE = '(min-width: 1180px)';
 
 export default function WatchPage() {
   const { slug = '' } = useParams();
@@ -51,28 +72,27 @@ function Missing({ slug }: { slug: string }) {
   const cat = useCatalogue();
   const words = slug.replace(/[-_]+/g, ' ').trim();
   const suggestions = useMemo(() => (words ? searchCatalogue(cat, discoveryWith({ q: words })).results.slice(0, 3) : []), [cat, words]);
+  useArrangement({ kind: 'quiet' }, suggestions.length ? suggestions.map((r) => r.video.id) : null);
   return (
-    <div className="page wrap watch-missing">
+    <div className="page wrap story-missing">
       <header className="page-head">
-        <p className="kicker">Nothing found</p>
-        <h1 className="page-title">
+        <p className="eyebrow">Nothing found</p>
+        <h1 className="title-monument">
           Nothing plays <em>here.</em>
         </h1>
-        <p className="page-lede">
-          There’s no video at “/watch/{slug}”. The link may be mistyped, or the video may have moved.
-        </p>
-        <div className="watch-actions">
+        <p className="lede">There’s no video at “/watch/{slug}”. The link may be mistyped, or the video may have moved.</p>
+        <div className="story-actions">
           <ButtonLink to={words ? `/search?q=${encodeURIComponent(words)}` : '/search'} variant="primary" icon="search">
             Search
           </ButtonLink>
-          <ButtonLink to="/" icon="home">
+          <ButtonLink to="/" variant="quiet" icon="home">
             Back to Home
           </ButtonLink>
         </div>
       </header>
       {suggestions.length ? (
         <section className="section" aria-labelledby="watch-missing-h">
-          <SectionHeader kicker="Closest matches" title="Perhaps you meant" id="watch-missing-h" />
+          <SectionHeader title="Perhaps you meant" id="watch-missing-h" />
           <ul className="grid-pods">
             {suggestions.map((r) => (
               <li key={r.video.id}>
@@ -87,6 +107,18 @@ function Missing({ slug }: { slug: string }) {
 }
 
 /* ───────────── The page ───────────── */
+
+function useMedia(query: string) {
+  const [on, setOn] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const sync = () => setOn(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, [query]);
+  return on;
+}
 
 function WatchView({ video }: { video: Video }) {
   const cat = useCatalogue();
@@ -104,9 +136,7 @@ function WatchView({ video }: { video: Video }) {
   }, []);
 
   const programme = video.programme ? (cat.get(video.programme) as Programme | undefined) : undefined;
-  const runtime = cat.runtime(video);
   const info = cat.mediaInfo(video);
-  const art = cat.artFor(video.art);
   const chapters = useChapterCues(info?.chapters);
 
   const queue = useMemo(() => parseQueue(params.get('queue')).filter((s) => !!cat.bySlug('video', s)), [params, cat]);
@@ -123,9 +153,46 @@ function WatchView({ video }: { video: Video }) {
   }, [cat, video, queue, inQueue, programme]);
 
   const related = useMemo(() => relatedVideos(cat, video.id, 10).filter((r) => r.video.id !== next?.video.id), [cat, video.id, next]);
+  const shown = related.slice(0, RELATED_SHOWN);
   const picks = useMemo(() => related.filter((r) => cat.isPlayable(r.video)).slice(0, 3).map((r) => r.video), [related, cat]);
 
-  const orderLabel = video.order ? (video.kind === 'episode' ? `${video.season ? `Season ${video.season} · ` : ''}Episode ${video.order}` : `Chapter ${video.order}`) : null;
+  /* The world: this story in focus; Up next and the related stories shown below in its ring. */
+  const ring = useMemo(() => [...new Set([...(next ? [next.video.id] : []), ...shown.map((r) => r.video.id)])], [next, shown]);
+  useArrangement({ kind: 'focus', video: video.id, related: ring });
+
+  /* Poster → theatre once playback has started (desktop composition only). */
+  const wide = useMedia(WIDE);
+  const reduced = useReducedMotion();
+  const [theatre, setTheatre] = useState(false);
+  const theatreRef = useRef(false);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLElement>(null);
+  const firstRect = useRef<DOMRect | null>(null);
+  const onPhase = useCallback((phase: Phase) => {
+    if (phase === 'poster' || theatreRef.current) return;
+    theatreRef.current = true;
+    firstRect.current = frameRef.current?.getBoundingClientRect() ?? null;
+    setTheatre(true);
+  }, []);
+  useLayoutEffect(() => {
+    const first = firstRect.current;
+    firstRect.current = null;
+    const el = frameRef.current;
+    if (!theatre || !first || !el || !wide || reduced || typeof el.animate !== 'function') return;
+    const last = el.getBoundingClientRect();
+    if (last.top < 0 || last.bottom > window.innerHeight + 2) {
+      // e.g. a chapter played from further down: bring the frame into view, without a flight
+      el.scrollIntoView({ block: 'nearest' });
+      return;
+    }
+    const dx = first.left - last.left;
+    const dy = first.top - last.top;
+    const s = first.width / Math.max(1, last.width);
+    if (Math.abs(dx) < 2 && Math.abs(dy) < 2 && Math.abs(s - 1) < 0.01) return;
+    const ease = 'cubic-bezier(0.45, 0.05, 0.15, 1)';
+    el.animate([{ transformOrigin: '0 0', transform: `translate(${dx}px, ${dy}px) scale(${s})` }, { transformOrigin: '0 0', transform: 'none' }], { duration: 950, easing: ease });
+    headRef.current?.animate([{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }], { duration: 700, delay: 260, easing: ease, fill: 'backwards' });
+  }, [theatre, wide, reduced]);
 
   const places = video.places.map((id) => cat.get(id) as Place | undefined).filter((p): p is Place => !!p);
   const people = (video.people ?? []).map((p) => ({ person: cat.get(p.person) as Person | undefined, role: p.role })).filter((p): p is { person: Person; role: string } => !!p.person);
@@ -148,98 +215,42 @@ function WatchView({ video }: { video: Video }) {
   );
 
   const paragraphs = video.description.split(/\n{2,}/).filter((p) => p.trim());
-  const titleStyle = { '--title-word': longestWordEm(video.title).toFixed(2) } as CSSProperties;
 
   return (
-    <div className="watch-page">
-      <div className="watch-stage">
-        <Player ref={playerRef} video={video} linkTime={linkTime} next={next} picks={picks} chapters={chapters} autoplay={autoplay} />
-      </div>
+    <div className="story" data-mode={theatre ? 'theatre' : 'poster'}>
+      <section className="story-hero" aria-labelledby="watch-title">
+        <div className="story-frame" ref={frameRef}>
+          <Player ref={playerRef} video={video} linkTime={linkTime} next={next} picks={picks} chapters={chapters} autoplay={autoplay} onPhase={onPhase} />
+        </div>
+        <StoryHead ref={headRef} video={video} programme={programme} />
+      </section>
 
-      <div className="wrap watch-body watch-dim">
-        <article className="watch-main" aria-labelledby="watch-title">
-          <header className="watch-head">
-            <p className="kicker watch-kicker">
-              {programme ? (
-                <Link to={cat.href(programme.id)} onClick={() => sound.play('transition')}>
-                  {programme.title}
-                </Link>
-              ) : (
-                <span>{KIND_LABEL[video.kind]}</span>
-              )}
-              {orderLabel ? <span className="watch-order">{orderLabel}</span> : null}
-              {programme && !(video.kind === 'episode' && orderLabel) ? <span className="watch-kind">{KIND_LABEL[video.kind]}</span> : null}
-            </p>
-            <h1 id="watch-title" className="watch-title" data-long={video.title.length > 42 || undefined} style={titleStyle}>
-              {video.title}
-            </h1>
-            <p className="watch-summary">{video.summary}</p>
-            <div className="watch-meta">
-              <AccessBadge video={video} />
-              <p className="watch-facts">
-                {runtime ? <span className="watch-fact watch-runtime">{runtimeLabel(runtime)}</span> : null}
-                {video.footage.length ? <span className="watch-fact">{video.footage.map((f) => FOOTAGE_LABEL[f]).join(', ')}</span> : null}
-                <span className="watch-fact watch-prov" data-prov={video.provenance}>
-                  {PROVENANCE_LABEL[video.provenance]}
-                </span>
-                {info && !info.hasAudio ? <span className="watch-fact">Silent</span> : null}
-              </p>
-            </div>
-            <div className="watch-actions">
-              <SaveButton video={video} />
-              <ButtonLink to={`/synapse/video/${video.slug}`} variant="ghost" icon="synapse" data-cursor-label="Connections">
-                Explore connections
-              </ButtonLink>
-            </div>
-          </header>
-
-          <dl className="watch-times" aria-label="Time">
-            <div className="watch-time" data-k="set">
-              <dt>Set in</dt>
-              <dd>{settingLabel(video)}</dd>
-            </div>
-            <div className="watch-time" data-k="made">
-              <dt>Made</dt>
-              <dd>{video.made ?? <span className="watch-none">Not listed</span>}</dd>
-            </div>
-            <div className="watch-time" data-k="pub">
-              <dt>Published on Monumental</dt>
-              <dd>{dateLabel(video.published)}</dd>
-            </div>
-          </dl>
-
-          <section id="watch-about" className="watch-section" aria-labelledby="watch-about-h">
-            <h2 id="watch-about-h" className="watch-h2">
+      <div className="wrap story-body story-dim">
+        <article className="story-main" aria-labelledby="watch-about-h">
+          <section id="watch-about" className="story-section" aria-labelledby="watch-about-h">
+            <h2 id="watch-about-h" className="story-h2">
               About this story
             </h2>
-            {video.context ? (
-              <aside className="watch-context" aria-label="Viewer context">
-                <p className="watch-context-title">
-                  <Icon name="info" size={16} strokeWidth={2} /> Context before you watch
-                </p>
-                <p className="watch-context-text">{video.context}</p>
-              </aside>
-            ) : null}
-            <div className="watch-desc">
+            <div className="story-desc">
               {paragraphs.map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
             </div>
             {video.moods.length ? (
-              <p className="watch-mood">
-                <span className="watch-mood-k">Mood</span> {video.moods.map((m) => MOOD_LABELS[m]).join(', ')}
+              <p className="story-mood">
+                <span className="story-mood-k">Mood</span> {video.moods.map((m) => MOOD_LABELS[m]).join(', ')}
               </p>
             ) : null}
           </section>
 
           {hasLinks ? (
-            <section id="watch-links" className="watch-section" aria-labelledby="watch-links-h">
-              <h2 id="watch-links-h" className="watch-h2">
+            <section id="watch-links" className="story-section" aria-labelledby="watch-links-h">
+              <h2 id="watch-links-h" className="story-h2">
                 Where it connects
               </h2>
-              <dl className="watch-links">
+              <dl className="story-links">
                 {places.length ? (
-                  <LinkRow label="Places" tone="iris">
+                  <LinkRow label="Places" tone="world">
                     {places.map((p) => {
                       const parent = cat.placeAncestors(p.id)[0];
                       return <TagLink key={p.id} to={cat.href(p.id)} label={p.name} note={parent?.name} />;
@@ -268,7 +279,7 @@ function WatchView({ video }: { video: Video }) {
                   </LinkRow>
                 ) : null}
                 {interests.length ? (
-                  <LinkRow label="Interests" tone="rose">
+                  <LinkRow label="Interests" tone="iris">
                     {interests.map((c) => (
                       <TagLink key={c.id} to={cat.href(c.id)} label={c.name} />
                     ))}
@@ -286,26 +297,26 @@ function WatchView({ video }: { video: Video }) {
           ) : null}
 
           {chapters.length > 1 ? (
-            <section id="watch-chapters" className="watch-section" aria-labelledby="watch-chapters-h">
-              <h2 id="watch-chapters-h" className="watch-h2">
+            <section id="watch-chapters" className="story-section" aria-labelledby="watch-chapters-h">
+              <h2 id="watch-chapters-h" className="story-h2">
                 Chapters
               </h2>
-              <ol className="watch-chapters">
+              <ol className="story-chapters">
                 {chapters.map((c, i) => (
                   <li key={`${c.start}-${i}`}>
                     <button
                       type="button"
-                      className="watch-chapter"
+                      className="story-chapter"
                       data-cursor="play"
                       data-cursor-label="Play from here"
                       disabled={!cat.isPlayable(video)}
                       onClick={() => playerRef.current?.playFrom(c.start)}
                     >
-                      <span className="watch-chapter-n" aria-hidden="true">
+                      <span className="story-chapter-n" aria-hidden="true">
                         {String(i + 1).padStart(2, '0')}
                       </span>
-                      <span className="watch-chapter-name">{c.text}</span>
-                      <span className="watch-chapter-t">
+                      <span className="story-chapter-name">{c.text}</span>
+                      <span className="story-chapter-t timecode">
                         <span className="sr-only">starts at </span>
                         {timecode(c.start)}
                       </span>
@@ -316,91 +327,18 @@ function WatchView({ video }: { video: Video }) {
             </section>
           ) : null}
 
-          <section id="watch-credits" className="watch-section watch-quiet" aria-labelledby="watch-credits-h">
-            <h2 id="watch-credits-h" className="watch-h2 watch-h2-sm">
-              Credits &amp; provenance
-            </h2>
-            <dl className="watch-credits">
-              <div>
-                <dt>Provenance</dt>
-                <dd>
-                  {PROVENANCE_LABEL[video.provenance]}
-                  {video.provenance !== 'monumental-original' ? <span className="watch-credit-note"> Shown as demonstration media — not a Monumental Original.</span> : null}
-                </dd>
-              </div>
-              <div>
-                <dt>Footage</dt>
-                <dd>{video.footage.length ? video.footage.map((f) => FOOTAGE_LABEL[f]).join(', ') : <span className="watch-none">No footage published yet</span>}</dd>
-              </div>
-              {video.credits ? (
-                <>
-                  <div>
-                    <dt>Licence</dt>
-                    <dd>{video.credits.licence}</dd>
-                  </div>
-                  <div>
-                    <dt>Attribution</dt>
-                    <dd>
-                      <p className="watch-attrib">{video.credits.attribution}</p>
-                    </dd>
-                  </div>
-                  {video.credits.sourceUrl ? (
-                    <div>
-                      <dt>Source</dt>
-                      <dd>
-                        <a className="watch-source" href={video.credits.sourceUrl} target="_blank" rel="noopener noreferrer">
-                          {hostOf(video.credits.sourceUrl)}
-                          <Icon name="arrow" size={14} />
-                          <span className="sr-only"> (opens in a new tab)</span>
-                        </a>
-                      </dd>
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <div>
-                  <dt>Licence</dt>
-                  <dd>
-                    <span className="watch-none">No licence or third-party attribution is listed for this item.</span>
-                  </dd>
-                </div>
-              )}
-              <div>
-                <dt>Media</dt>
-                <dd className="watch-media">
-                  {info ? (
-                    <>
-                      <span>{info.renditions.length ? info.renditions.map((r) => r.label).join(' · ') : 'Single file'}</span>
-                      <span>{info.captions.length ? info.captions.map((c) => c.label).join(', ') : 'No captions'}</span>
-                      {chapters.length > 1 ? <span>{plural(chapters.length, 'chapter')}</span> : null}
-                      <span>{info.hasAudio ? 'Audio' : 'No audio track'}</span>
-                    </>
-                  ) : (
-                    <span>No playable media yet</span>
-                  )}
-                </dd>
-              </div>
-              {art?.provisional ? (
-                <div>
-                  <dt>Artwork</dt>
-                  <dd>
-                    <span className="watch-none">Poster and preview art are provisional, pending approved imagery.</span>
-                  </dd>
-                </div>
-              ) : null}
-            </dl>
-          </section>
+          <Credits video={video} chapterCount={chapters.length} />
         </article>
 
-        <aside className="watch-side" aria-label="Up next">
-          <section id="watch-next" className="watch-next" aria-labelledby="watch-next-h">
-            <h2 id="watch-next-h" className="watch-h2 watch-h2-sm">
+        <aside className="story-side" aria-label="Up next">
+          <section id="watch-next" className="story-next" aria-labelledby="watch-next-h">
+            <h2 id="watch-next-h" className="story-h2 story-h2-sm">
               Up next
             </h2>
             {next ? (
               <NextCard next={next} />
             ) : (
-              <p className="watch-next-none">
+              <p className="story-next-none">
                 {inQueue
                   ? 'This is the last stop on your journey.'
                   : programme
@@ -410,7 +348,7 @@ function WatchView({ video }: { video: Video }) {
             )}
             {inQueue ? <Journey queue={queue} current={video.slug} /> : null}
             {programme ? (
-              <ButtonLink to={cat.href(programme.id)} variant="quiet" size="sm" iconAfter="arrow">
+              <ButtonLink to={cat.href(programme.id)} variant="quiet" size="sm" iconAfter="arrow" className="story-next-prog">
                 {programme.original ? 'About the programme' : 'The whole series'}
               </ButtonLink>
             ) : null}
@@ -418,22 +356,21 @@ function WatchView({ video }: { video: Video }) {
         </aside>
       </div>
 
-      <section id="watch-related" className="wrap section watch-related watch-dim" aria-labelledby="watch-related-h">
+      <section id="watch-related" className="wrap story-related story-dim" aria-labelledby="watch-related-h">
         <SectionHeader
-          kicker="Connections"
           title="Why these are connected"
           id="watch-related-h"
           action={
-            <ButtonLink to={`/synapse/video/${video.slug}`} variant="ghost" size="sm" icon="synapse">
+            <ButtonLink to={`/synapse/video/${video.slug}`} variant="quiet" size="sm" icon="synapse">
               All connections
             </ButtonLink>
           }
         >
-          Each link below says what it shares with “{video.title}”.
+          Each story says what it shares with “{video.title}”. In the world, each one is joined to this story by a filament.
         </SectionHeader>
-        {related.length ? (
-          <ul className="grid-pods">
-            {related.slice(0, 6).map((r) => (
+        {shown.length ? (
+          <ul className="grid-pods story-related-grid">
+            {shown.map((r) => (
               <li key={r.video.id}>
                 <VideoPod video={r.video} reasons={r.reasons} />
               </li>
@@ -449,15 +386,114 @@ function WatchView({ video }: { video: Video }) {
   );
 }
 
-/* ───────────── Pieces ───────────── */
+/* ───────────── The head: one eyebrow, the title, one meta line, context, actions ───────────── */
 
-/**
- * Rough width of the title's longest word in em in the expanded display face (its capitals are very wide).
- * The title's font size is capped so that word always fits the column on one line.
- */
-function longestWordEm(title: string) {
-  const em = (w: string) => [...w].reduce((s, ch) => s + (/[A-Z]/.test(ch) ? 1.3 : /[a-z0-9]/.test(ch) ? 1.02 : 0.5), 0);
-  return Math.max(4, ...title.split(/\s+/).map(em));
+function StoryHead({ ref, video, programme }: { ref: Ref<HTMLElement>; video: Video; programme?: Programme }) {
+  const cat = useCatalogue();
+  const access = useAccessState(video);
+  const runtime = cat.runtime(video);
+  const info = cat.mediaInfo(video);
+  const place = video.places[0] ? cat.label(video.places[0]) : null;
+  const season = video.kind === 'episode' && video.season ? `Season ${video.season} · ` : '';
+  const entry = programme ? `${season}${entryLabel(video)}` : null;
+  const titleStyle = { '--title-word': longestWordEm(video.title).toFixed(2) } as CSSProperties;
+  return (
+    <header className="story-head" ref={ref}>
+      <p className="eyebrow story-eyebrow">
+        {programme ? (
+          <>
+            <Link to={cat.href(programme.id)} onClick={() => sound.play('transition')}>
+              {programme.title}
+            </Link>
+            {entry ? <span className="story-entry">{entry}</span> : null}
+          </>
+        ) : (
+          <span>{KIND_LABEL[video.kind]}</span>
+        )}
+      </p>
+      <h1 id="watch-title" className="story-title" data-long={video.title.length > 34 || undefined} style={titleStyle}>
+        {video.title}
+      </h1>
+      <p className="story-meta">
+        {access.key !== 'free' ? (
+          <span className="story-fact story-access" data-access={access.key}>
+            {access.key === 'premium' || access.key === 'early' ? <Icon name={access.locked ? 'lock' : 'diamond'} size={12} strokeWidth={2} /> : null}
+            {access.label}
+          </span>
+        ) : null}
+        <span className="story-fact story-set">
+          <span className="sr-only">Set in </span>
+          {video.setting ? settingLabel(video) : 'Timeless'}
+        </span>
+        {place ? <span className="story-fact">{place}</span> : null}
+        {runtime ? <span className="story-fact">{runtimeLabel(runtime)}</span> : null}
+        {video.footage.length ? <span className="story-fact">{video.footage.map((f) => FOOTAGE_LABEL[f]).join(', ')}</span> : null}
+        <span className="story-fact story-prov" data-prov={video.provenance}>
+          {PROVENANCE_LABEL[video.provenance]}
+        </span>
+        {info && !info.hasAudio ? <span className="story-fact">Silent</span> : null}
+      </p>
+      <p className="story-summary">{video.summary}</p>
+      {video.context ? (
+        <aside className="story-context" aria-label="Viewer context">
+          <p className="story-context-title">
+            <Icon name="info" size={15} strokeWidth={2} /> Context before you watch
+          </p>
+          <p className="story-context-text">{video.context}</p>
+        </aside>
+      ) : null}
+      <div className="story-actions">
+        <SaveButton video={video} />
+        <ButtonLink to={`/synapse/video/${video.slug}`} variant="quiet" icon="synapse" data-cursor-label="Connections">
+          Explore connections
+        </ButtonLink>
+      </div>
+    </header>
+  );
+}
+
+function SaveButton({ video }: { video: Video }) {
+  const lib = useLibrary();
+  const saved = isSaved(lib, video.id);
+  return (
+    <Button
+      variant="ghost"
+      className="story-save"
+      icon={saved ? 'saved' : 'save'}
+      aria-pressed={saved}
+      data-cursor="save"
+      data-cursor-label={saved ? 'In My World' : 'Save to My World'}
+      onClick={(e) => {
+        const now = libraryActions.toggleSave(video.id);
+        announceSave({ saved: now, title: video.title, from: e.currentTarget, id: video.id, undo: () => libraryActions.toggleSave(video.id) });
+      }}
+    >
+      {saved ? 'Saved' : 'Save'}
+    </Button>
+  );
+}
+
+/* ───────────── Connections, credits ───────────── */
+
+function LinkRow({ label, tone, children }: { label: string; tone: string; children: ReactNode }) {
+  return (
+    <div className="story-link-row" data-tone={tone}>
+      <dt>{label}</dt>
+      <dd>
+        <ul className="story-tags">{Array.isArray(children) ? children.map((c, i) => <li key={i}>{c}</li>) : <li>{children}</li>}</ul>
+      </dd>
+    </div>
+  );
+}
+
+function TagLink({ to, label, note }: { to: string; label: string; note?: string }) {
+  return (
+    <Link to={to} className="story-tag" onClick={() => sound.play('select')}>
+      <span className="story-tag-node" aria-hidden="true" />
+      <span>{label}</span>
+      {note ? <small>{note}</small> : null}
+    </Link>
+  );
 }
 
 function hostOf(url: string) {
@@ -468,62 +504,129 @@ function hostOf(url: string) {
   }
 }
 
-function SaveButton({ video }: { video: Video }) {
-  const lib = useLibrary();
-  const saved = isSaved(lib, video.id);
+function Credits({ video, chapterCount }: { video: Video; chapterCount: number }) {
+  const cat = useCatalogue();
+  const info = cat.mediaInfo(video);
+  const art = cat.artFor(video.art);
   return (
-    <Button
-      variant={saved ? 'chrome' : 'ghost'}
-      icon={saved ? 'saved' : 'save'}
-      aria-pressed={saved}
-      data-cursor="save"
-      data-cursor-label={saved ? 'In My World' : 'Save to My World'}
-      onClick={(e) => {
-        const now = libraryActions.toggleSave(video.id);
-        announceSave({ saved: now, title: video.title, from: e.currentTarget, undo: () => libraryActions.toggleSave(video.id) });
-      }}
-    >
-      {saved ? 'Saved' : 'Save'}
-    </Button>
+    <section id="watch-credits" className="story-section story-quiet" aria-labelledby="watch-credits-h">
+      <h2 id="watch-credits-h" className="story-h2 story-h2-sm">
+        Credits &amp; record
+      </h2>
+      <dl className="story-record" aria-label="Time">
+        <div data-k="set">
+          <dt>Set in</dt>
+          <dd>{settingLabel(video)}</dd>
+        </div>
+        <div data-k="made">
+          <dt>Made</dt>
+          <dd>{video.made ?? <span className="story-none">Not listed</span>}</dd>
+        </div>
+        <div data-k="pub">
+          <dt>Published on Monumental</dt>
+          <dd>{dateLabel(video.published)}</dd>
+        </div>
+      </dl>
+      <dl className="story-credits">
+        <div>
+          <dt>Provenance</dt>
+          <dd>
+            {PROVENANCE_LABEL[video.provenance]}
+            {video.provenance !== 'monumental-original' ? <span className="story-credit-note"> Shown as demonstration media — not a Monumental Original.</span> : null}
+          </dd>
+        </div>
+        <div>
+          <dt>Footage</dt>
+          <dd>{video.footage.length ? video.footage.map((f) => FOOTAGE_LABEL[f]).join(', ') : <span className="story-none">No footage published yet</span>}</dd>
+        </div>
+        {video.credits ? (
+          <>
+            <div>
+              <dt>Licence</dt>
+              <dd>{video.credits.licence}</dd>
+            </div>
+            <div>
+              <dt>Attribution</dt>
+              <dd>
+                <p className="story-attrib">{video.credits.attribution}</p>
+              </dd>
+            </div>
+            {video.credits.sourceUrl ? (
+              <div>
+                <dt>Source</dt>
+                <dd>
+                  <a className="story-source" href={video.credits.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    {hostOf(video.credits.sourceUrl)}
+                    <Icon name="arrow" size={14} />
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  </a>
+                </dd>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div>
+            <dt>Licence</dt>
+            <dd>
+              <span className="story-none">No licence or third-party attribution is listed for this item.</span>
+            </dd>
+          </div>
+        )}
+        <div>
+          <dt>Media</dt>
+          <dd className="story-media">
+            {info ? (
+              <>
+                <span>{info.renditions.length ? info.renditions.map((r) => r.label).join(' · ') : 'Single file'}</span>
+                <span>{info.captions.length ? info.captions.map((c) => c.label).join(', ') : 'No captions'}</span>
+                {chapterCount > 1 ? <span>{plural(chapterCount, 'chapter')}</span> : null}
+                <span>{info.hasAudio ? 'Audio' : 'No audio track'}</span>
+              </>
+            ) : (
+              <span>No playable media yet</span>
+            )}
+          </dd>
+        </div>
+        {art?.provisional ? (
+          <div>
+            <dt>Artwork</dt>
+            <dd>
+              <span className="story-none">Poster and preview art are provisional, pending approved imagery.</span>
+            </dd>
+          </div>
+        ) : null}
+      </dl>
+    </section>
   );
 }
 
-function LinkRow({ label, tone, children }: { label: string; tone: string; children: ReactNode }) {
-  return (
-    <div className="watch-link-row" data-tone={tone}>
-      <dt>{label}</dt>
-      <dd>
-        <ul className="watch-tags">{Array.isArray(children) ? children.map((c, i) => <li key={i}>{c}</li>) : <li>{children}</li>}</ul>
-      </dd>
-    </div>
-  );
-}
-
-function TagLink({ to, label, note }: { to: string; label: string; note?: string }) {
-  return (
-    <Link to={to} className="watch-tag" onClick={() => sound.play('select')}>
-      <span className="watch-tag-node" aria-hidden="true" />
-      <span>{label}</span>
-      {note ? <small>{note}</small> : null}
-    </Link>
-  );
-}
+/* ───────────── Up next ───────────── */
 
 function NextCard({ next }: { next: UpNext }) {
   const cat = useCatalogue();
   const access = useAccessState(next.video);
   const runtime = cat.runtime(next.video);
+  const lit = useSeedLit(next.video.id);
+  const id = next.video.id;
+  useEffect(() => () => releaseSeed(id), [id]);
   return (
-    <Link to={next.href} className="watch-next-card" data-cursor="play" data-cursor-label="Next" onClick={() => sound.play('transition')}>
-      <span className="watch-next-art">
+    <Link
+      to={next.href}
+      className="story-next-card"
+      data-world-lit={lit || undefined}
+      data-cursor="play"
+      data-cursor-label="Next"
+      onClick={() => sound.play('transition')}
+      {...seedHover(id)}
+    >
+      <span className="story-next-art">
         <Art art={next.video.art} alt="" />
+        {runtime ? <span className="story-next-runtime timecode">{runtimeLabel(runtime)}</span> : null}
       </span>
-      <span className="watch-next-meta">
-        <span className="watch-next-label">{next.label}</span>
-        <span className="watch-next-title">{next.video.title}</span>
-        <span className="watch-next-facts">
-          {[runtime ? runtimeLabel(runtime) : null, access.label, settingLabel(next.video)].filter(Boolean).join(' · ')}
-        </span>
+      <span className="story-next-meta">
+        <span className="story-next-label">{next.label}</span>
+        <span className="story-next-title">{next.video.title}</span>
+        <span className="story-next-facts">{[access.key !== 'free' ? access.label : null, settingLabel(next.video)].filter(Boolean).join(' · ')}</span>
       </span>
     </Link>
   );
@@ -533,8 +636,8 @@ function Journey({ queue, current }: { queue: string[]; current: string }) {
   const cat = useCatalogue();
   const pos = queuePosition(queue, current);
   return (
-    <div className="watch-journey">
-      <p className="watch-journey-title">
+    <div className="story-journey">
+      <p className="story-journey-title">
         Your journey · stop {pos + 1} of {queue.length}
       </p>
       <ol>
@@ -545,8 +648,8 @@ function Journey({ queue, current }: { queue: string[]; current: string }) {
           const rt = cat.runtime(v);
           return (
             <li key={slug} aria-current={here ? 'step' : undefined}>
-              {here ? <span className="watch-journey-here">{v.title}</span> : <Link to={watchHref(slug, queue)}>{v.title}</Link>}
-              {rt ? <span className="mono">{runtimeLabel(rt)}</span> : null}
+              {here ? <span className="story-journey-here">{v.title}</span> : <Link to={watchHref(slug, queue)}>{v.title}</Link>}
+              {rt ? <span className="timecode">{runtimeLabel(rt)}</span> : null}
             </li>
           );
         })}

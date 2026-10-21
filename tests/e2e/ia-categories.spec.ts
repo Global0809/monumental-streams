@@ -1,8 +1,13 @@
 /**
- * Category pages: one engine, eight presentation families. These journeys prove real outcomes:
- * choosing a category changes the collection, facets / search / sort change it and live in the
- * URL, saving updates My World, places and eras open World and the Time Machine, empty
- * categories are honest — and fill themselves the moment a title carries their interest.
+ * Category pages: one engine, eight presentation families, written as an editorial layer over
+ * the category's chamber in the living world. These journeys prove real outcomes: choosing a
+ * category changes the collection (and re-forms the chamber), facets / search / sort change it
+ * and live in the URL — and the world lights exactly the seeds that are showing; the leading
+ * story and every card light their seed (and a seed lit from the world lights them back);
+ * saving updates My World; places and eras open World and the Time Machine and light their
+ * stories in the chamber; empty categories are honest — and fill themselves the moment a title
+ * carries their interest. World state is read from the DOM's mirror of the stage store
+ * (data-world-highlight / data-world-lit) and, where WebGL runs, from window.__stage.
  */
 import { expect, test, type Page } from '@playwright/test';
 import { pinPreviewCatalogue } from './snapshot.ts';
@@ -14,6 +19,15 @@ test.beforeEach(async ({ page }) => {
 /** Visible titles of the result cards, in order (the link's first text node, without its spoken suffix). */
 const titles = (page: Page) => page.locator('main .cat-results article h3 a').evaluateAll((els) => els.map((a) => (a.firstChild?.textContent ?? '').trim()));
 const toolbar = (page: Page, label: string) => page.getByRole('search', { name: `Filter ${label}` });
+/** The seeds the world is lighting, as the page mirrors the stage store: 'all', or the ids. */
+const litIds = async (page: Page) => ((await page.locator('.catpage').getAttribute('data-world-highlight')) ?? '').split(' ').filter(Boolean).sort();
+type StageSnap = { arrangement: { kind: string; section?: string }; highlight: string[] | null; hovered: string | null };
+/** The live stage store when the WebGL stage runs (dev builds expose window.__stage), else null. */
+const stage = (page: Page) =>
+  page.evaluate(() => {
+    const s = (window as unknown as { __stage?: { store: { get(): StageSnap } } }).__stage?.store.get();
+    return s ? { arrangement: s.arrangement, highlight: s.highlight, hovered: s.hovered } : null;
+  });
 
 /** Tag real catalogue videos with an interest inside this browser only (the API is untouched). */
 const tagInBrowser = (page: Page, tags: Record<string, string[]>) => pinPreviewCatalogue(page, tags);
@@ -29,6 +43,12 @@ test.describe('category pages', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Movies' })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Categories' }).getByRole('link', { name: /^Movies/ })).toHaveAttribute('aria-current', 'page');
     await expect.poll(() => titles(page)).toContain('Sintel');
+    // the organ is the hero: no page-drawn scene, one gold action (the leading story)
+    await expect(page.locator('main canvas, main .cat-room, main .cine')).toHaveCount(0);
+    await expect(page.locator('main .btn-primary')).toHaveCount(1);
+    await expect(page.locator('.catpage')).toHaveAttribute('data-world-highlight', 'all');
+    const s0 = await stage(page);
+    if (s0) expect(s0.arrangement).toEqual({ kind: 'category', section: 'movies' });
 
     // primary navigation
     await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Music', exact: true }).click();
@@ -50,6 +70,8 @@ test.describe('category pages', () => {
     await expect(current).toHaveAttribute('aria-current', 'page');
     await expect(current).toBeFocused();
     await expect.poll(() => titles(page)).toContain('Kingston Jamaica');
+    // switching re-forms the chamber around the new organ
+    if (s0) await expect.poll(async () => (await stage(page))?.arrangement).toEqual({ kind: 'category', section: 'culture' });
     await page.goBack();
     await expect(page.getByRole('heading', { level: 1, name: 'Music' })).toBeVisible();
   });
@@ -63,12 +85,17 @@ test.describe('category pages', () => {
     await expect(page).toHaveURL(/\?facet=fiction$/);
     await expect.poll(() => titles(page)).toEqual(['Sintel', 'Tears of Steel']);
     await expect(tools.getByRole('button', { name: /^Fiction\s*\d+$/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(tools.getByRole('button', { name: 'Remove filter Fiction' })).toBeVisible();
-    await expect(tools.locator('.cat-showing')).toContainText('of 6 titles');
+    await expect(tools.locator('.cat-showing')).toContainText('2 of 6 titles in Fiction');
+    await expect(tools.getByRole('button', { name: 'Show all Movies' })).toBeVisible();
+    // the world lights exactly what is showing
+    await expect.poll(() => litIds(page)).toEqual(['video:sintel', 'video:tears-of-steel']);
+    const s1 = await stage(page);
+    if (s1) expect([...(s1.highlight ?? [])].sort()).toEqual(['video:sintel', 'video:tears-of-steel']);
 
     await page.goBack();
     await expect(page).toHaveURL(/\/movies$/);
     await expect.poll(async () => (await titles(page)).length).toBe(6);
+    await expect(page.locator('.catpage')).toHaveAttribute('data-world-highlight', 'all');
 
     // sort by era: the 1905 films lead
     await tools.getByLabel('Sort Movies').selectOption('era-old');
@@ -78,6 +105,7 @@ test.describe('category pages', () => {
     // search within the category (URL follows after a pause)
     await tools.getByRole('searchbox', { name: 'Search within Movies' }).fill('newspaper');
     await expect.poll(() => titles(page)).toEqual(['Newspaper Train']);
+    await expect.poll(() => litIds(page)).toEqual(['video:newspaper-train-1942']);
     await expect(page).toHaveURL(/q=newspaper/);
     await page.reload();
     await expect(tools.getByRole('searchbox', { name: 'Search within Movies' })).toHaveValue('newspaper');
@@ -86,17 +114,56 @@ test.describe('category pages', () => {
     // no match → honest relaxation
     await tools.getByRole('searchbox', { name: 'Search within Movies' }).fill('zzzzqx');
     await expect(page.getByRole('heading', { name: /No Movies titles match “zzzzqx”/ })).toBeVisible();
+    // nothing matches: no seed stays lit
+    await expect(page.locator('.catpage')).toHaveAttribute('data-world-highlight', '');
     await page.getByRole('button', { name: 'Clear “zzzzqx”' }).click();
     await expect.poll(async () => (await titles(page)).length).toBe(6);
+    await expect(page.locator('.catpage')).toHaveAttribute('data-world-highlight', 'all');
   });
 
-  test('the marquee follows the filmstrip selection', async ({ page }) => {
+  test('the leading story and the cards light their seeds, and a seed lit in the world lights them back', async ({ page }) => {
     await page.goto('/movies');
-    const strip = page.getByRole('group', { name: 'Choose the film on the screen' });
-    await strip.getByRole('button', { name: /Show Coney Island at Night on the screen/ }).click();
-    await expect(page.locator('.cine-title')).toHaveText('Coney Island at Night');
-    await expect(strip.getByRole('button', { name: /Coney Island at Night/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.getByRole('link', { name: 'Watch Coney Island at Night' })).toBeVisible();
+    const lead = page.locator('.cat-lead');
+    const leadTitle = (await lead.getByRole('heading', { level: 2 }).innerText()).trim();
+    const leadId = await lead.getAttribute('data-vid');
+    expect(leadId).toBeTruthy();
+    // the immediate action watches it
+    await expect(lead.getByRole('link', { name: `Watch ${leadTitle}` })).toHaveAttribute('href', /\/watch\//);
+
+    // pointing at the lead lights its seed — and its card in the collection answers too
+    await lead.hover();
+    await expect(lead).toHaveAttribute('data-world-lit', 'true');
+    await expect(page.locator(`.cat-results [data-seed="${leadId}"]`)).toHaveAttribute('data-world-lit', 'true');
+    const s1 = await stage(page);
+    if (s1) expect(s1.hovered).toBe(leadId);
+    await page.mouse.move(5, 5);
+    await expect(lead).not.toHaveAttribute('data-world-lit', 'true');
+
+    // a card lights its seed on keyboard focus too
+    const card = page.locator('.cat-results [data-seed="video:sintel"]');
+    await card.getByRole('link', { name: /^Sintel/ }).focus();
+    await expect(card).toHaveAttribute('data-world-lit', 'true');
+
+    // where the stage runs: a seed under the pointer in the world lights its card
+    if (s1) {
+      await page.evaluate(() =>
+        (window as unknown as { __stage: { store: { set(fn: (s: StageSnap) => StageSnap): void } } }).__stage.store.set((s) => ({ ...s, hovered: 'video:tears-of-steel' })),
+      );
+      await expect(page.locator('.cat-results [data-seed="video:tears-of-steel"]')).toHaveAttribute('data-world-lit', 'true');
+    }
+  });
+
+  test('on a phone the first screen holds the title, the leading story and its Watch action @mobile', async ({ page }) => {
+    await page.goto('/culture');
+    await expect(page.locator('main h1')).toHaveText('Culture');
+    // what is really visible: above the phone's bottom bar (0 on wider screens)
+    const fold = await page.evaluate(() => window.innerHeight - (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tabbar-h')) || 0));
+    const lead = page.locator('.cat-lead');
+    for (const loc of [page.locator('main h1'), lead.getByRole('heading', { level: 2 }), lead.getByRole('link', { name: /^Watch / })]) {
+      await expect(loc).toBeInViewport();
+      const box = (await loc.boundingBox())!;
+      expect(box.y + box.height, await loc.innerText()).toBeLessThanOrEqual(fold + 1);
+    }
   });
 
   test('saving a title flies it into My World and My World lists it', async ({ page }) => {
@@ -104,7 +171,7 @@ test.describe('category pages', () => {
     const save = page.locator('main .cat-results').getByRole('button', { name: 'Save Sintel' });
     await save.click();
     await expect(page.locator('.toaster').getByText('Saved “Sintel” to My World')).toBeVisible();
-    await expect(page.locator('main .cat-results').getByRole('button', { name: 'Remove Sintel from My World' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('main .cat-results').getByRole('button', { name: 'Remove Sintel from saved' })).toHaveAttribute('aria-pressed', 'true');
     // the orb lands on the My World navigation item
     await expect(page.locator('[data-nav="my-world"].is-receiving')).toHaveCount(1, { timeout: 4000 });
     await expect(page.locator('[data-nav="my-world"]').first()).toContainText('1');
@@ -118,13 +185,22 @@ test.describe('category pages', () => {
     await page.goto('/culture');
     const ctx = page.locator('#cat-context');
     await expect(ctx.getByRole('link', { name: /^Kingston/ })).toBeVisible();
+    // pointing at a place leaves only its stories alight in the chamber; leaving restores
+    await ctx.getByRole('link', { name: /^Kingston/ }).hover();
+    await expect.poll(() => litIds(page)).toEqual(['video:kingston-1920']);
+    await page.mouse.move(5, 5);
+    await expect(page.locator('.catpage')).toHaveAttribute('data-world-highlight', 'all');
     await toolbar(page, 'Culture').getByRole('button', { name: /^Art\s*\d+$/ }).click();
     await expect(page).toHaveURL(/facet=art/);
     await expect(ctx.getByRole('link', { name: /^Kingston/ })).toHaveCount(0);
     await page.goBack();
     await expect(ctx.getByRole('link', { name: /^Kingston/ })).toBeVisible();
 
-    await ctx.getByRole('link', { name: /^1940s: \d+ titles? — open in the Time Machine$/ }).click();
+    const forties = ctx.getByRole('link', { name: /^1940s: \d+ titles? — open in the Time Machine$/ });
+    const n40s = Number((await forties.textContent())!.match(/1940s: (\d+)/)![1]);
+    await forties.focus();
+    await expect.poll(async () => (await litIds(page)).length).toBe(n40s);
+    await forties.click();
     await expect(page).toHaveURL(/\/time-machine\/1940s/);
     await page.goBack();
     await ctx.getByRole('link', { name: /^Kingston/ }).click();
@@ -171,7 +247,7 @@ test.describe('category pages', () => {
     await page.getByRole('navigation', { name: 'Categories' }).getByRole('link', { name: /^News 1 title$/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'News' })).toBeVisible();
     // broadsheet: dates and sources up front
-    const lead = page.locator('.lead');
+    const lead = page.locator('.cat-lead');
     await expect(lead.getByRole('heading', { name: 'Newspaper Train' })).toBeVisible();
     await expect(lead.getByText('Len Lye, Realist Film Unit, for the UK Ministry of Information')).toBeVisible();
     await expect(lead.getByText('Filmed')).toBeVisible();
@@ -234,7 +310,7 @@ function smallTargets(page: Page) {
         h = Math.max(h, lr.height);
       }
       const after = getComputedStyle(el, '::after');
-      if (after.content !== 'none' && after.position === 'absolute' && el.closest('.cc')) continue; // whole-card link
+      if (after.content !== 'none' && after.position === 'absolute' && el.closest('.pod')) continue; // whole-card link (seed card)
       if (w >= 43.5 && h >= 43.5) continue;
       out.push(`${el.tagName.toLowerCase()}.${el.className} "${(el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 30)}" ${Math.round(w)}×${Math.round(h)}`);
     }

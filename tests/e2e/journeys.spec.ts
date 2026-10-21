@@ -438,7 +438,7 @@ test.describe('catalogue', () => {
       await expect(interests.getByRole('button', { name: /^Documentary/ })).toHaveAttribute('aria-pressed', 'true');
       await expect(setIn.getByRole('button', { name: /^1940s/ })).toHaveAttribute('aria-pressed', 'true');
       await expect(access.getByRole('radio', { name: /^Free/ })).toHaveAttribute('aria-checked', 'true');
-      await expect(page.locator('.cat-count')).toHaveText(/^1 story$/);
+      await expect(page.locator('.srch-count')).toHaveText(/^1 story$/);
       await expect(pod('Newspaper Train')).toBeVisible();
     };
     await check();
@@ -545,7 +545,7 @@ test.describe('time machine', () => {
     await expect(page.getByRole('heading', { name: 'Stories made in the 1940s' })).toBeVisible();
     await expect(pod('Newspaper Train')).toBeVisible();
 
-    const dial = page.getByRole('slider', { name: 'Decade dial' });
+    const dial = page.getByRole('slider', { name: 'Decade', exact: true });
     await dial.focus();
     await page.keyboard.press('ArrowRight');
     await expect(page).toHaveURL(/\/time-machine\/1950s\?lens=made$/);
@@ -558,14 +558,15 @@ test.describe('time machine', () => {
     await page.goto('/time-machine/2010s');
     await expect(page.getByText('No stories set in the 2010s yet')).toBeVisible();
     await expect(page.getByText(/The nearest decade.* with stories/)).toBeVisible();
-    const nearest = page.getByRole('link', { name: /^1960s · \d+$/ });
+    const nearest = page.getByRole('link', { name: /^1960s · \d+ stor(y|ies)$/ });
     await nearest.click();
     await expect(page).toHaveURL(/\/time-machine\/1960s$/);
     await expect(pod('Apollo 11')).toBeVisible();
 
     await page.goto('/time-machine/1850s');
     await expect(page.getByRole('heading', { name: /This era isn’t in the archive/ })).toBeVisible();
-    await expect(page.getByRole('heading', { name: '“1850s” is beyond the clock’s reach' })).toBeVisible();
+    await expect(page.getByText(/The archive covers the 1900s to the 2020s/)).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Go to the 1900s' })).toHaveAttribute('href', /\/time-machine\/1900s$/);
   });
 });
 
@@ -732,6 +733,186 @@ test.describe('reduced motion', () => {
     await page.waitForTimeout(1500);
     await expect(page).toHaveURL(/\/watch\/reel-living-atlas$/);
     await ctx.close();
+  });
+});
+
+/* ───────────── 12. The world answers: story, programme, search ───────────── */
+
+/**
+ * The living world's state, read from the very stage store the app uses (dev builds): the
+ * engine's QA handle when the 3D stage runs, otherwise the module at the URL the app loaded it
+ * from (a hot-updated module carries a ?t= stamp, and a bare import would be a second copy).
+ */
+const stageCall = (page: Page, hover?: string | null) =>
+  page.evaluate(
+    async ({ set, hovered }) => {
+      type Facts = { arrangement: { kind: string; video?: string; programme?: string; related?: string[] }; highlight: string[] | null; hovered: string | null };
+      type Store = { get(): Facts; set(fn: (s: Facts) => Facts): void };
+      const handle = (window as unknown as { __stage?: { store?: Store } }).__stage?.store;
+      const url = performance.getEntriesByType('resource').map((e) => e.name).find((n) => /\/src\/stage\/store\.ts(\?|$)/.test(n)) ?? '/src/stage/store.ts';
+      const store: Store = handle ?? (await import(url)).stageStore;
+      if (set) store.set((s) => (s.hovered === hovered ? s : { ...s, hovered }));
+      const s = store.get();
+      return { arrangement: s.arrangement, highlight: s.highlight, hovered: s.hovered };
+    },
+    { set: hover !== undefined, hovered: hover ?? null },
+  );
+const stage = (page: Page) => stageCall(page);
+/** A seed under the pointer in the world (what the engine writes when the pointer meets a seed). */
+const worldHover = (page: Page, id: string | null) => stageCall(page, id);
+
+test.describe('the world answers', () => {
+  test('a story holds the world in focus: its ring is Up next + related, cards and seeds light each other, playing dims the world and the frame takes the stage', async ({ page }) => {
+    await page.goto('/watch/kingston-1920');
+    await expect(page.getByRole('heading', { level: 1, name: 'Kingston Jamaica' })).toBeVisible();
+    await expect(page.getByRole('complementary', { name: 'Viewer context' })).toContainText('Context before you watch');
+    await expect.poll(async () => (await stage(page)).arrangement.kind).toBe('focus');
+    const focus = (await stage(page)).arrangement;
+    expect(focus.video).toBe('video:kingston-1920');
+
+    // the ring is exactly the stories offered below: Up next first, then the related seed cards
+    const nextCard = page.getByRole('complementary', { name: 'Up next' }).getByRole('link').first();
+    const nextId = `video:${((await nextCard.getAttribute('href')) ?? '').replace(/^\/watch\//, '').replace(/\?.*$/, '')}`;
+    const pods = page.locator('#watch-related .pod');
+    const podIds = await pods.evaluateAll((els) => els.map((e) => e.getAttribute('data-seed') ?? ''));
+    expect(podIds.length).toBeGreaterThan(0);
+    expect(focus.related).toEqual([nextId, ...podIds]);
+
+    // card → seed: hovering Up next lights its seed (and filament); leaving lets go
+    await nextCard.hover();
+    await expect.poll(async () => (await stage(page)).hovered).toBe(nextId);
+    await page.mouse.move(2, 2);
+    await expect.poll(async () => (await stage(page)).hovered).toBe(null);
+    // seed → card: a seed under the pointer in the world lights its card
+    await worldHover(page, podIds[0]);
+    await expect(pods.first()).toHaveAttribute('data-world-lit');
+    await worldHover(page, nextId);
+    await expect(nextCard).toHaveAttribute('data-world-lit');
+    await worldHover(page, null);
+    await expect(nextCard).not.toHaveAttribute('data-world-lit');
+
+    // save → the story is kept (and its seed flies into My World)
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(toast(page, 'Saved “Kingston Jamaica” to My World')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Saved', exact: true })).toHaveAttribute('aria-pressed', 'true');
+
+    // play → the world turns to `watch` (dims, stops) and the frame takes the stage
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.getByRole('button', { name: 'Play: Kingston Jamaica' }).click();
+    await expectPlaying(page);
+    await expect.poll(async () => (await stage(page)).arrangement.kind).toBe('watch');
+    await expect(page.locator('.story')).toHaveAttribute('data-mode', 'theatre');
+    // pause → the focus comes back; the frame keeps the stage
+    await playerKey(page, 'k');
+    await expect.poll(async () => (await stage(page)).arrangement).toEqual(focus);
+    await expect(page.locator('.story')).toHaveAttribute('data-mode', 'theatre');
+  });
+
+  test('a programme holds its episodes in focus and lights them; rows and seeds light each other; status stays honest', async ({ page }) => {
+    const payload = (await (await page.request.get('/api/catalogue')).json()) as { content: { videos: { id: string; programme?: string }[] } };
+    const episodes = payload.content.videos.filter((v) => v.programme === 'programme:open-archive').map((v) => v.id);
+    expect(episodes.length).toBeGreaterThan(2);
+
+    await page.goto('/programme/open-archive');
+    await expect(page.getByRole('heading', { level: 1, name: 'Open Archive' })).toBeVisible();
+    await expect(page.getByRole('note', { name: 'What exists today' })).toContainText(/Available/);
+    await expect.poll(async () => (await stage(page)).arrangement.programme).toBe('programme:open-archive');
+    const s = await stage(page);
+    expect(s.arrangement.kind).toBe('focus');
+    expect([...(s.highlight ?? [])].sort()).toEqual([...episodes].sort());
+    // the one gold action plays the seed in front
+    await expect(page.getByRole('link', { name: 'Play from the start' })).toHaveAttribute('href', `/watch/${(s.arrangement.video ?? '').replace(/^video:/, '')}`);
+
+    const rows = page.locator('#prog-episodes .prog-ep');
+    const idOf = async (i: number) => `video:${((await rows.nth(i).locator('.prog-ep-title a').getAttribute('href')) ?? '').replace(/^\/watch\//, '')}`;
+    const third = await idOf(2);
+    await rows.nth(2).hover();
+    await expect.poll(async () => (await stage(page)).hovered).toBe(third);
+    await page.mouse.move(2, 2);
+    await expect.poll(async () => (await stage(page)).hovered).toBe(null);
+    const fourth = await idOf(3);
+    await worldHover(page, fourth);
+    await expect(rows.nth(3)).toHaveAttribute('data-world-lit');
+    await worldHover(page, null);
+
+    // nothing published yet: said plainly, nothing lit, no play action
+    await page.goto('/programme/better-late-than-never');
+    await expect(page.getByRole('note', { name: 'What exists today' })).toContainText('Announced');
+    await expect(page.locator('#prog-episodes').getByText('Nothing to play yet')).toBeVisible();
+    await expect(page.getByRole('link', { name: /^(Play|Watch)/ })).toHaveCount(0);
+    await expect.poll(async () => (await stage(page)).arrangement.programme).toBe('programme:better-late-than-never');
+    expect((await stage(page)).highlight).toBeNull();
+  });
+
+  test('search lights the stories that match in the world, nothing when nothing matches; cards and collections answer', async ({ page }) => {
+    await page.goto('/search');
+    await expect.poll(async () => (await stage(page)).arrangement.kind).toBe('quiet');
+    expect((await stage(page)).highlight).toBeNull();
+
+    // hovering a collection lights its stories; leaving gives the field back
+    await page.locator('.srch-quick-link').first().hover();
+    await expect.poll(async () => (await stage(page)).highlight?.length ?? 0).toBeGreaterThan(0);
+    await page.mouse.move(2, 2);
+    await expect.poll(async () => (await stage(page)).highlight).toBeNull();
+
+    // a query: exactly its results are lit (and still after a reload — the URL holds it)
+    const search = page.getByRole('search', { name: 'Catalogue' }).getByRole('searchbox');
+    await search.fill('train');
+    await expect(page).toHaveURL(/\/search\?q=train$/);
+    const pods = page.locator('.srch-grid .pod');
+    await expect(pods.first()).toBeVisible();
+    // lit seeds === the result cards (polled together: the results settle a beat after typing)
+    const litMatchesCards = async () => {
+      const lit = [...((await stage(page)).highlight ?? [])].sort().join();
+      const cards = (await pods.evaluateAll((els) => els.map((e) => e.getAttribute('data-seed') ?? ''))).sort().join();
+      return !!lit && lit === cards;
+    };
+    await expect.poll(litMatchesCards).toBe(true);
+    await page.reload();
+    await expect(search).toHaveValue('train');
+    await expect.poll(litMatchesCards).toBe(true);
+
+    // card ⇄ seed
+    const first = pods.first();
+    const firstId = (await first.getAttribute('data-seed')) ?? '';
+    await first.hover();
+    await expect.poll(async () => (await stage(page)).hovered).toBe(firstId);
+    await page.mouse.move(2, 2);
+    await worldHover(page, firstId);
+    await expect(first).toHaveAttribute('data-world-lit');
+    await worldHover(page, null);
+
+    // nothing matches → no story is lit; clearing gives every story back
+    await search.fill('zzzzqx');
+    await expect(page.getByText('Nothing matches all of that')).toBeVisible();
+    const none = (await stage(page)).highlight;
+    expect(none).not.toBeNull();
+    const all = (await (await page.request.get('/api/catalogue')).json()) as { content: { videos: { id: string }[] } };
+    expect(all.content.videos.some((v) => (none ?? []).includes(v.id))).toBe(false);
+    await page.getByRole('search', { name: 'Catalogue' }).getByRole('button', { name: 'Clear the search' }).click();
+    await expect.poll(async () => (await stage(page)).highlight).toBeNull();
+  });
+
+  test('a collection gathers its stories in the world and lights them all', async ({ page }) => {
+    await page.goto('/collection/miami-gateway');
+    await expect(page.getByRole('heading', { level: 1, name: 'Miami: The Gateway' })).toBeVisible();
+    const pods = page.locator('#coll-stories .pod');
+    await expect(pods.first()).toBeVisible();
+    const cards = await pods.evaluateAll((els) => els.map((e) => e.getAttribute('data-seed') ?? ''));
+    await expect.poll(async () => (await stage(page)).arrangement.kind).toBe('focus');
+    const s = await stage(page);
+    expect([s.arrangement.video, ...(s.arrangement.related ?? [])]).toEqual(cards);
+    expect([...(s.highlight ?? [])].sort()).toEqual([...cards].sort());
+    // the rule opens in Search as live filters
+    await page.getByRole('link', { name: 'Open in Search with these filters' }).click();
+    await expect(page).toHaveURL(/\/search\?place=miami-dade-county$/);
+    await expect(page.locator('.srch-count')).toHaveText(`${cards.length} ${cards.length === 1 ? 'story' : 'stories'}`);
+  });
+
+  test('a story’s first screen holds its title and a visible Play @mobile', async ({ page }) => {
+    await page.goto('/watch/newspaper-train-1942');
+    await expect(page.getByRole('button', { name: 'Play: Newspaper Train' })).toBeInViewport();
+    await expect(page.getByRole('heading', { level: 1, name: 'Newspaper Train' })).toBeInViewport();
   });
 });
 

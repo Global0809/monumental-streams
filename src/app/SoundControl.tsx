@@ -10,7 +10,7 @@ import { sound, soundStore } from '../systems/sound/engine.ts';
 import { Icon } from '../ui/Icon.tsx';
 import { Slider } from '../ui/controls.tsx';
 
-export function SoundControl() {
+export function SoundControl({ compact = false }: { compact?: boolean }) {
   const prefs = usePrefs();
   const s = useStore(soundStore);
   const [open, setOpen] = useState(false);
@@ -53,7 +53,7 @@ export function SoundControl() {
   const set = (patch: Partial<typeof prefs.sound>) => libraryActions.setPrefs({ sound: { ...prefs.sound, ...patch } });
 
   return (
-    <div className="sound-control" ref={wrap}>
+    <div className={`sound-control ${compact ? 'is-compact' : ''}`} ref={wrap}>
       <button
         type="button"
         className={`sound-toggle ${on ? 'is-on' : ''} ${wasOnBefore ? 'is-inviting' : ''}`}
@@ -72,28 +72,28 @@ export function SoundControl() {
         </span>
         <span className="sound-word">{on ? 'Sound on' : 'Sound off'}</span>
       </button>
-      <button
-        ref={levelsBtn}
-        type="button"
-        className="icon-btn btn-quiet icon-btn-sm sound-more"
-        aria-expanded={open}
-        aria-controls={panelId}
-        aria-label="Sound levels"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <Icon name="down" size={16} />
-      </button>
-      {open ? (
+      {compact ? null : (
+        <button
+          ref={levelsBtn}
+          type="button"
+          className="icon-btn btn-quiet icon-btn-sm sound-more"
+          aria-expanded={open}
+          aria-controls={panelId}
+          aria-label="Sound levels"
+          onClick={() => setOpen((v) => !v)}
+        >
+          <Icon name="down" size={16} />
+        </button>
+      )}
+      {open && !compact ? (
         <div id={panelId} className="sound-panel panel" role="group" aria-label="Sound levels">
           <p className="kicker">
-            Sonic identity · <b>{on ? 'awake' : 'asleep'}</b>
+            Website sound · <b>{on ? 'awake' : 'asleep'}</b>
           </p>
           <Slider label="Master" value={prefs.sound.master} onChange={(v) => set({ master: v })} />
           <Slider label="Ambience (respiration)" value={prefs.sound.ambience} onChange={(v) => set({ ambience: v })} />
           <Slider label="Interface effects" value={prefs.sound.effects} onChange={(v) => set({ effects: v })} />
-          <p className="sound-note muted">
-            Programme volume is set in the player. Ambience falls silent while a programme plays and the whole system sleeps when this tab is hidden.
-          </p>
+          <p className="sound-note muted">Programme volume is set in the player. Ambience falls silent while a programme plays and the whole system sleeps when this tab is hidden.</p>
         </div>
       ) : null}
     </div>

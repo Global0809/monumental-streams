@@ -1,4 +1,4 @@
-/* The nucleus cursor — champagne gold for things you act on, iris for things you open. */
+/* The archive cursor — a precise pearl point, a hairline lens, a gold reticle for the world. */
 .cursor {
   position: fixed;
   inset: 0;
@@ -18,42 +18,47 @@
   will-change: transform;
 }
 
-/* ── Nucleus: the exact hotspot ── */
+/* ── The point: the exact hotspot ── */
 .cursor-nucleus {
-  width: 6px;
-  height: 6px;
-  margin: -3px 0 0 -3px;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
   border-radius: 50%;
   background: var(--pearl);
-  box-shadow: 0 0 0 1.5px rgb(10 8 17 / 0.85), 0 0 10px var(--iris-glow);
-  transition: background var(--t-fast), scale var(--t-fast) var(--ease-out), opacity var(--t-fast);
+  box-shadow: 0 0 0 1.5px rgb(7 6 12 / 0.85);
+  transition:
+    background var(--t-fast),
+    scale var(--t-fast) var(--ease-out),
+    opacity var(--t-fast);
 }
-.cursor-nucleus:is([data-mode='view'], [data-mode='play'], [data-mode='save']) {
+.cursor-nucleus:is([data-mode='view'], [data-mode='play'], [data-mode='save'], [data-mode='stage']) {
   background: var(--gold);
-  box-shadow: 0 0 0 1.5px rgb(10 8 17 / 0.85), 0 0 12px var(--gold-glow);
+  box-shadow:
+    0 0 0 1.5px rgb(7 6 12 / 0.85),
+    0 0 10px var(--gold-glow);
 }
 .cursor-nucleus[data-mode='wrap'] {
-  scale: 0.66;
+  scale: 0.7;
 }
 .cursor-nucleus.is-pressed {
-  scale: 0.7;
+  scale: 0.6;
 }
 .cursor-nucleus[data-mode='text'],
 .cursor-nucleus[data-mode='hide'] {
   opacity: 0;
 }
 
-/* ── Membrane: the following shape ── */
+/* ── The lens: the following shape ── */
 .cursor-membrane {
-  --w: 34px;
-  --h: 34px;
+  --w: 26px;
+  --h: 26px;
   --r: 50%;
-  width: 34px;
-  height: 34px;
-  margin: -17px 0 0 -17px;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
   border-radius: 50%;
-  border: 1.5px solid rgb(232 224 255 / 0.55);
-  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.35), inset 0 0 12px rgb(179 163 255 / 0.12);
+  border: 1px solid rgb(244 240 251 / 0.42);
+  box-shadow: 0 0 0 1px rgb(7 6 12 / 0.25);
   transition:
     width var(--t-mid) var(--ease-out),
     height var(--t-mid) var(--ease-out),
@@ -64,65 +69,74 @@
     box-shadow var(--t-mid),
     opacity var(--t-fast);
 }
-/* the heartbeat: a faint pulse of the membrane wall */
-.cursor-membrane::after {
-  content: '';
-  position: absolute;
-  inset: -5px;
-  border-radius: inherit;
-  border: 1px solid rgb(179 163 255 / 0.3);
-  animation: breathe var(--beat-dur) infinite;
-}
 .cursor-membrane[data-mode='open'] {
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-color: var(--iris);
+  box-shadow:
+    0 0 0 1px rgb(7 6 12 / 0.3),
+    0 0 20px -6px var(--iris-glow);
+}
+
+/* view: a gold ring around a card */
+.cursor-membrane[data-mode='view'] {
+  width: 58px;
+  height: 58px;
+  margin: -29px 0 0 -29px;
+  border-color: rgb(242 214 162 / 0.85);
+  box-shadow:
+    0 0 0 1px rgb(7 6 12 / 0.25),
+    0 0 30px -8px var(--gold-glow);
+}
+
+/* stage: a gold reticle on something in the living world */
+.cursor-membrane[data-mode='stage'] {
   width: 46px;
   height: 46px;
   margin: -23px 0 0 -23px;
-  border-color: var(--iris);
-  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.35), 0 0 22px -4px var(--iris-glow);
+  border-color: rgb(242 214 162 / 0.3);
+  background:
+    linear-gradient(var(--gold), var(--gold)) 50% 0 / 1.5px 9px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 50% 100% / 1.5px 9px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 0 50% / 9px 1.5px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 100% 50% / 9px 1.5px no-repeat;
+  box-shadow: 0 0 26px -8px var(--gold-glow);
 }
-
-/* view: a wide gold orbit with a satellite riding it */
-.cursor-membrane[data-mode='view'] {
-  width: 78px;
-  height: 78px;
-  margin: -39px 0 0 -39px;
-  border-color: rgb(242 214 162 / 0.85);
-  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.3), 0 0 34px -6px var(--gold-glow), inset 0 0 22px rgb(242 214 162 / 0.12);
+.cursor-membrane[data-mode='stage'] .cursor-glyph {
+  animation: cursor-reticle 600ms var(--ease-out) both;
 }
-.cursor-membrane[data-mode='view']::after {
-  inset: -9px;
-  border-color: rgb(242 214 162 / 0.22);
-}
-.cursor-membrane[data-mode='view'] .cursor-glyph {
-  animation: cursor-orbit 3.2s linear infinite;
-}
-.cursor-membrane[data-mode='view'] .cursor-glyph::before {
+.cursor-membrane[data-mode='stage'] .cursor-glyph::before {
   content: '';
   position: absolute;
-  top: -4px;
-  left: 50%;
-  width: 7px;
-  height: 7px;
-  margin-left: -3.5px;
+  inset: 9px;
   border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 10px var(--gold-glow);
+  border: 1px solid rgb(242 214 162 / 0.55);
+}
+@keyframes cursor-reticle {
+  from {
+    rotate: -45deg;
+    scale: 1.5;
+    opacity: 0;
+  }
 }
 
 /* play: a gold ring with a play notch on its edge, never over the hotspot */
 .cursor-membrane[data-mode='play'] {
-  width: 64px;
-  height: 64px;
-  margin: -32px 0 0 -32px;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
   border-color: var(--gold);
-  border-width: 2px;
-  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.3), 0 0 30px -6px var(--gold-glow);
+  border-width: 1.5px;
+  box-shadow:
+    0 0 0 1px rgb(7 6 12 / 0.3),
+    0 0 28px -8px var(--gold-glow);
 }
 .cursor-membrane[data-mode='play'] .cursor-glyph::before {
   content: '';
   width: 0;
   height: 0;
-  transform: translateX(26px);
+  transform: translateX(23px);
   border-left: 7px solid var(--gold);
   border-top: 4.5px solid transparent;
   border-bottom: 4.5px solid transparent;
@@ -130,21 +144,23 @@
 
 /* save: a gold rounded square */
 .cursor-membrane[data-mode='save'] {
-  width: 42px;
-  height: 42px;
-  margin: -21px 0 0 -21px;
-  border-radius: 13px;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 12px;
   border-color: var(--gold);
 }
 
 /* drag: a capsule with chevrons that grips (narrows, turns gold) when pressed */
 .cursor-membrane[data-mode='drag'] {
-  width: 62px;
-  height: 34px;
-  margin: -17px 0 0 -31px;
-  border-radius: 17px;
+  width: 58px;
+  height: 30px;
+  margin: -15px 0 0 -29px;
+  border-radius: 15px;
   border-color: var(--iris);
-  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.35), 0 0 20px -6px var(--iris-glow);
+  box-shadow:
+    0 0 0 1px rgb(7 6 12 / 0.3),
+    0 0 18px -6px var(--iris-glow);
 }
 .cursor-membrane[data-mode='drag'] .cursor-glyph::before,
 .cursor-membrane[data-mode='drag'] .cursor-glyph::after {
@@ -155,8 +171,10 @@
   height: 6px;
   margin-top: -3px;
   border: solid var(--iris);
-  border-width: 0 0 1.6px 1.6px;
-  transition: translate var(--t-mid) var(--ease-out), border-color var(--t-mid);
+  border-width: 0 0 1.5px 1.5px;
+  transition:
+    translate var(--t-mid) var(--ease-out),
+    border-color var(--t-mid);
 }
 .cursor-membrane[data-mode='drag'] .cursor-glyph::before {
   left: -14px;
@@ -167,10 +185,12 @@
   rotate: -135deg;
 }
 .cursor-membrane[data-mode='drag'].is-pressed {
-  width: 44px;
-  margin-left: -22px;
+  width: 42px;
+  margin-left: -21px;
   border-color: var(--gold);
-  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.35), 0 0 24px -4px var(--gold-glow);
+  box-shadow:
+    0 0 0 1px rgb(7 6 12 / 0.3),
+    0 0 22px -4px var(--gold-glow);
 }
 .cursor-membrane[data-mode='drag'].is-pressed .cursor-glyph::before {
   translate: -5px 0;
@@ -181,42 +201,38 @@
   border-color: var(--gold);
 }
 
-/* wrap: the membrane leaves the pointer and wraps the control under it */
+/* wrap: the lens leaves the pointer and wraps the control under it */
 .cursor-membrane[data-mode='wrap'] {
   width: var(--w);
   height: var(--h);
   margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2);
   border-radius: var(--r);
-  border-color: rgb(255 240 214 / 0.62);
-  background-color: rgb(242 214 162 / 0.05);
-  box-shadow: 0 0 0 1px rgb(10 8 17 / 0.3), 0 0 26px -8px var(--gold-glow);
-}
-.cursor-membrane[data-mode='wrap']::after {
-  display: none;
+  border-color: rgb(244 240 251 / 0.5);
+  background-color: rgb(179 163 255 / 0.05);
+  box-shadow:
+    0 0 0 1px rgb(7 6 12 / 0.25),
+    0 0 22px -10px var(--iris-glow);
 }
 
-/* text: the native I-beam leads; a faint iris caret halo marks the field */
-.cursor-membrane[data-mode='text'] {
-  width: 10px;
-  height: 30px;
-  margin: -15px 0 0 -5px;
-  border-radius: 5px;
-  border-color: rgb(179 163 255 / 0.4);
-  box-shadow: 0 0 18px -4px var(--iris-glow);
-}
-.cursor-membrane[data-mode='text']::after,
+/* text: the native I-beam leads */
+.cursor-membrane[data-mode='text'],
 .cursor-membrane[data-mode='hide'] {
   opacity: 0;
 }
 
-.cursor-membrane.is-pressed:not([data-mode='drag']):not([data-mode='wrap']) {
-  width: 24px;
-  height: 24px;
-  margin: -12px 0 0 -12px;
+.cursor-membrane.is-pressed:not([data-mode='drag']):not([data-mode='wrap']):not([data-mode='stage']) {
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+}
+.cursor-membrane[data-mode='stage'].is-pressed {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
 }
 .cursor-membrane[data-mode='wrap'].is-pressed {
-  border-color: var(--gold);
-  background-color: rgb(242 214 162 / 0.1);
+  border-color: var(--iris);
+  background-color: rgb(179 163 255 / 0.1);
 }
 .cursor-glyph {
   position: absolute;
@@ -225,15 +241,16 @@
   place-items: center;
 }
 
-/* ── Label pill ── */
+/* ── Label: an eyebrow beside the pointer ── */
 .cursor-label {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 11px 5px 9px;
-  border-radius: var(--radius-pill);
-  background: rgb(10 8 17 / 0.84);
-  border: 1px solid rgb(242 214 162 / 0.4);
+  gap: 7px;
+  max-width: 320px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgb(7 6 12 / 0.84);
+  border: 1px solid rgb(242 214 162 / 0.32);
   box-shadow: 0 10px 30px -12px #000;
   font-family: var(--font-body);
   font-size: 12px;
@@ -241,27 +258,37 @@
   letter-spacing: 0.01em;
   color: var(--pearl);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   opacity: 0;
   transition: opacity var(--t-fast);
 }
 .cursor-label::before {
   content: '';
+  flex: none;
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: var(--gold);
   box-shadow: 0 0 8px var(--gold-glow);
 }
+/* in the world, the label says what kind of thing it is first */
+.cursor-label[data-mode='stage']::before {
+  content: attr(data-kind);
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
 .cursor-label[data-show='true'] {
   opacity: 1;
 }
 
-@keyframes cursor-orbit {
-  to {
-    rotate: 360deg;
-  }
-}
-:root[data-motion='reduce'] .cursor-membrane .cursor-glyph,
-:root[data-motion='reduce'] .cursor-membrane::after {
+:root[data-motion='reduce'] .cursor-membrane .cursor-glyph {
   animation: none;
 }

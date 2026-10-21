@@ -10,6 +10,7 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { Link } from 'react-router';
 import type { ID, Programme, Video } from '../../../shared/types.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
+import { setHovered, stageStore } from '../../stage/store.ts';
 import { sound } from '../../systems/sound/engine.ts';
 import { Art, ReasonChips } from '../../ui/Pod.tsx';
 import { movementYears, type DecadeContext } from './chrono.ts';
@@ -96,15 +97,18 @@ export function Lineage({ phrase, label, ctx }: { phrase: string; label: string;
     };
   }, [measure]);
 
-  /** Hover / focus props that light a node's thread. */
-  const lightProps = (key: string) => ({
-    'data-node': key,
-    'data-lit': lit ? (lit.has(key) ? 'on' : 'off') : undefined,
-    onPointerEnter: () => setHot(key),
-    onPointerLeave: () => setHot((h) => (h === key ? null : h)),
-    onFocus: () => setHot(key),
-    onBlur: () => setHot((h) => (h === key ? null : h)),
-  });
+  /** Hover / focus props that light a node's thread (and, for a story, its seed in the world). */
+  const lightProps = (key: string, seed?: ID) => {
+    const on = () => {
+      setHot(key);
+      if (seed) setHovered(seed);
+    };
+    const off = () => {
+      setHot((h) => (h === key ? null : h));
+      if (seed && stageStore.get().hovered === seed) setHovered(null);
+    };
+    return { 'data-node': key, 'data-lit': lit ? (lit.has(key) ? 'on' : 'off') : undefined, onPointerEnter: on, onPointerLeave: off, onFocus: on, onBlur: off };
+  };
 
   const nothing = !ctx.roots.length && !ctx.movements.length && !ctx.echoes.length && !ctx.today.length;
 
@@ -210,7 +214,7 @@ export function Lineage({ phrase, label, ctx }: { phrase: string; label: string;
                   const e = cat.get(t.id) as Video | Programme | undefined;
                   return (
                     <li key={t.id}>
-                      <div className="tm-node tm-node-today" {...lightProps(nodeKey('today', t.id))}>
+                      <div className="tm-node tm-node-today" {...lightProps(nodeKey('today', t.id), t.kind === 'video' ? t.id : undefined)}>
                         <Art art={e?.art} alt="" className="tm-node-art" />
                         <div className="tm-node-text">
                           <Link to={cat.href(t.id)} className="tm-node-name" data-cursor={t.kind === 'video' ? 'play' : 'open'} onClick={() => sound.play('transition')}>
@@ -219,7 +223,7 @@ export function Lineage({ phrase, label, ctx }: { phrase: string; label: string;
                           <span className="tm-node-years">
                             {t.kind === 'video' ? 'Story' : 'Programme'} · through {cat.label(t.through)}
                           </span>
-                          <ReasonChips reasons={t.reasons} max={2} />
+                          <ReasonChips reasons={t.reasons} max={1} />
                         </div>
                       </div>
                     </li>

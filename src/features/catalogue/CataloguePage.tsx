@@ -8,7 +8,11 @@
  * searchCatalogue runs on every state change (memoised, deferred while typing). Empty results
  * offer the engine's relaxations ("Remove Documentary → 3 stories") instead of a dead end.
  *
- * The section rail (Movies, Music, Sports …) is a lens over the interest filter, so a section
+ * The world stays a quiet field and answers the question: the stories that match are the lit
+ * seeds (highlight = result ids; nothing lit when nothing matches), every card lights its own
+ * seed on hover, and hovering a collection lights that collection's stories.
+ *
+ * The section line (Movies, Music, Sports …) is a lens over the interest filter, so a section
  * is just ?interest=… in the URL; /search?section=music is accepted as an entry point and
  * rewritten to that canonical form.
  */
@@ -18,15 +22,17 @@ import type { Section } from '../../../shared/sections.ts';
 import type { EntityKind } from '../../../shared/catalogue.ts';
 import { applyRelaxation, collectionVideos, searchCatalogue, SORT_KEYS, SORT_LABELS, type Relaxation, type SearchHit } from '../../../shared/search.ts';
 import { discoveryFromParams, discoveryToParams, discoveryToSearch } from '../../../shared/url-state.ts';
-import type { DiscoveryState, SortKey } from '../../../shared/types.ts';
+import type { Collection, DiscoveryState, ID, SortKey } from '../../../shared/types.ts';
 import { plural } from '../../lib/format.ts';
+import { useArrangement } from '../../stage/store.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
 import { isReducedMotion } from '../../systems/motion.ts';
 import { sound } from '../../systems/sound/engine.ts';
 import { Button } from '../../ui/controls.tsx';
 import { Dialog, EmptyState } from '../../ui/feedback.tsx';
-import { Icon, type IconName } from '../../ui/Icon.tsx';
+import { Icon } from '../../ui/Icon.tsx';
 import { Art, Row, VideoPod } from '../../ui/Pod.tsx';
+import { useHighlightPreview } from '../watch/seed.ts';
 import { FacetPanel } from './FacetPanel.tsx';
 import { activeFilters, clearFilters, filterCount, isFiltered, removeFilter } from './facets.ts';
 import { activeSection, searchSections, sectionCounts, sectionFromParam, withSection } from './sections.ts';
@@ -34,18 +40,8 @@ import './catalogue.css';
 
 const PAGE = 24;
 const TYPE_DELAY = 250;
-
-/** A distinct mark per section on the rail. */
-const SECTION_ICON: Record<string, IconName> = {
-  movies: 'film',
-  music: 'music',
-  sports: 'sport',
-  gaming: 'gamepad',
-  news: 'news',
-  fashion: 'hanger',
-  culture: 'palette',
-  kids: 'balloon',
-};
+/** A highlight no seed carries: "nothing matches" dims the whole field. */
+const NOTHING_LIT = ['none:no-match'];
 
 const KIND_LABEL: Partial<Record<EntityKind, string>> = {
   place: 'Place',
@@ -116,6 +112,10 @@ export default function CataloguePage() {
   const active = activeFilters(cat, state);
   const nFilters = filterCount(state);
 
+  /* The world: a quiet field; the matching stories are the lit seeds. */
+  const lit = useMemo<ID[] | null>(() => (browse ? null : result.total ? result.results.map((h) => h.video.id) : NOTHING_LIT), [browse, result]);
+  useArrangement({ kind: 'quiet' }, lit);
+
   const write = useCallback(
     (next: DiscoveryState, replace: boolean) => {
       if (typing.current !== null) {
@@ -183,12 +183,12 @@ export default function CataloguePage() {
 
   const panel = <FacetPanel cat={cat} state={state} facets={result.facets} onChange={update} idPrefix={wide ? 'side' : 'dlg'} />;
 
-  // Section rail: counts with every constraint except interests; the lit section matches exactly.
+  // Section line: counts with every constraint except interests; the lit section matches exactly.
   const sections = useMemo(() => searchSections(), []);
   const section = activeSection(state.interests, sections);
   const withoutInterests = useMemo(() => searchCatalogue(cat, { ...deferred, interests: [] }), [cat, deferred]);
   const counts = useMemo(() => sectionCounts(withoutInterests.results.map((h) => h.video), sections), [withoutInterests, sections]);
-  // a lit section scrolled out of the (phone-width) rail is brought into view
+  // a lit section scrolled out of the (phone-width) line is brought into view
   const railRef = useRef<HTMLUListElement>(null);
   const sectionId = section?.id ?? null;
   useEffect(() => {
@@ -206,42 +206,39 @@ export default function CataloguePage() {
   };
 
   return (
-    <div className="page cat">
-      <header className="wrap cat-head">
-        <h1 className="page-title cat-title">Search</h1>
-        <p className="page-lede cat-lede">Every story, person, place and era on Monumental — by what it is, where it lives and when it is set. Filters combine, and the link keeps them.</p>
-        <form className="cat-search" role="search" aria-label="Search the catalogue" onSubmit={submit}>
+    <div className="page srch">
+      <header className="wrap srch-head">
+        <h1 className="srch-title">Search</h1>
+        <form className="srch-field" role="search" aria-label="Search the catalogue" onSubmit={submit}>
           <label htmlFor="cat-q" className="sr-only">
             Search stories, people, places and eras
           </label>
-          <Icon name="search" size={22} />
+          <Icon name="search" size={24} />
           <input
             id="cat-q"
-            className="cat-input"
+            className="srch-input"
             type="search"
             value={draft}
             onChange={(e) => onType(e.target.value)}
-            placeholder="Search stories, people, places, eras…"
+            placeholder="Stories, people, places, eras…"
             autoComplete="off"
             spellCheck={false}
             enterKeyHint="search"
             data-cursor="text"
           />
           {draft ? (
-            <button type="button" className="cat-clear" aria-label="Clear the search" onClick={() => update((s) => ({ ...s, q: '' }))}>
+            <button type="button" className="srch-clear" aria-label="Clear the search" onClick={() => update((s) => ({ ...s, q: '' }))}>
               <Icon name="close" size={18} />
             </button>
           ) : null}
         </form>
-        <div className="cat-sections" role="group" aria-label="Sections">
-          <ul ref={railRef} className="cat-sections-list">
+        <p className="srch-lede">Filters combine, and the link keeps them. The stories that match light up in the world.</p>
+        <div className="srch-sections" role="group" aria-label="Sections">
+          <ul ref={railRef} className="srch-sections-list">
             <li>
-              <button type="button" className="cat-section" data-react="press ripple" aria-pressed={state.interests.length === 0} onClick={() => chooseSection(null)}>
-                <span className="cat-section-orb" aria-hidden="true">
-                  <Icon name="stream" size={18} />
-                </span>
-                <span className="cat-section-name">Everything</span>
-                <span className="cat-section-count">{withoutInterests.total}</span>
+              <button type="button" className="srch-section" aria-pressed={state.interests.length === 0} onClick={() => chooseSection(null)}>
+                <span className="srch-section-name">Everything</span>
+                <span className="srch-section-count">{withoutInterests.total}</span>
               </button>
             </li>
             {sections.map((s) => {
@@ -251,17 +248,16 @@ export default function CataloguePage() {
                 <li key={s.id}>
                   <button
                     type="button"
-                    className="cat-section" data-react="press ripple"
+                    className="srch-section"
+                    data-hue={s.id}
                     aria-pressed={on}
                     disabled={!on && n === 0}
                     title={!on && n === 0 ? `No ${s.label.toLowerCase()} stories match yet` : undefined}
                     onClick={() => chooseSection(s)}
                   >
-                    <span className="cat-section-orb" aria-hidden="true">
-                      <Icon name={SECTION_ICON[s.id] ?? (s.icon as IconName)} size={18} />
-                    </span>
-                    <span className="cat-section-name">{s.label}</span>
-                    <span className="cat-section-count">
+                    <span className="srch-section-dot" aria-hidden="true" />
+                    <span className="srch-section-name">{s.label}</span>
+                    <span className="srch-section-count">
                       {n}
                       <span className="sr-only"> {n === 1 ? 'story' : 'stories'}</span>
                     </span>
@@ -271,32 +267,32 @@ export default function CataloguePage() {
             })}
           </ul>
           {section ? (
-            <p className="cat-section-note">
+            <p className="srch-section-note">
               <span>
                 Searching <b>{section.label}</b> — {section.tagline}
               </span>
-              <Link to={section.path} className="cat-section-go" onClick={() => sound.play('transition')}>
+              <Link to={section.path} className="srch-section-go" onClick={() => sound.play('transition')}>
                 Open {section.label}
                 <Icon name="arrow" size={16} />
               </Link>
             </p>
           ) : state.interests.length ? (
-            <p className="cat-section-note">
+            <p className="srch-section-note">
               <span>Searching a custom mix of interests — see Filters.</span>
             </p>
           ) : null}
         </div>
       </header>
 
-      <div className={`wrap cat-layout ${wide ? 'cat-layout-wide' : ''}`}>
+      <div className={`wrap srch-layout ${wide ? 'srch-layout-wide' : ''}`}>
         {wide ? (
-          <aside className="cat-side" aria-labelledby="cat-filters-title">
-            <div className="cat-side-head">
-              <h2 id="cat-filters-title" className="cat-side-title">
+          <aside className="srch-side" aria-labelledby="cat-filters-title">
+            <div className="srch-side-head">
+              <h2 id="cat-filters-title" className="srch-side-title">
                 Filters
               </h2>
               {nFilters ? (
-                <button type="button" className="cat-text-btn" onClick={clearAll}>
+                <button type="button" className="srch-text-btn" onClick={clearAll}>
                   Clear filters
                 </button>
               ) : null}
@@ -305,30 +301,31 @@ export default function CataloguePage() {
           </aside>
         ) : null}
 
-        <section className="cat-results" aria-labelledby="cat-results-title">
-          <div className="cat-toolbar">
-            <div className="cat-toolbar-count">
-              <h2 id="cat-results-title" className="cat-results-title">
+        <section className="srch-results" aria-labelledby="cat-results-title">
+          <div className="srch-toolbar">
+            <div className="srch-toolbar-count">
+              <h2 id="cat-results-title" className="srch-results-title">
                 {browse ? 'All stories' : 'Results'}
               </h2>
-              <p className="cat-count" aria-hidden="true">
+              {/* .cat-count: a stable hook the phone journeys (journeys-mobile.spec.ts) read */}
+              <p className="srch-count cat-count" aria-hidden="true">
                 <b>{result.total}</b> {result.total === 1 ? 'story' : 'stories'}
               </p>
               <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
                 {announced}
               </p>
             </div>
-            <div className="cat-toolbar-tools">
+            <div className="srch-toolbar-tools">
               {!wide ? (
-                <Button variant="chrome" icon="filter" onClick={() => setFiltersOpen(true)} aria-haspopup="dialog">
+                <Button variant="ghost" icon="filter" onClick={() => setFiltersOpen(true)} aria-haspopup="dialog">
                   Filters{nFilters ? ` · ${nFilters}` : ''}
                 </Button>
               ) : null}
-              <div className="cat-sort">
-                <label htmlFor="cat-sort" className="cat-sort-label">
+              <div className="srch-sort">
+                <label htmlFor="cat-sort" className="srch-sort-label">
                   Sort
                 </label>
-                <select id="cat-sort" className="input cat-select" value={state.sort} onChange={(e) => update((s) => ({ ...s, sort: e.target.value as SortKey }))}>
+                <select id="cat-sort" className="input srch-select" value={state.sort} onChange={(e) => update((s) => ({ ...s, sort: e.target.value as SortKey }))}>
                   {SORT_KEYS.map((k) => (
                     <option key={k} value={k}>
                       {SORT_LABELS[k]}
@@ -340,13 +337,13 @@ export default function CataloguePage() {
           </div>
 
           {active.length ? (
-            <div className="cat-active" role="group" aria-label="Active filters">
+            <div className="srch-active" role="group" aria-label="Active filters">
               <ul>
                 {active.map((f) => (
                   <li key={`${f.key}:${f.value ?? ''}`}>
                     <button
                       type="button"
-                      className={`cat-active-chip cat-tone-${f.tone}`}
+                      className={`srch-active-chip srch-tone-${f.tone}`}
                       aria-label={f.removeLabel}
                       onClick={() => {
                         sound.play('unsave');
@@ -354,12 +351,12 @@ export default function CataloguePage() {
                       }}
                     >
                       <span>{f.label}</span>
-                      <Icon name="close" size={14} />
+                      <Icon name="close" size={13} />
                     </button>
                   </li>
                 ))}
               </ul>
-              <button type="button" className="cat-text-btn" onClick={clearAll}>
+              <button type="button" className="srch-text-btn" onClick={clearAll}>
                 Clear all
               </button>
             </div>
@@ -371,7 +368,7 @@ export default function CataloguePage() {
 
           {result.total ? (
             <>
-              <ul className="grid-pods cat-grid">
+              <ul className="grid-pods srch-grid">
                 {result.results.slice(0, limit).map((hit, i) => (
                   <li key={hit.video.id}>
                     <VideoPod video={hit.video} priority={i < 3} footer={deferred.q.trim() && hit.matched.length ? <Matched hit={hit} /> : undefined} />
@@ -379,19 +376,19 @@ export default function CataloguePage() {
                 ))}
               </ul>
               {result.total > limit ? (
-                <div className="cat-more">
-                  <Button variant="chrome" icon="down" onClick={() => setLimit((l) => l + PAGE)}>
+                <div className="srch-more">
+                  <Button variant="ghost" icon="down" onClick={() => setLimit((l) => l + PAGE)}>
                     Show {Math.min(PAGE, result.total - limit)} more of {result.total - limit}
                   </Button>
                 </div>
               ) : null}
               {result.relaxations.length ? (
-                <div className="cat-widen">
-                  <p className="cat-widen-title">Only a few matches. Widen the search:</p>
+                <div className="srch-widen">
+                  <p className="srch-widen-title">Only a few matches. Widen the search:</p>
                   <ul>
                     {result.relaxations.slice(0, 4).map((r) => (
                       <li key={`${r.key}:${r.value ?? ''}`}>
-                        <button type="button" className="cat-relax" onClick={() => relax(r)}>
+                        <button type="button" className="srch-relax" onClick={() => relax(r)}>
                           {r.label} <span aria-hidden="true">→</span> <b>{plural(r.count, 'story', 'stories')}</b>
                         </button>
                       </li>
@@ -411,7 +408,7 @@ export default function CataloguePage() {
               actions={
                 <>
                   {result.relaxations.slice(0, 4).map((r) => (
-                    <button key={`${r.key}:${r.value ?? ''}`} type="button" className="btn btn-chrome btn-md cat-relax-btn" onClick={() => relax(r)}>
+                    <button key={`${r.key}:${r.value ?? ''}`} type="button" className="btn btn-ghost btn-md srch-relax-btn" onClick={() => relax(r)}>
                       <span>
                         {r.label} → {plural(r.count, 'story', 'stories')}
                       </span>
@@ -435,8 +432,8 @@ export default function CataloguePage() {
 
       {!wide ? (
         <Dialog open={filtersOpen} onClose={closeFilters} title="Filters" wide labelledBy="cat-filters-dialog-title">
-          <div className="cat-dialog-body">{panel}</div>
-          <div className="cat-dialog-foot">
+          <div className="srch-dialog-body">{panel}</div>
+          <div className="srch-dialog-foot">
             <Button variant="quiet" onClick={clearAll} disabled={!nFilters}>
               Clear all
             </Button>
@@ -452,8 +449,8 @@ export default function CataloguePage() {
 
 function Matched({ hit }: { hit: SearchHit }) {
   return (
-    <p className="cat-matched">
-      <span className="cat-matched-k">Matched</span> {hit.matched.slice(0, 3).join(' · ')}
+    <p className="srch-matched">
+      <span className="srch-matched-k">Matched</span> {hit.matched.slice(0, 3).join(' · ')}
     </p>
   );
 }
@@ -461,17 +458,17 @@ function Matched({ hit }: { hit: SearchHit }) {
 function Entities({ entities }: { entities: { id: string; kind: EntityKind; label: string }[] }) {
   const cat = useCatalogue();
   return (
-    <nav className="cat-entities" aria-labelledby="cat-entities-title">
-      <h3 id="cat-entities-title" className="cat-block-title">
+    <nav className="srch-entities" aria-labelledby="cat-entities-title">
+      <h3 id="cat-entities-title" className="srch-block-title">
         Places, people and eras
       </h3>
       <ul>
         {entities.map((e) => (
           <li key={e.id}>
-            <Link to={cat.href(e.id)} className="cat-entity" data-kind={e.kind} onClick={() => sound.play('transition')}>
-              <span className="cat-entity-kind">{KIND_LABEL[e.kind] ?? e.kind}</span>
-              <span className="cat-entity-label">{e.label}</span>
-              <Icon name="arrow" size={16} />
+            <Link to={cat.href(e.id)} className="srch-entity" data-kind={e.kind} onClick={() => sound.play('transition')}>
+              <span className="srch-entity-kind">{KIND_LABEL[e.kind] ?? e.kind}</span>
+              <span className="srch-entity-label">{e.label}</span>
+              <Icon name="arrow" size={15} />
             </Link>
           </li>
         ))}
@@ -482,24 +479,35 @@ function Entities({ entities }: { entities: { id: string; kind: EntityKind; labe
 
 function QuickStart() {
   const cat = useCatalogue();
-  const items = useMemo(() => cat.collections.map((c) => ({ c, n: collectionVideos(cat, c).length })), [cat]);
+  const items = useMemo(() => cat.collections.map((c) => ({ c, ids: collectionVideos(cat, c).map((v) => v.id) })), [cat]);
   if (!items.length) return null;
   return (
-    <nav className="cat-quick" aria-labelledby="cat-quick-title">
-      <h3 id="cat-quick-title" className="cat-block-title">
+    <nav className="srch-quick" aria-labelledby="cat-quick-title">
+      <h3 id="cat-quick-title" className="srch-block-title">
         Start with a collection
       </h3>
       <Row label="Collections">
-        {items.map(({ c, n }) => (
-          <Link key={c.id} to={cat.href(c.id)} className="cat-quick-link" draggable={false} data-cursor="view" data-cursor-label="Open" onClick={() => sound.play('transition')}>
-            <Art art={c.art} alt="" />
-            <span className="cat-quick-body">
-              <span className="cat-quick-title">{c.title}</span>
-              <span className="cat-quick-count">{n ? plural(n, 'story', 'stories') : 'No stories yet'}</span>
-            </span>
-          </Link>
+        {items.map(({ c, ids }) => (
+          <QuickLink key={c.id} collection={c} ids={ids} />
         ))}
       </Row>
     </nav>
+  );
+}
+
+/** A collection; while hovered or focused its stories are the ones lit in the world. */
+function QuickLink({ collection: c, ids }: { collection: Collection; ids: ID[] }) {
+  const cat = useCatalogue();
+  const preview = useHighlightPreview(() => ids);
+  return (
+    <Link to={cat.href(c.id)} className="srch-quick-link" draggable={false} data-cursor="view" data-cursor-label="Open" onClick={() => sound.play('transition')} {...preview.handlers}>
+      <span className="srch-quick-art">
+        <Art art={c.art} alt="" />
+      </span>
+      <span className="srch-quick-body">
+        <span className="srch-quick-title">{c.title}</span>
+        <span className="srch-quick-count">{ids.length ? plural(ids.length, 'story', 'stories') : 'No stories yet'}</span>
+      </span>
+    </Link>
   );
 }

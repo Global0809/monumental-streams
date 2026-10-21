@@ -7,13 +7,17 @@
  * Keyboard: the web is one tab stop (roving focus). Arrow keys walk the ring, Home/End jump,
  * Enter or Space opens. The "Why these are connected" list on the page is the full text
  * alternative.
+ *
+ * The web answers the living world: pointing at or focusing a story node lights its seed
+ * (setHovered), and a seed under the pointer in the world lights its node here.
  */
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type KeyboardEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { kindOf } from '../../../shared/catalogue.ts';
 import { graphFor } from '../../../shared/relations.ts';
 import type { ID, Video } from '../../../shared/types.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
+import { setHovered, stageStore } from '../../stage/store.ts';
 import { sound } from '../../systems/sound/engine.ts';
 import { Segmented } from '../../ui/controls.tsx';
 import { EmptyState } from '../../ui/feedback.tsx';
@@ -46,7 +50,7 @@ export function pageAction(cat: ReturnType<typeof useCatalogue>, id: ID): { labe
   }
 }
 
-export function NeuralGraph({ centreId, centreArt, depth, onDepth, reduced, lead, details }: { centreId: ID; centreArt?: ID; depth: 1 | 2; onDepth: (d: 1 | 2) => void; reduced: boolean; lead: ReactNode; details?: ReactNode }) {
+export function NeuralGraph({ centreId, centreArt, depth, onDepth, reduced }: { centreId: ID; centreArt?: ID; depth: 1 | 2; onDepth: (d: 1 | 2) => void; reduced: boolean }) {
   const cat = useCatalogue();
   const navigate = useNavigate();
   const boxRef = useRef<HTMLDivElement>(null);
@@ -85,10 +89,25 @@ export function NeuralGraph({ centreId, centreArt, depth, onDepth, reduced, lead
   const layout = useMemo(() => (width ? layoutGraph(graph, width) : null), [graph, width]);
   const ring = useMemo(() => (layout ? layout.order.filter((id) => id !== centreId) : []), [layout, centreId]);
 
-  const current = hover ?? pinned;
+  // a story's seed under the pointer in the world lights its node here
+  const worldHovered = useSyncExternalStore(
+    stageStore.subscribe,
+    () => stageStore.get().hovered,
+    () => null,
+  );
+  const fromWorld: Focus = worldHovered && worldHovered !== centreId && layout?.byId.has(worldHovered) ? { type: 'node', id: worldHovered } : null;
+  const current = hover ?? fromWorld ?? pinned;
+  const seedOf = (f: Focus) => (f?.type === 'node' && kindOf(f.id) === 'video' ? f.id : null);
   const activate = (f: Focus) => {
     setHover(f);
     if (f) setPinned(f);
+    const seed = seedOf(f);
+    if (seed) setHovered(seed);
+  };
+  const deactivate = () => {
+    const seed = seedOf(hover);
+    setHover(null);
+    if (seed && stageStore.get().hovered === seed) setHovered(null);
   };
 
   // Which nodes / edges are lit by the current focus.
@@ -201,201 +220,215 @@ export function NeuralGraph({ centreId, centreArt, depth, onDepth, reduced, lead
     if (!layout) return n.label;
     const first = edgesOf(layout, n.id)[0];
     const via = n.depth === 2 && n.parent ? ` Two steps out, via ${cat.label(n.parent)}.` : '';
-    const why = first ? ` ${first.reasons.slice(0, 3).map((r) => r.label).join('; ')}.` : '';
+    const why = first
+      ? ` ${first.reasons
+          .slice(0, 3)
+          .map((r) => r.label)
+          .join('; ')}.`
+      : '';
     return `${n.label} — ${KIND_LABEL[n.kind]}.${via}${why}`;
   };
 
   return (
-    <div className="syn-stage">
-      <div className="syn-lead">{lead}</div>
-
-      <div className="syn-graph-col" id="syn-web">
-        <div className="syn-toolbar">
-          <h2 className="syn-web-title">
-            <span className="kicker">
-              <b>The web</b>
-            </span>
-            <span className="serif">{direct ? `${direct} direct connection${direct === 1 ? '' : 's'}` : 'No connections yet'}</span>
+    <div className="syn-web">
+      <div className="syn-toolbar">
+        <div className="syn-web-head">
+          <p className="eyebrow">
+            <b>The web</b>
+          </p>
+          <h2 id="syn-web-h" className="syn-h2">
+            {direct ? `${direct} direct connection${direct === 1 ? '' : 's'}` : 'No connections yet'}
           </h2>
-          <Segmented
-            label="Reach"
-            hideLabel
-            value={String(depth) as '1' | '2'}
-            onChange={(v) => onDepth(v === '2' ? 2 : 1)}
-            options={[
-              { value: '1', label: 'Direct' },
-              { value: '2', label: 'Two steps out' },
-            ]}
-          />
         </div>
-        {presentKinds.length ? (
-          <ul className="syn-legend" aria-label="Node kinds">
-            {presentKinds.map((k) => (
-              <li key={k}>
-                <span className="syn-dot" data-kind={k} aria-hidden="true" />
-                {KIND_PLURAL[k]} <span className="syn-legend-n">{graph.nodes.filter((n) => n.depth > 0 && n.kind === k).length}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <div ref={boxRef} className="syn-graph" data-visible={visible || undefined} data-lit={lit ? true : undefined}>
-          {!direct ? (
-            <EmptyState icon="synapse" title="This node has no connections yet">
-              <p>As stories, people and places are added, links appear here automatically.</p>
-            </EmptyState>
-          ) : layout && centre ? (
-            <svg className="syn-svg" viewBox={`0 0 ${layout.width} ${layout.height}`} width={layout.width} height={layout.height} role="group" aria-label={`Connection web around ${centre.label}`} aria-describedby="syn-web-hint" data-compact={layout.compact || undefined}>
-              <defs>
-                <clipPath id="syn-clip" clipPathUnits="objectBoundingBox">
-                  <circle cx="0.5" cy="0.5" r="0.5" />
-                </clipPath>
-                <radialGradient id="syn-aura" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" style={{ stopColor: 'var(--iris)', stopOpacity: 0.22 }} />
-                  <stop offset="100%" style={{ stopColor: 'var(--iris)', stopOpacity: 0 }} />
-                </radialGradient>
-              </defs>
-
-              {/* Orbit guides */}
-              <g className="syn-orbits" aria-hidden="true">
-                {[...new Set(layout.nodes.filter((n) => n.depth > 0).map((n) => n.depth))].map((d) => {
-                  const ns = layout.nodes.filter((n) => n.depth === d);
-                  const rx = Math.max(...ns.map((n) => Math.abs(n.x - centre.x)));
-                  const ry = Math.max(...ns.map((n) => Math.abs(n.y - centre.y)));
-                  return <ellipse key={d} cx={centre.x} cy={centre.y} rx={rx} ry={ry} />;
-                })}
-              </g>
-
-              {/* Axons */}
-              <g className="syn-edges">
-                {layout.edges.map((e, i) => {
-                  const on = lit?.edges.has(e.key);
-                  const dur = 2.4 + (i % 5) * 0.45 + Math.min(e.length, 600) / 600;
-                  return (
-                    <g key={e.key} className="syn-axon" data-cross={e.cross || undefined} data-on={on || undefined} data-dim={(lit && !on) || undefined}>
-                      <path className="syn-edge" d={e.d} style={{ strokeWidth: 0.8 + (Math.min(e.weight, 20) / 20) * 2.4 }} />
-                      {reduced ? null : <path className="syn-pulse" d={e.d} pathLength={100} style={{ animationDuration: `${dur.toFixed(2)}s`, animationDelay: `-${((i * 0.77) % dur).toFixed(2)}s` }} />}
-                      <path className="syn-edge-hit" d={e.d} onPointerEnter={() => activate({ type: 'edge', key: e.key })} onPointerLeave={() => setHover(null)} />
-                    </g>
-                  );
-                })}
-              </g>
-
-              {/* Centre */}
-              <g className="syn-centre" data-kind={centre.kind} transform={`translate(${centre.x} ${centre.y})`} aria-hidden="true">
-                <circle className="syn-centre-aura" r={centre.r * 2.2} fill="url(#syn-aura)" />
-                <circle className="syn-centre-halo" r={centre.r + 9} />
-                <circle className="syn-centre-core" r={centre.r} />
-                {centreArt && cat.artFor(centreArt) ? (
-                  <image href={cat.artFor(centreArt)!.posterSmall} x={-centre.r} y={-centre.r} width={centre.r * 2} height={centre.r * 2} clipPath="url(#syn-clip)" preserveAspectRatio="xMidYMid slice" />
-                ) : (
-                  <circle className="syn-centre-nucleus" r={centre.r * 0.34} />
-                )}
-                <circle className="syn-centre-ring" r={centre.r} />
-              </g>
-
-              {/* Nodes */}
-              <g className="syn-nodes">
-                {ring.map((id, i) => {
-                  const n = layout.byId.get(id)!;
-                  const art = n.kind === 'video' ? cat.artFor((cat.get(id) as Video | undefined)?.art) : null;
-                  const on = lit?.nodes.has(id);
-                  return (
-                    <g
-                      key={id}
-                      ref={(el) => {
-                        if (el) nodeEls.current.set(id, el);
-                        else nodeEls.current.delete(id);
-                      }}
-                      className="syn-node"
-                      data-kind={n.kind}
-                      data-depth={n.depth}
-                      data-on={(current?.type === 'node' && current.id === id) || undefined}
-                      data-dim={(lit && !on) || undefined}
-                      transform={`translate(${n.x.toFixed(1)} ${n.y.toFixed(1)})`}
-                      role="link"
-                      tabIndex={i === roving ? 0 : -1}
-                      aria-label={ariaFor(n)}
-                      data-cursor="open"
-                      data-cursor-label="Travel"
-                      onClick={() => go(id)}
-                      onKeyDown={(e) => onNodeKey(e, i, id)}
-                      onFocus={() => {
-                        setRoving(i);
-                        activate({ type: 'node', id });
-                      }}
-                      onBlur={() => setHover(null)}
-                      onPointerEnter={() => activate({ type: 'node', id })}
-                      onPointerLeave={() => setHover(null)}
-                    >
-                      <circle className="syn-node-hit" r={Math.max(n.r + 6, 22)} />
-                      <circle className="syn-node-glow" r={n.r + 5} />
-                      {art ? (
-                        <image href={n.depth === 1 ? art.posterSmall : art.lqip} x={-n.r} y={-n.r} width={n.r * 2} height={n.r * 2} clipPath="url(#syn-clip)" preserveAspectRatio="xMidYMid slice" />
-                      ) : (
-                        <>
-                          <circle className="syn-node-core" r={n.r} />
-                          <circle className="syn-node-nucleus" r={Math.max(1.6, n.r * 0.32)} />
-                        </>
-                      )}
-                      <circle className="syn-node-ring" r={n.r} />
-                    </g>
-                  );
-                })}
-              </g>
-
-              {/* Labels on top, never interactive */}
-              <g className="syn-labels" aria-hidden="true">
-                <text className="syn-label syn-label-centre" x={centre.caption.x} y={centre.caption.y} textAnchor="middle">
-                  {centre.caption.lines.map((l, k) => (
-                    <tspan key={k} x={centre.caption.x} dy={k ? (layout.compact ? 13 : 16) : 0}>
-                      {l}
-                    </tspan>
-                  ))}
-                </text>
-                {ring.map((id) => {
-                  const n = layout.byId.get(id)!;
-                  const on = current?.type === 'node' && current.id === id;
-                  if (!n.caption.shown && !on) return null;
-                  return (
-                    <text key={id} className="syn-label" data-on={on || undefined} data-dim={(lit && !lit.nodes.has(id)) || undefined} data-depth={n.depth} x={n.caption.x} y={n.caption.y} textAnchor={n.caption.anchor}>
-                      {n.caption.lines.map((l, k) => (
-                        <tspan key={k} x={n.caption.x} dy={k ? (layout.compact ? 12 : 14) : 0}>
-                          {l}
-                        </tspan>
-                      ))}
-                    </text>
-                  );
-                })}
-              </g>
-            </svg>
-          ) : (
-            <div className="syn-svg-skeleton" aria-hidden="true" />
-          )}
-          {tip ? (
-            <div className="syn-tip" style={{ left: `${tip.left}%`, top: `${tip.top}%`, ['--off' as string]: `${tip.off}px` }} data-below={tip.below || undefined} data-align={tip.align} aria-hidden="true">
-              <span className="syn-tip-kind">{tip.kind}</span>
-              <strong className="syn-tip-title">{tip.title}</strong>
-              {tip.reasons.length ? (
-                <ul>
-                  {tip.reasons.map((r) => (
-                    <li key={r}>{r}</li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-        <p id="syn-web-hint" className="syn-hint">
-          <span className="syn-hint-fine">Hover or focus a node to see why it is connected · click or press Enter to travel there · arrow keys walk the web</span>
-          <span className="syn-hint-touch">Tap a node to travel to its synapse · every link is explained in words below</span>
-        </p>
+        <Segmented
+          label="Reach"
+          hideLabel
+          value={String(depth) as '1' | '2'}
+          onChange={(v) => onDepth(v === '2' ? 2 : 1)}
+          options={[
+            { value: '1', label: 'Direct' },
+            { value: '2', label: 'Two steps out' },
+          ]}
+        />
       </div>
+      {presentKinds.length ? (
+        <ul className="syn-legend" aria-label="Node kinds">
+          {presentKinds.map((k) => (
+            <li key={k}>
+              <span className="syn-dot" data-kind={k} aria-hidden="true" />
+              {KIND_PLURAL[k]} <span className="syn-legend-n">{graph.nodes.filter((n) => n.depth > 0 && n.kind === k).length}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <div className="syn-web-body">
+        <div className="syn-graph-col">
+          <div ref={boxRef} className="syn-graph" data-visible={visible || undefined} data-lit={lit ? true : undefined}>
+            {!direct ? (
+              <EmptyState icon="synapse" title="This node has no connections yet">
+                <p>As stories, people and places are added, links appear here automatically.</p>
+              </EmptyState>
+            ) : layout && centre ? (
+              <svg
+                className="syn-svg"
+                viewBox={`0 0 ${layout.width} ${layout.height}`}
+                width={layout.width}
+                height={layout.height}
+                role="group"
+                aria-label={`Connection web around ${centre.label}`}
+                aria-describedby="syn-web-hint"
+                data-compact={layout.compact || undefined}
+              >
+                <defs>
+                  <clipPath id="syn-clip" clipPathUnits="objectBoundingBox">
+                    <circle cx="0.5" cy="0.5" r="0.5" />
+                  </clipPath>
+                  <radialGradient id="syn-aura" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" style={{ stopColor: 'var(--iris)', stopOpacity: 0.22 }} />
+                    <stop offset="100%" style={{ stopColor: 'var(--iris)', stopOpacity: 0 }} />
+                  </radialGradient>
+                </defs>
 
-      <aside className="syn-card panel panel-pad" aria-label="Connection details">
-        {layout ? <Card focus={current} layout={layout} centreId={centreId} /> : null}
-      </aside>
+                {/* Orbit guides */}
+                <g className="syn-orbits" aria-hidden="true">
+                  {[...new Set(layout.nodes.filter((n) => n.depth > 0).map((n) => n.depth))].map((d) => {
+                    const ns = layout.nodes.filter((n) => n.depth === d);
+                    const rx = Math.max(...ns.map((n) => Math.abs(n.x - centre.x)));
+                    const ry = Math.max(...ns.map((n) => Math.abs(n.y - centre.y)));
+                    return <ellipse key={d} cx={centre.x} cy={centre.y} rx={rx} ry={ry} />;
+                  })}
+                </g>
 
-      {details ? <div className="syn-details-wrap">{details}</div> : null}
+                {/* Axons */}
+                <g className="syn-edges">
+                  {layout.edges.map((e, i) => {
+                    const on = lit?.edges.has(e.key);
+                    const dur = 2.4 + (i % 5) * 0.45 + Math.min(e.length, 600) / 600;
+                    return (
+                      <g key={e.key} className="syn-axon" data-cross={e.cross || undefined} data-on={on || undefined} data-dim={(lit && !on) || undefined}>
+                        <path className="syn-edge" d={e.d} style={{ strokeWidth: 0.8 + (Math.min(e.weight, 20) / 20) * 2.4 }} />
+                        {reduced ? null : <path className="syn-pulse" d={e.d} pathLength={100} style={{ animationDuration: `${dur.toFixed(2)}s`, animationDelay: `-${((i * 0.77) % dur).toFixed(2)}s` }} />}
+                        <path className="syn-edge-hit" d={e.d} onPointerEnter={() => activate({ type: 'edge', key: e.key })} onPointerLeave={deactivate} />
+                      </g>
+                    );
+                  })}
+                </g>
+
+                {/* Centre */}
+                <g className="syn-centre" data-kind={centre.kind} transform={`translate(${centre.x} ${centre.y})`} aria-hidden="true">
+                  <circle className="syn-centre-aura" r={centre.r * 2.2} fill="url(#syn-aura)" />
+                  <circle className="syn-centre-halo" r={centre.r + 9} />
+                  <circle className="syn-centre-core" r={centre.r} />
+                  {centreArt && cat.artFor(centreArt) ? (
+                    <image href={cat.artFor(centreArt)!.posterSmall} x={-centre.r} y={-centre.r} width={centre.r * 2} height={centre.r * 2} clipPath="url(#syn-clip)" preserveAspectRatio="xMidYMid slice" />
+                  ) : (
+                    <circle className="syn-centre-nucleus" r={centre.r * 0.34} />
+                  )}
+                  <circle className="syn-centre-ring" r={centre.r} />
+                </g>
+
+                {/* Nodes */}
+                <g className="syn-nodes">
+                  {ring.map((id, i) => {
+                    const n = layout.byId.get(id)!;
+                    const art = n.kind === 'video' ? cat.artFor((cat.get(id) as Video | undefined)?.art) : null;
+                    const on = lit?.nodes.has(id);
+                    return (
+                      <g
+                        key={id}
+                        ref={(el) => {
+                          if (el) nodeEls.current.set(id, el);
+                          else nodeEls.current.delete(id);
+                        }}
+                        className="syn-node"
+                        data-kind={n.kind}
+                        data-depth={n.depth}
+                        data-on={(current?.type === 'node' && current.id === id) || undefined}
+                        data-dim={(lit && !on) || undefined}
+                        transform={`translate(${n.x.toFixed(1)} ${n.y.toFixed(1)})`}
+                        role="link"
+                        tabIndex={i === roving ? 0 : -1}
+                        aria-label={ariaFor(n)}
+                        data-cursor="open"
+                        data-cursor-label="Travel"
+                        onClick={() => go(id)}
+                        onKeyDown={(e) => onNodeKey(e, i, id)}
+                        onFocus={() => {
+                          setRoving(i);
+                          activate({ type: 'node', id });
+                        }}
+                        onBlur={deactivate}
+                        onPointerEnter={() => activate({ type: 'node', id })}
+                        onPointerLeave={deactivate}
+                      >
+                        <circle className="syn-node-hit" r={Math.max(n.r + 6, 22)} />
+                        <circle className="syn-node-glow" r={n.r + 5} />
+                        {art ? (
+                          <image href={n.depth === 1 ? art.posterSmall : art.lqip} x={-n.r} y={-n.r} width={n.r * 2} height={n.r * 2} clipPath="url(#syn-clip)" preserveAspectRatio="xMidYMid slice" />
+                        ) : (
+                          <>
+                            <circle className="syn-node-core" r={n.r} />
+                            <circle className="syn-node-nucleus" r={Math.max(1.6, n.r * 0.32)} />
+                          </>
+                        )}
+                        <circle className="syn-node-ring" r={n.r} />
+                      </g>
+                    );
+                  })}
+                </g>
+
+                {/* Labels on top, never interactive */}
+                <g className="syn-labels" aria-hidden="true">
+                  <text className="syn-label syn-label-centre" x={centre.caption.x} y={centre.caption.y} textAnchor="middle">
+                    {centre.caption.lines.map((l, k) => (
+                      <tspan key={k} x={centre.caption.x} dy={k ? (layout.compact ? 13 : 16) : 0}>
+                        {l}
+                      </tspan>
+                    ))}
+                  </text>
+                  {ring.map((id) => {
+                    const n = layout.byId.get(id)!;
+                    const on = current?.type === 'node' && current.id === id;
+                    if (!n.caption.shown && !on) return null;
+                    return (
+                      <text key={id} className="syn-label" data-on={on || undefined} data-dim={(lit && !lit.nodes.has(id)) || undefined} data-depth={n.depth} x={n.caption.x} y={n.caption.y} textAnchor={n.caption.anchor}>
+                        {n.caption.lines.map((l, k) => (
+                          <tspan key={k} x={n.caption.x} dy={k ? (layout.compact ? 12 : 14) : 0}>
+                            {l}
+                          </tspan>
+                        ))}
+                      </text>
+                    );
+                  })}
+                </g>
+              </svg>
+            ) : (
+              <div className="syn-svg-skeleton" aria-hidden="true" />
+            )}
+            {tip ? (
+              <div className="syn-tip" style={{ left: `${tip.left}%`, top: `${tip.top}%`, ['--off' as string]: `${tip.off}px` }} data-below={tip.below || undefined} data-align={tip.align} aria-hidden="true">
+                <span className="syn-tip-kind">{tip.kind}</span>
+                <strong className="syn-tip-title">{tip.title}</strong>
+                {tip.reasons.length ? (
+                  <ul>
+                    {tip.reasons.map((r) => (
+                      <li key={r}>{r}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+          <p id="syn-web-hint" className="syn-hint">
+            <span className="syn-hint-fine">Hover or focus a node to see why it is connected · click or press Enter to travel there · arrow keys walk the web</span>
+            <span className="syn-hint-touch">Tap a node to travel to its synapse · every link is explained in words below</span>
+          </p>
+        </div>
+
+        <aside className="syn-card" aria-label="Connection details">
+          {layout ? <Card focus={current} layout={layout} centreId={centreId} /> : null}
+        </aside>
+      </div>
     </div>
   );
 }
@@ -407,10 +440,10 @@ function Card({ focus, layout, centreId }: { focus: Focus; layout: ReturnType<ty
     if (e) {
       return (
         <div className="syn-card-body">
-          <p className="kicker">
+          <p className="syn-card-kind">
             <b>Axon</b> · {e.reasons.length} reason{e.reasons.length === 1 ? '' : 's'}
           </p>
-          <h3 className="syn-card-title serif">
+          <h3 className="syn-card-title">
             {cat.label(e.from)} <span className="syn-card-join">⟷</span> {cat.label(e.to)}
           </h3>
           <ReasonChips reasons={e.reasons} max={6} />
@@ -425,19 +458,17 @@ function Card({ focus, layout, centreId }: { focus: Focus; layout: ReturnType<ty
       const page = pageAction(cat, n.id);
       return (
         <div className="syn-card-body">
-          <p className="kicker">
+          <p className="syn-card-kind">
             <span className="syn-dot" data-kind={n.kind} aria-hidden="true" /> <b>{KIND_LABEL[n.kind]}</b>
             {n.depth === 2 && n.parent ? ` · via ${cat.label(n.parent)}` : ''}
           </p>
-          <h3 className="syn-card-title serif">{n.label}</h3>
+          <h3 className="syn-card-title">{n.label}</h3>
           <ul className="syn-card-ties">
             {ties.map((t) => {
               const other = t.from === n.id ? t.to : t.from;
               return (
                 <li key={t.key}>
-                  <p className="syn-card-pair">
-                    {other === centreId ? 'Why it is here' : `Also tied to ${cat.label(other)}`}
-                  </p>
+                  <p className="syn-card-pair">{other === centreId ? 'Why it is here' : `Also tied to ${cat.label(other)}`}</p>
                   <ReasonChips reasons={t.reasons} max={4} />
                 </li>
               );
@@ -462,13 +493,20 @@ function Card({ focus, layout, centreId }: { focus: Focus; layout: ReturnType<ty
   const direct = layout.nodes.filter((x) => x.depth === 1).sort((a, b) => b.weight - a.weight);
   return (
     <div className="syn-card-body">
-      <p className="kicker">
+      <p className="syn-card-kind">
         <b>Reading the web</b>
       </p>
-      <h3 className="syn-card-title serif">{direct.length ? `Strongest: ${direct[0].label}` : 'A quiet node'}</h3>
+      <h3 className="syn-card-title">{direct.length ? `Strongest: ${direct[0].label}` : 'A quiet node'}</h3>
       <p className="muted">
         {direct.length
-          ? `Thicker axons carry more shared reasons. ${direct.length > 1 ? `Next strongest: ${direct.slice(1, 3).map((x) => x.label).join(' and ')}.` : ''} Point at any node or axon — or tab into the web — to read why it is linked.`
+          ? `Thicker axons carry more shared reasons. ${
+              direct.length > 1
+                ? `Next strongest: ${direct
+                    .slice(1, 3)
+                    .map((x) => x.label)
+                    .join(' and ')}.`
+                : ''
+            } Point at any node or axon — or tab into the web — to read why it is linked.`
           : 'Nothing in the archive links here yet.'}
       </p>
     </div>

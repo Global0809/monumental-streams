@@ -267,7 +267,9 @@ function countNodes(tree: TreeNode[]): number {
   return tree.reduce((s, n) => s + 1 + countNodes(n.children), 0);
 }
 
-/* ───────────── Sphere geometry ───────────── */
+/* ───────────── Sphere geometry ─────────────
+ * The living globe is drawn by the shared stage (src/stage). These pure helpers and the camera
+ * targets below no longer drive a page-owned globe; they remain for their unit tests. */
 
 export type Vec3 = [number, number, number];
 const RAD = Math.PI / 180;

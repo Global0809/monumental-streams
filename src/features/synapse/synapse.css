@@ -1,6 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════
-   THE SYNAPSE — Chrome Bloom
-   A soft web of light around one entity on the violet night.
+   CONNECTIONS — an editorial layer over the living world in focus.
+   The entity reads on the left while the world draws its connected stories in on the open
+   side; the neural web below floats unboxed over the world (a soft dark well behind it keeps
+   it legible); glass only for the reading card. No boxes inside boxes.
    Kind colours: place / story iris · route iris-2 · decade / movement frost ·
    person / programme gold · interest / theme pearl.
    ═══════════════════════════════════════════════════════════════ */
@@ -38,44 +40,55 @@
   box-shadow: 0 0 10px var(--k);
 }
 
-/* ───────── Stage: lead + web + reading card ───────── */
-.syn-stage {
+/* ───────── The first screen: the entity, with the world in the open side ───────── */
+.syn-hero {
   display: grid;
+  align-content: start;
   gap: clamp(1.75rem, 3vw, 2.5rem);
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: 'lead' 'graph' 'card' 'details';
+  max-width: 40rem;
 }
 @media (min-width: 1100px) {
-  .syn-stage {
-    grid-template-columns: minmax(20rem, 0.8fr) minmax(0, 1.55fr);
-    grid-template-areas: 'lead graph' 'card graph' 'details graph';
-    grid-template-rows: auto auto 1fr;
-    column-gap: clamp(2rem, 4vw, 4rem);
-    align-items: start;
+  .syn-hero {
+    min-height: calc(78svh - clamp(1.5rem, 5vw, 4rem));
+    max-width: 36rem;
   }
 }
-.syn-lead {
-  grid-area: lead;
-  min-width: 0;
-}
-.syn-graph-col {
-  grid-area: graph;
-  min-width: 0;
-}
-.syn-card {
-  grid-area: card;
-  min-width: 0;
-}
-.syn-details-wrap {
-  grid-area: details;
-  min-width: 0;
+.syn-section {
+  margin-top: var(--section-gap);
 }
 .syn-details {
   display: grid;
   gap: 1rem;
 }
 .syn-details-title {
-  margin-bottom: -0.2rem;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 540;
+  letter-spacing: -0.02em;
+  color: var(--pearl);
+}
+.syn-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.8rem;
+  font-size: var(--step--1);
+  color: var(--lilac-dim);
+}
+.syn-mark {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.syn-h2 {
+  font-family: var(--font-display);
+  font-size: var(--step-4);
+  font-weight: 460;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--pearl);
 }
 
 /* ───────── Entity header ───────── */
@@ -86,8 +99,8 @@
 .syn-head-art {
   position: relative;
   width: 100%;
-  max-width: 560px;
-  margin-bottom: 0.6rem;
+  max-width: 22rem;
+  margin-top: 0.2rem;
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-card);
   overflow: hidden;
@@ -141,14 +154,7 @@
 }
 .syn-lede {
   max-width: 52ch;
-  font-size: var(--step-1);
-  line-height: 1.55;
-  color: var(--lilac);
-}
-.syn-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  text-shadow: 0 1px 14px rgb(7 6 12 / 0.9);
 }
 .syn-body {
   display: grid;
@@ -211,23 +217,58 @@
 }
 
 /* ───────── The web ───────── */
+.syn-web-head {
+  display: grid;
+  gap: 0.6rem;
+}
+.syn-web-body {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+  margin-top: 1rem;
+}
+@media (min-width: 1100px) {
+  .syn-web-body {
+    grid-template-columns: minmax(0, 1.65fr) minmax(18rem, 0.8fr);
+    column-gap: clamp(2rem, 4vw, 3.5rem);
+    align-items: start;
+  }
+}
+.syn-graph-col {
+  min-width: 0;
+}
+.syn-card {
+  min-width: 0;
+  padding: clamp(1rem, 2.4vw, 1.5rem);
+  border-radius: var(--radius-panel);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgb(24 20 36 / 0.78), rgb(12 10 19 / 0.86));
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(16px) saturate(1.15);
+}
+@media (min-width: 1100px) {
+  .syn-card {
+    position: sticky;
+    top: 2rem;
+  }
+}
+.syn-card-kind {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--lilac-dim);
+}
+.syn-card-kind b {
+  color: var(--pearl);
+}
 .syn-toolbar {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: end;
   gap: 0.9rem 1rem;
-}
-.syn-web-title {
-  display: grid;
-  gap: 0.4rem;
-}
-.syn-web-title .serif {
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 400;
-  line-height: 1.02;
-  letter-spacing: -0.035em;
 }
 .syn-toolbar .segmented button {
   min-height: var(--hit);
@@ -252,18 +293,11 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* unboxed: the web floats over the world; a soft dark well behind it keeps labels legible */
 .syn-graph {
   position: relative;
-  margin-top: 1.1rem;
   min-height: 260px;
-  border-radius: var(--radius-panel);
-  border: 1px solid var(--line);
-  background:
-    radial-gradient(50% 50% at 50% 50%, color-mix(in oklab, var(--iris) 14%, transparent), transparent 72%),
-    radial-gradient(90% 80% at 50% 0%, color-mix(in oklab, var(--iris-deep) 26%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in oklab, var(--night-2) 70%, transparent), color-mix(in oklab, var(--night) 85%, transparent));
-  box-shadow: var(--shadow-float);
-  overflow: hidden;
+  background: radial-gradient(closest-side, rgb(7 6 12 / 0.72), rgb(7 6 12 / 0.45) 72%, transparent);
 }
 .syn-graph .empty {
   margin: 1rem;
@@ -482,9 +516,9 @@
 }
 .syn-card-title {
   font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 600;
-  line-height: 1.04;
+  font-size: var(--step-2);
+  font-weight: 540;
+  line-height: 1.08;
   letter-spacing: -0.035em;
   overflow-wrap: break-word;
 }
@@ -515,26 +549,23 @@
 .syn-groups {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
-  gap: 1.25rem;
+  gap: 2.5rem clamp(1.5rem, 3vw, 3rem);
   align-items: start;
 }
+/* columns of text, not boxes: a hairline in the kind's colour heads each group */
 .syn-group {
-  padding: 1.4rem 1.5rem 0.6rem;
-  border-radius: var(--radius-panel);
-  border: 1px solid var(--line);
-  background:
-    radial-gradient(80% 50% at 0% 0%, color-mix(in oklab, var(--k) 9%, transparent), transparent 70%),
-    var(--glass);
+  padding-top: 1rem;
+  border-top: 1px solid color-mix(in oklab, var(--k) 45%, transparent);
 }
 .syn-group-title {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   font-family: var(--font-display);
-  font-size: var(--step-2);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-size: var(--step-1);
+  font-weight: 540;
+  letter-spacing: -0.02em;
 }
 .syn-group-count {
   margin-left: auto;
@@ -559,6 +590,9 @@
 }
 .syn-link:first-child {
   border-top: 0;
+}
+.syn-link[data-world-lit] .syn-link-name {
+  color: var(--gold);
 }
 .syn-link-head {
   display: flex;
@@ -696,23 +730,18 @@
   align-items: center;
   gap: 0.45rem;
   min-height: var(--hit);
-  padding: 0 1.05rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line-2);
-  background: var(--glass);
-  color: var(--lilac);
+  color: var(--iris);
   font-size: var(--step--1);
   font-weight: 600;
   cursor: pointer;
   list-style: none;
-  transition: color var(--t-mid), border-color var(--t-mid);
+  transition: color var(--t-mid);
 }
 .syn-more > summary::-webkit-details-marker {
   display: none;
 }
 .syn-more > summary:hover {
   color: var(--pearl);
-  border-color: color-mix(in oklab, var(--iris) 45%, transparent);
 }
 .syn-more[open] > summary svg {
   transform: rotate(45deg);

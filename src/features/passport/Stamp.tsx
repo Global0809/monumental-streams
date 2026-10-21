@@ -1,7 +1,8 @@
 /**
  * One passport seal per stop: a soft chrome disc while unstamped, and a gold seal once earned
  * (place name on the rim, country code, stop number and the date it was stamped).
- * The SVG is decorative; the caption beneath carries the same facts as text.
+ * The SVG is decorative; the caption beneath carries the same facts as text. The stop the
+ * globe is turned to (data-current) carries an iris ring.
  */
 import { useId, type CSSProperties } from 'react';
 import type { Place } from '../../../shared/types.ts';
@@ -9,7 +10,7 @@ import { stampDate, tiltFor, type StampInfo } from './logic.ts';
 
 const FRESH_MS = 15 * 60_000;
 
-export function Stamp({ place, index, stamp, status }: { place: Place; index: number; stamp: StampInfo | null; status: string }) {
+export function Stamp({ place, index, stamp, status, current }: { place: Place; index: number; stamp: StampInfo | null; status: string; current?: boolean }) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const n = String(index + 1).padStart(2, '0');
   const name = place.name.toUpperCase();
@@ -18,7 +19,7 @@ export function Stamp({ place, index, stamp, status }: { place: Place; index: nu
   const fresh = !!stamp && Date.now() - stamp.at < FRESH_MS;
 
   return (
-    <li className="pp-stamp" data-on={stamp ? '' : undefined} data-fresh={fresh || undefined}>
+    <li className="pp-stamp" data-on={stamp ? '' : undefined} data-fresh={fresh || undefined} data-current={current || undefined}>
       <svg className="pp-stamp-svg" viewBox="0 0 120 120" aria-hidden="true" style={{ '--pp-tilt': `${stamp ? tiltFor(place.id) : 0}deg` } as CSSProperties}>
         {stamp ? (
           <g className="pp-seal-on">

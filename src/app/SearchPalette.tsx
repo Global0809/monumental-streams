@@ -1,17 +1,23 @@
 /**
- * Search utility: a command-palette overlay with live results from the shared search engine.
+ * Search utility: a command palette with live results from the shared search engine.
  * Combobox pattern (input + listbox with aria-activedescendant): arrows move, Enter opens,
  * Escape closes (native <dialog>). "See all" carries the query into the full search page,
- * where it combines with every filter.
+ * where it combines with every filter. Matching destinations are offered too.
+ *
+ * The world listens: the story under the active option lights its seed in the living world
+ * (setHovered), and lets go when the palette closes.
  */
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { defaultDiscovery, searchCatalogue } from '../../shared/search.ts';
 import { runtimeLabel, settingLabel } from '../lib/format.ts';
 import { useCatalogue } from '../state/catalogue.tsx';
+import { setHovered, stageStore } from '../stage/store.ts';
 import { sound } from '../systems/sound/engine.ts';
 import { Dialog } from '../ui/feedback.tsx';
-import { Icon } from '../ui/Icon.tsx';
+import { Icon, type IconName } from '../ui/Icon.tsx';
+import { matchingSections } from './palette-options.ts';
+import './palette.css';
 
 interface Option {
   id: string;
@@ -19,7 +25,9 @@ interface Option {
   title: string;
   meta: string;
   thumb?: string;
-  kind: 'video' | 'entity' | 'all';
+  icon?: IconName;
+  hue?: string;
+  kind: 'video' | 'entity' | 'section' | 'all';
 }
 
 const KIND_LABEL: Record<string, string> = {
@@ -38,6 +46,7 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
   const [q, setQ] = useState('');
   const [activeIndex, setActive] = useState(0);
   const input = useRef<HTMLInputElement>(null);
+  const lit = useRef<string | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -65,11 +74,36 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
       thumb: cat.artFor(v.art)?.posterSmall,
       kind: 'video',
     }));
+    const dests: Option[] = matchingSections(query).map((s) => ({ id: `section:${s.id}`, href: s.path, title: s.label, meta: s.tagline, icon: s.icon as IconName, hue: s.id, kind: 'section' }));
     const ents: Option[] = res.entities.slice(0, 4).map((e) => ({ id: e.id, href: cat.href(e.id), title: e.label, meta: KIND_LABEL[e.kind] ?? e.kind, kind: 'entity' }));
-    return [...vids, ...ents, { id: 'all', href: `/catalogue?q=${encodeURIComponent(query)}`, title: `See all results for “${query}”`, meta: `${res.total} ${res.total === 1 ? 'story' : 'stories'}`, kind: 'all' }];
+    return [
+      ...vids,
+      ...dests,
+      ...ents,
+      { id: 'all', href: `/catalogue?q=${encodeURIComponent(query)}`, title: `See all results for “${query}”`, meta: `${res.total} ${res.total === 1 ? 'story' : 'stories'}`, kind: 'all' },
+    ];
   }, [cat, q]);
 
   useEffect(() => setActive(0), [q]);
+
+  // the active story's seed lights up in the world while the palette is open
+  const active = options[activeIndex];
+  useEffect(() => {
+    const id = open && active?.kind === 'video' ? active.id : null;
+    if (id) {
+      lit.current = id;
+      setHovered(id);
+    } else if (lit.current) {
+      if (stageStore.get().hovered === lit.current) setHovered(null);
+      lit.current = null;
+    }
+  }, [open, active]);
+  useEffect(
+    () => () => {
+      if (lit.current && stageStore.get().hovered === lit.current) setHovered(null);
+    },
+    [],
+  );
 
   const go = (o: Option | undefined) => {
     if (!o) return;
@@ -97,7 +131,7 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
     <Dialog open={open} onClose={onClose} title="Search" wide>
       <div className="palette">
         <div className="palette-field">
-          <Icon name="search" size={20} />
+          <Icon name="search" size={22} />
           <input
             ref={input}
             className="palette-input"
@@ -108,7 +142,7 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
             aria-activedescendant={options[activeIndex] ? `pal-${activeIndex}` : undefined}
             aria-autocomplete="list"
             aria-label="Search stories, people, places and eras"
-            placeholder="Search stories, people, places, eras…"
+            placeholder="Stories, people, places, eras…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={onKey}
@@ -116,7 +150,7 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
             enterKeyHint="search"
           />
         </div>
-        <p className="palette-hint">{q.trim() ? 'Results update as you type' : 'Start typing, or jump to something new'}</p>
+        <p className="palette-hint eyebrow">{q.trim() ? 'Results' : 'Newest to watch'}</p>
         <ul id="palette-list" role="listbox" aria-label="Search results" className="palette-list">
           {options.map((o, i) => (
             <li
@@ -125,18 +159,37 @@ export function SearchPalette({ open, onClose }: { open: boolean; onClose: () =>
               role="option"
               aria-selected={i === activeIndex}
               className={`palette-option palette-${o.kind}`}
+              data-hue={o.hue}
               onPointerMove={() => setActive(i)}
               onClick={() => go(o)}
             >
-              {o.thumb ? <img src={o.thumb} alt="" className="palette-thumb" /> : <span className="palette-thumb palette-glyph" aria-hidden="true"><Icon name={o.kind === 'all' ? 'arrow' : 'synapse'} size={18} /></span>}
+              {o.thumb ? (
+                <img src={o.thumb} alt="" className="palette-thumb" />
+              ) : (
+                <span className="palette-thumb palette-glyph" aria-hidden="true">
+                  <Icon name={o.icon ?? (o.kind === 'all' ? 'arrow' : 'synapse')} size={18} />
+                </span>
+              )}
               <span className="palette-text">
                 <span className="palette-title">{o.title}</span>
-                <span className="palette-meta">{o.meta}</span>
+                <span className="palette-meta">{o.kind === 'section' ? `Destination · ${o.meta}` : o.meta}</span>
               </span>
               <Icon name="right" size={16} />
             </li>
           ))}
         </ul>
+        <p className="palette-keys" aria-hidden="true">
+          <span>
+            <kbd>↑</kbd>
+            <kbd>↓</kbd> move
+          </span>
+          <span>
+            <kbd>Enter</kbd> open
+          </span>
+          <span>
+            <kbd>Esc</kbd> close
+          </span>
+        </p>
       </div>
     </Dialog>
   );

@@ -15,12 +15,14 @@ import {
   knobAngle,
   newSeed,
   parseSeed,
+  poolIds,
   poolStats,
   queueHref,
   snapMinutes,
   whereLevel,
   whereOptions,
   withOption,
+  worldFor,
 } from '../../src/features/somewhere/logic.ts';
 import { NOW, fixtureCatalogue, fixturePayload } from './fixture.ts';
 
@@ -146,5 +148,25 @@ describe('journeys', () => {
     expect(guest.locked).toBeGreaterThan(0); // Brixton Sound Systems and Block Party need a membership
     const nowhere = poolStats(cat, { ...DEFAULT_DIAL, where: 'place:kingston' }, true, NOW);
     expect(nowhere).toEqual({ count: 0, seconds: 0, locked: 0 });
+  });
+});
+
+describe('the world', () => {
+  it('lights exactly the stories GO would draw from while dialling', () => {
+    const music = { ...DEFAULT_DIAL, interest: 'interest:music' };
+    const ids = poolIds(cat, music, false, NOW);
+    expect(ids).toHaveLength(poolStats(cat, music, false, NOW).count);
+    expect(ids.every((id) => (cat.get(id) as { categories: string[] }).categories.includes('interest:music'))).toBe(true);
+    expect(worldFor(null, ids)).toEqual({ arrangement: { kind: 'quiet' }, highlight: ids });
+    expect(worldFor(null, [])).toEqual({ arrangement: { kind: 'quiet' }, highlight: null });
+  });
+
+  it('brings a plan forward: first stop in focus, the others linked to it, all lit', () => {
+    const plan = planJourney(cat, { minutes: 30, seed: 7, premium: false }, NOW);
+    const stops = plan.items.map((i) => i.video.id);
+    const w = worldFor(stops, ['video:ignored']);
+    expect(w.arrangement).toEqual({ kind: 'focus', video: stops[0], related: stops.slice(1) });
+    expect(w.highlight).toEqual(stops);
+    expect(worldFor([], ['video:a'])).toEqual({ arrangement: { kind: 'quiet' }, highlight: ['video:a'] });
   });
 });

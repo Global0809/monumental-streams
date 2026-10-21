@@ -1,30 +1,36 @@
 /**
- * CULTURE PASSPORT — journeys through places, stamped as you watch.
+ * CULTURE PASSPORT — journeys through places, stamped as you watch. An editorial column over
+ * the living world: the globe turns to the next stop to stamp and every story set at a stop
+ * glows (the stage highlight), so the journey is drawn in the world itself.
  *
  * The URL is the journey (/passport?stops=slug,slug&title=…; no stops = the first ready-made
- * journey). A booklet shows the route schematic on the left page and one ink stamp per stop on
- * the right. A stop is stamped when the viewer has a passport stamp for it or for any place
+ * journey). A stop is stamped when the viewer has a passport stamp for it or for any place
  * inside it (the player stamps every place of a video once 60% has been watched).
  * Ready-made journeys are derived from the catalogue; viewers can build, rename, reorder,
  * save and share their own.
+ *
+ * World ⇄ page: "Show on the globe" (or clicking a stop on the globe) flies the camera to that
+ * stop; pointing at a stop lights its place; story cards light their seeds and the reverse.
  */
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { activeJourneys } from '../../../shared/library.ts';
-import type { ID, Journey, Place, Video } from '../../../shared/types.ts';
+import type { ID, Journey, Place } from '../../../shared/types.ts';
 import { jumpTo, useChapters } from '../../app/chapters.ts';
-import { FOOTAGE_LABEL, dateLabel, plural, runtimeLabel, settingLabel } from '../../lib/format.ts';
+import type { Arrangement } from '../../stage/contract.ts';
+import { setHighlight, useArrangement, useStageEvent } from '../../stage/store.ts';
+import { dateLabel, plural } from '../../lib/format.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
 import { libraryActions, useLibrary } from '../../state/library.ts';
 import { isTouch } from '../../systems/device.ts';
 import { isReducedMotion } from '../../systems/motion.ts';
-import { flyToMyWorld } from '../../systems/reactive.ts';
 import { sound } from '../../systems/sound/engine.ts';
-import { Button, ButtonLink, IconButton } from '../../ui/controls.tsx';
+import { Button, IconButton } from '../../ui/controls.tsx';
 import { EmptyState, toast } from '../../ui/feedback.tsx';
 import { Icon } from '../../ui/Icon.tsx';
-import { AccessBadge, Art, SectionHeader } from '../../ui/Pod.tsx';
-import { StudioLoop } from '../somewhere/StudioLoop.tsx';
+import { Art, SectionHeader, VideoPod } from '../../ui/Pod.tsx';
+import { announceSave } from '../../ui/save.ts';
+import { setHotPlace, useHot } from '../atlas/parts.tsx';
 import {
   MAX_STOPS,
   MAX_TITLE,
@@ -45,7 +51,6 @@ import {
   type StampInfo,
 } from './logic.ts';
 import { PlaceCombobox } from './PlaceCombobox.tsx';
-import { RouteSchematic } from './RouteSchematic.tsx';
 import { SealDefs, Stamp } from './Stamp.tsx';
 import './passport.css';
 
@@ -102,8 +107,40 @@ export default function PassportPage() {
   }, [complete, contentKey]);
   const totalStamps = Object.keys(lib.stamps).length;
 
+  /* ── The world: the next stop in front, every story along the journey glowing ── */
+  const [focus, setFocus] = useState<ID | null>(null);
+  const next = stops.find((s) => !stampMap.get(s)) ?? stops[0];
+  const focused = focus && stops.includes(focus) ? focus : (next ?? null);
+  const arrangement = useMemo<Arrangement>(() => (focused ? { kind: 'world', place: focused } : { kind: 'world' }), [focused]);
+  const highlight = useMemo(() => {
+    if (!stops.length) return null;
+    const ids = new Set<ID>();
+    for (const s of stops) for (const v of storiesFor(cat, s)) ids.add(v.id);
+    return [...ids];
+  }, [cat, stops]);
+  useArrangement(arrangement);
+  // set apart from useArrangement: stops with no stories ([] — nothing glows) differ from no journey (null)
+  const highlightKey = highlight ? `ids:${highlight.join('|')}` : 'all';
+  useEffect(() => {
+    setHighlight(highlight);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightKey]);
+  const onPlaceActivate = useCallback(
+    ({ id }: { id: ID }) => {
+      if (stops.includes(id)) setFocus(id);
+      else if (cat.get(id)) navigate(cat.href(id));
+    },
+    [stops, cat, navigate],
+  );
+  useStageEvent('placeActivate', onPlaceActivate);
+  useEffect(() => () => setHotPlace(null), []);
+  const showOnGlobe = (id: ID) => {
+    sound.play('transition');
+    setFocus(id);
+  };
+
   /* ── Editing (always through the URL) ── */
-  const write = (nextStops: ID[], nextTitle: string | null) => navigate({ search: `?${passportSearch(cat, nextStops, nextTitle)}` }, { replace: true });
+  const write = (nextStops: ID[], nextTitle: string | null) => navigate({ search: `?${passportSearch(cat, nextStops, nextTitle)}` }, { replace: true, preventScrollReset: true });
   const comboRef = useRef<HTMLInputElement>(null);
   const btns = useRef(new Map<string, HTMLButtonElement | null>());
   const pendingFocus = useRef<string | null>(null);
@@ -127,17 +164,20 @@ export default function PassportPage() {
   const move = (i: number, dir: -1 | 1) => {
     const j = i + dir;
     if (j < 0 || j >= stops.length) return;
-    const next = [...stops];
-    [next[i], next[j]] = [next[j], next[i]];
+    const nextStops = [...stops];
+    [nextStops[i], nextStops[j]] = [nextStops[j], nextStops[i]];
     pendingFocus.current = `${stops[i]}|${dir < 0 ? 'up' : 'down'}`;
-    write(next, explicitTitle);
+    write(nextStops, explicitTitle);
   };
   const remove = (i: number) => {
     const before = stops;
     const name = cat.label(stops[i]);
     const neighbour = stops[i + 1] ?? stops[i - 1];
     pendingFocus.current = neighbour ? `${neighbour}|remove` : 'combo';
-    write(stops.filter((_, k) => k !== i), explicitTitle);
+    write(
+      stops.filter((_, k) => k !== i),
+      explicitTitle,
+    );
     sound.play('unsave');
     toast(`Removed ${name} from this journey`, { action: { label: 'Undo', run: () => write(before, explicitTitle) } });
   };
@@ -155,14 +195,12 @@ export default function PassportPage() {
     const id = before ? before.id : journeyId(stops, title);
     libraryActions.saveJourney({ id, title, kind: 'passport', stops });
     setEditingId(id);
-    sound.play('save');
-    flyToMyWorld(from ?? null);
-    toast(before ? `Saved changes to “${title}”` : `Saved “${title}” to My World`, {
-      tone: 'success',
-      action: {
-        label: 'Undo',
-        run: () => (before ? libraryActions.saveJourney({ id: before.id, title: before.title, kind: 'passport', stops: before.stops }) : libraryActions.removeJourney(id)),
-      },
+    announceSave({
+      saved: true,
+      title,
+      from,
+      message: before ? `Saved changes to “${title}”` : undefined,
+      undo: () => (before ? libraryActions.saveJourney({ id: before.id, title: before.title, kind: 'passport', stops: before.stops }) : libraryActions.removeJourney(id)),
     });
   };
   const unsave = (j: Journey) => {
@@ -174,7 +212,8 @@ export default function PassportPage() {
     });
   };
   const share = async () => {
-    const url = `${window.location.origin}/passport?${passportSearch(cat, stops, title)}`;
+    // BASE_URL keeps the link right on a sub-path host (the static GitHub Pages build)
+    const url = `${window.location.origin}${import.meta.env.BASE_URL}passport?${passportSearch(cat, stops, title)}`;
     if (isTouch() && typeof navigator.share === 'function') {
       try {
         await navigator.share({ title, url });
@@ -194,10 +233,12 @@ export default function PassportPage() {
   const onOpen = (savedId: string | null) => {
     sound.play('transition');
     setEditingId(savedId);
+    setFocus(null);
     requestAnimationFrame(() => jumpTo('pp-booklet'));
   };
   const startBlank = () => {
     setEditingId(null);
+    setFocus(null);
     navigate({ search: '?stops=' });
     requestAnimationFrame(() => {
       document.getElementById('pp-build')?.scrollIntoView({ behavior: isReducedMotion() ? 'auto' : 'smooth', block: 'start' });
@@ -209,89 +250,78 @@ export default function PassportPage() {
   const km = routeKm(places);
   const groups = (Object.keys(READY_GROUP_LABEL) as ReadyGroup[]).map((g) => ({ g, list: ready.filter((r) => r.group === g) })).filter((x) => x.list.length);
 
-  const actions = (
-    <>
-      <Button variant={exact ? 'ghost' : 'primary'} icon={exact ? 'saved' : 'save'} aria-pressed={!!exact} onClick={(e) => (exact ? unsave(exact) : save(e.currentTarget))} data-cursor="save">
-        {exact ? 'Saved' : editing ? 'Save changes' : 'Save journey'}
-      </Button>
-      <Button variant="chrome" icon="share" onClick={share} disabled={!stops.length}>
-        Share
-      </Button>
-    </>
+  const saveButton = (primary: boolean) => (
+    <Button variant={exact ? 'aurum' : primary ? 'primary' : 'ghost'} size={primary ? 'lg' : 'md'} icon={exact ? 'saved' : 'save'} aria-pressed={!!exact} onClick={(e) => (exact ? unsave(exact) : save(e.currentTarget))} data-cursor="save">
+      {exact ? 'Saved' : editing ? 'Save changes' : 'Save journey'}
+    </Button>
+  );
+  const shareButton = (
+    <Button variant="ghost" icon="share" onClick={share} disabled={!stops.length}>
+      Share
+    </Button>
   );
 
   return (
-    <div className="page wrap pp-page">
+    <div className="pp">
       <SealDefs />
       <header className="pp-head">
-        <div className="pp-head-text">
-          <nav className="pp-crumbs" aria-label="Breadcrumb">
-            <Link to="/world">World</Link>
-            <span aria-hidden="true">/</span>
-            <span aria-current="page">Culture Passport</span>
-          </nav>
-          <p className="kicker">
-            Stamped so far · <b>{plural(totalStamps, 'place')}</b>
-          </p>
-          <h1 className="page-title">
-            Culture <em>Passport</em>
-          </h1>
-          <p className="page-lede">Journeys through places. Watch at least 60% of a story set at a stop and that place is stamped into your passport.</p>
-        </div>
-        <StudioLoop art="art:culture-passport" caption="Studio loop" className="pp-head-loop" />
+        <nav className="pp-crumbs" aria-label="Breadcrumb">
+          <Link to="/world">World</Link>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">Culture Passport</span>
+        </nav>
+        <p className="eyebrow">
+          Stamped so far · <b>{plural(totalStamps, 'place')}</b>
+        </p>
+        <h1 className="title-monument pp-title">
+          Culture <em>Passport</em>
+        </h1>
+        <p className="lede pp-lede">Journeys through places. Watch at least 60% of a story set at a stop and that place is stamped into your passport.</p>
       </header>
 
-      {/* ── The booklet ── */}
-      <section id="pp-booklet" className="pp-booklet-wrap" aria-labelledby="pp-journey-title">
-        <div className="pp-booklet">
-          <div className="pp-page pp-page-map">
-            <p className="kicker pp-page-kicker">{kicker}</p>
-            <h2 id="pp-journey-title" className="pp-journey-title">
-              {title}
-            </h2>
-            <RouteSchematic places={places} stamped={stampedSet} title={title} />
-            <p className="pp-map-foot">
-              {plural(places.length, 'stop')}
-              {places.length > 1 ? ` · about ${km < 10 ? km.toFixed(1) : Math.round(km).toLocaleString('en-GB')} km stop to stop` : ''}
-            </p>
-          </div>
-          <div className="pp-spine" aria-hidden="true" />
-          <div className="pp-page pp-page-stamps">
-            <h3 className="pp-stamps-title">Trail stamps</h3>
-            <div className="pp-progress">
-              <p className="pp-progress-label" aria-live="polite">
-                <span className="pp-progress-n">{stampedSet.size}</span> of {plural(stops.length, 'stamp')}
-              </p>
-              <div className="pp-progress-track" aria-hidden="true">
-                {stops.map((s) => (
-                  <span key={s} data-on={stampedSet.has(s) || undefined} />
-                ))}
-              </div>
-            </div>
-            {complete ? (
-              <div className="pp-complete" role="status">
-                <Icon name="passport" size={26} />
-                <p>
-                  <strong>Journey complete.</strong> Every stop on “{title}” is stamped.
-                </p>
-              </div>
-            ) : null}
-            {places.length ? (
-              <ol className="pp-stamps">
-                {places.map((p, i) => {
-                  const st = stampMap.get(p.id) ?? null;
-                  const stories = cat.videosForPlace(p.id, true);
-                  const status = st ? `Stamped ${shortDate(st.at)}` : stories.some((v) => cat.isPlayable(v)) ? 'Not yet stamped' : stories.length ? 'Stories planned' : 'No stories yet';
-                  return <Stamp key={p.id} place={p} index={i} stamp={st} status={status} />;
-                })}
-              </ol>
-            ) : (
-              <p className="pp-stamps-empty">No stops yet — add your first one below.</p>
-            )}
+      {/* ── The open journey ── */}
+      <section id="pp-booklet" className="pp-journey" aria-labelledby="pp-journey-title">
+        <p className="eyebrow">{kicker}</p>
+        <h2 id="pp-journey-title" className="pp-journey-title">
+          {title}
+        </h2>
+        <p className="pp-journey-meta">
+          {plural(places.length, 'stop')}
+          {places.length > 1 ? ` · about ${km < 10 ? km.toFixed(1) : Math.round(km).toLocaleString('en-GB')} km stop to stop` : ''}
+        </p>
+        <div className="pp-progress">
+          <p className="pp-progress-label" aria-live="polite">
+            <span className="pp-progress-n">{stampedSet.size}</span> of {plural(stops.length, 'stamp')}
+          </p>
+          <div className="pp-progress-track" aria-hidden="true">
+            {stops.map((s) => (
+              <span key={s} data-on={stampedSet.has(s) || undefined} />
+            ))}
           </div>
         </div>
+        {complete ? (
+          <div className="pp-complete" role="status">
+            <Icon name="passport" size={24} />
+            <p>
+              <strong>Journey complete.</strong> Every stop on “{title}” is stamped.
+            </p>
+          </div>
+        ) : null}
+        {places.length ? (
+          <ol className="pp-stamps">
+            {places.map((p, i) => {
+              const st = stampMap.get(p.id) ?? null;
+              const stories = cat.videosForPlace(p.id, true);
+              const status = st ? `Stamped ${shortDate(st.at)}` : stories.some((v) => cat.isPlayable(v)) ? 'Not yet stamped' : stories.length ? 'Stories planned' : 'No stories yet';
+              return <Stamp key={p.id} place={p} index={i} stamp={st} status={status} current={p.id === focused} />;
+            })}
+          </ol>
+        ) : (
+          <p className="pp-stamps-empty">No stops yet — add your first one below.</p>
+        )}
         <div className="pp-actions">
-          {actions}
+          {saveButton(true)}
+          {shareButton}
           <Button variant="quiet" icon="list" onClick={() => jumpTo('pp-build')}>
             Edit stops
           </Button>
@@ -302,25 +332,25 @@ export default function PassportPage() {
       </section>
 
       {/* ── Stops and their stories ── */}
-      <section id="pp-stops" className="section" aria-labelledby="pp-stops-title">
+      <section id="pp-stops" className="pp-sec" aria-labelledby="pp-stops-title">
         <SectionHeader kicker="Watch to stamp" title="Stops and stories" id="pp-stops-title">
           Stories set at each stop, including places inside it. Stamps are kept in My World on this device, or in your account when signed in.
         </SectionHeader>
         {places.length ? (
           <ol className="pp-stoplist">
             {places.map((p, i) => (
-              <StopCard key={p.id} place={p} index={i} stamp={stampMap.get(p.id) ?? null} />
+              <StopCard key={p.id} place={p} index={i} stamp={stampMap.get(p.id) ?? null} focused={p.id === focused} onShow={() => showOnGlobe(p.id)} />
             ))}
           </ol>
         ) : (
-          <EmptyState icon="passport" title="This journey has no stops yet" actions={<Button variant="primary" icon="plus" onClick={() => jumpTo('pp-build')}>Add a stop</Button>}>
+          <EmptyState icon="passport" title="This journey has no stops yet" actions={<Button variant="ghost" icon="plus" onClick={() => jumpTo('pp-build')}>Add a stop</Button>}>
             <p>Pick places below and their stories will appear here.</p>
           </EmptyState>
         )}
       </section>
 
       {/* ── Ready-made journeys ── */}
-      <section id="pp-journeys" className="section" aria-labelledby="pp-journeys-title">
+      <section id="pp-journeys" className="pp-sec" aria-labelledby="pp-journeys-title">
         <SectionHeader title="Ready-made journeys" id="pp-journeys-title">
           Routes from programmes, the launch gateway, cultural routes and the archive films — each with its stamp progress.
         </SectionHeader>
@@ -337,34 +367,24 @@ export default function PassportPage() {
                     <li key={r.key} className="pp-jcard" data-current={current || undefined}>
                       <div className="pp-jcard-art" aria-hidden="true">
                         {cover ? <Art art={cover} alt="" /> : null}
-                        <span className="pp-jcard-count" data-done={(n > 0 && n === r.stops.length) || undefined}>
-                          {n} of {plural(r.stops.length, 'stamp')}
-                        </span>
                       </div>
                       <p className="pp-jcard-meta">{r.kicker}</p>
-                      <h4 className="pp-jcard-title">{r.title}</h4>
+                      <h4 className="pp-jcard-title">
+                        {current ? (
+                          r.title
+                        ) : (
+                          <Link to={openHref(r.stops, r.title)} onClick={() => onOpen(null)}>
+                            {r.title}
+                          </Link>
+                        )}
+                      </h4>
                       <p className="pp-jcard-path">{pathLabel(cat.label, r.stops)}</p>
                       <p className="pp-jcard-sum">{r.summary}</p>
-                      {r.note ? (
-                        <p className="pp-jcard-note">
-                          <Icon name="info" size={14} />
-                          <span>{r.note}</span>
-                        </p>
-                      ) : null}
-                      <div className="pp-jcard-foot">
-                        <span className="sr-only">
-                          {n} of {plural(r.stops.length, 'stamp')}
-                        </span>
-                        {current ? (
-                          <span className="badge badge-free" aria-current="true">
-                            In your passport
-                          </span>
-                        ) : (
-                          <ButtonLink to={openHref(r.stops, r.title)} size="sm" variant="chrome" iconAfter="arrow" onClick={() => onOpen(null)}>
-                            Open journey
-                          </ButtonLink>
-                        )}
-                      </div>
+                      {r.note ? <p className="pp-jcard-note">{r.note}</p> : null}
+                      <p className="pp-jcard-foot" data-done={(n > 0 && n === r.stops.length) || undefined}>
+                        {n} of {plural(r.stops.length, 'stamp')}
+                        {current ? <span aria-current="true"> · In your passport</span> : null}
+                      </p>
                     </li>
                   );
                 })}
@@ -379,12 +399,12 @@ export default function PassportPage() {
       </section>
 
       {/* ── Build your own ── */}
-      <section id="pp-build" className="section" aria-labelledby="pp-build-title">
+      <section id="pp-build" className="pp-sec" aria-labelledby="pp-build-title">
         <SectionHeader kicker="Edit this journey" title="Build your own" id="pp-build-title">
-          Changes redraw the passport above and update its link straight away.
+          Changes redraw the passport above, turn the globe, and update the link straight away.
         </SectionHeader>
         <div className="pp-build">
-          <div className="pp-build-form panel panel-pad">
+          <div className="pp-build-form">
             <div className="field">
               <label htmlFor="pp-title-input">Journey title</label>
               <input
@@ -410,7 +430,10 @@ export default function PassportPage() {
               disabled={stops.length >= MAX_STOPS}
               hint={stops.length >= MAX_STOPS ? `This journey is full (${MAX_STOPS} stops).` : `${stops.length} of ${MAX_STOPS} stops used.`}
             />
-            <div className="pp-build-actions">{actions}</div>
+            <div className="pp-build-actions">
+              {saveButton(false)}
+              {shareButton}
+            </div>
           </div>
           <div className="pp-build-list">
             <h3 className="pp-build-sub" id="pp-order-title">
@@ -419,20 +442,7 @@ export default function PassportPage() {
             {places.length ? (
               <ol className="pp-edit" aria-labelledby="pp-order-title">
                 {places.map((p, i) => (
-                  <li key={p.id} className="pp-edit-row">
-                    <span className="pp-edit-n" aria-hidden="true">
-                      {i + 1}
-                    </span>
-                    <span className="pp-edit-name">
-                      <strong>{p.name}</strong>
-                      <small>{placeTrail(cat, p)}</small>
-                    </span>
-                    <span className="pp-edit-btns">
-                      <IconButton ref={(el) => void btns.current.set(`${p.id}|up`, el)} icon="up" size="sm" label={`Move ${p.name} up`} disabled={i === 0} onClick={() => move(i, -1)} />
-                      <IconButton ref={(el) => void btns.current.set(`${p.id}|down`, el)} icon="down" size="sm" label={`Move ${p.name} down`} disabled={i === places.length - 1} onClick={() => move(i, 1)} />
-                      <IconButton ref={(el) => void btns.current.set(`${p.id}|remove`, el)} icon="close" size="sm" label={`Remove ${p.name}`} onClick={() => remove(i)} />
-                    </span>
-                  </li>
+                  <EditRow key={p.id} place={p} index={i} last={i === places.length - 1} btns={btns.current} onMove={move} onRemove={remove} />
                 ))}
               </ol>
             ) : (
@@ -448,7 +458,7 @@ export default function PassportPage() {
       </section>
 
       {/* ── Saved journeys ── */}
-      <section id="pp-saved" className="section" aria-labelledby="pp-saved-title">
+      <section id="pp-saved" className="pp-sec" aria-labelledby="pp-saved-title">
         <SectionHeader kicker="My World" title="Saved journeys" id="pp-saved-title" />
         {saved.length ? (
           <ul className="pp-saved-list">
@@ -465,11 +475,12 @@ export default function PassportPage() {
                   </div>
                   <div className="pp-saved-act">
                     {current ? (
-                      <span className="badge badge-free">Open</span>
+                      <span className="pp-saved-open">Open now</span>
                     ) : (
-                      <ButtonLink to={openHref(j.stops, j.title)} size="sm" variant="chrome" onClick={() => onOpen(j.id)}>
-                        Open
-                      </ButtonLink>
+                      <Link to={openHref(j.stops, j.title)} className="pp-textlink" onClick={() => onOpen(j.id)}>
+                        Open <span className="sr-only">{j.title}</span>
+                        <span aria-hidden="true">→</span>
+                      </Link>
                     )}
                     <IconButton icon="trash" size="sm" label={`Remove saved journey ${j.title}`} onClick={() => unsave(j)} />
                   </div>
@@ -503,10 +514,34 @@ function journeyCover(cat: ReturnType<typeof useCatalogue>, r: ReadyJourney): ID
   return undefined;
 }
 
+/* ───────────── One row of the editor ───────────── */
+
+function EditRow({ place, index, last, btns, onMove, onRemove }: { place: Place; index: number; last: boolean; btns: Map<string, HTMLButtonElement | null>; onMove: (i: number, dir: -1 | 1) => void; onRemove: (i: number) => void }) {
+  const cat = useCatalogue();
+  const hot = useHot(place.id);
+  return (
+    <li className="pp-edit-row" {...hot}>
+      <span className="pp-edit-n" aria-hidden="true">
+        {index + 1}
+      </span>
+      <span className="pp-edit-name">
+        <strong>{place.name}</strong>
+        <small>{placeTrail(cat, place)}</small>
+      </span>
+      <span className="pp-edit-btns">
+        <IconButton ref={(el) => void btns.set(`${place.id}|up`, el)} icon="up" size="sm" label={`Move ${place.name} up`} disabled={index === 0} onClick={() => onMove(index, -1)} />
+        <IconButton ref={(el) => void btns.set(`${place.id}|down`, el)} icon="down" size="sm" label={`Move ${place.name} down`} disabled={last} onClick={() => onMove(index, 1)} />
+        <IconButton ref={(el) => void btns.set(`${place.id}|remove`, el)} icon="close" size="sm" label={`Remove ${place.name}`} onClick={() => onRemove(index)} />
+      </span>
+    </li>
+  );
+}
+
 /* ───────────── One stop with its stories ───────────── */
 
-function StopCard({ place, index, stamp }: { place: Place; index: number; stamp: StampInfo | null }) {
+function StopCard({ place, index, stamp, focused, onShow }: { place: Place; index: number; stamp: StampInfo | null; focused: boolean; onShow: () => void }) {
   const cat = useCatalogue();
+  const hot = useHot(place.id);
   const stories = useMemo(() => storiesFor(cat, place.id), [cat, place.id]);
   const playable = stories.filter((v) => cat.isPlayable(v));
   const via = stamp && stamp.place !== place.id ? cat.label(stamp.place) : null;
@@ -519,10 +554,10 @@ function StopCard({ place, index, stamp }: { place: Place; index: number; stamp:
         : 'No stories yet';
 
   return (
-    <li className="pp-stop" data-on={stamp ? '' : undefined}>
-      <header className="pp-stop-head">
+    <li className="pp-stop" data-on={stamp ? '' : undefined} data-focused={focused || undefined}>
+      <header className="pp-stop-head" {...hot}>
         <span className="pp-stop-num" aria-hidden="true">
-          {index + 1}
+          {String(index + 1).padStart(2, '0')}
         </span>
         <div className="pp-stop-id">
           <h3 className="pp-stop-name">
@@ -530,62 +565,43 @@ function StopCard({ place, index, stamp }: { place: Place; index: number; stamp:
             <Link to={cat.href(place.id)}>{place.name}</Link>
           </h3>
           <p className="pp-stop-trail">{placeTrail(cat, place)}</p>
+          <p className="pp-stop-status" data-on={stamp ? '' : undefined}>
+            {stamp ? <Icon name="check" size={14} /> : null}
+            {status}
+          </p>
         </div>
-        <p className="pp-stop-status" data-on={stamp ? '' : undefined}>
-          {stamp ? <Icon name="check" size={14} /> : null}
-          {status}
-        </p>
+        <button type="button" className="pp-locate" aria-pressed={focused} aria-label={`${focused ? 'On the globe' : 'Show on the globe'}: ${place.name}`} onClick={onShow}>
+          <Icon name="globe" size={16} />
+          <span>{focused ? 'On the globe' : 'Show on the globe'}</span>
+        </button>
       </header>
       {stories.length ? (
         <ul className="pp-stories">
           {stories.slice(0, STORIES_PER_STOP).map((v) => (
-            <StoryRow key={v.id} video={v} stampedBy={stamp?.video === v.id} stopStamped={!!stamp} />
+            <li key={v.id}>
+              <VideoPod
+                video={v}
+                size="sm"
+                footer={
+                  stamp?.video === v.id ? (
+                    <p className="pp-pod-stamp" data-on="">
+                      <Icon name="check" size={13} /> Stamped this stop
+                    </p>
+                  ) : !stamp && cat.isPlayable(v) ? (
+                    <p className="pp-pod-stamp">Watch 60% to stamp</p>
+                  ) : null
+                }
+              />
+            </li>
           ))}
         </ul>
       ) : (
-        <p className="pp-stop-empty">
-          {place.status === 'expanding' ? 'This place is mapped so the World can grow; no stories are set here yet.' : 'No stories are set here yet.'}
-        </p>
+        <p className="pp-stop-empty">{place.status === 'expanding' ? 'This place is mapped so the World can grow; no stories are set here yet.' : 'No stories are set here yet.'}</p>
       )}
       {stories.length > STORIES_PER_STOP ? (
-        <Link className="pp-stop-more" to={cat.href(place.id)}>
-          All {stories.length} stories in {place.name} <Icon name="arrow" size={14} />
+        <Link className="pp-textlink pp-stop-more" to={cat.href(place.id)}>
+          All {stories.length} stories in {place.name} <span aria-hidden="true">→</span>
         </Link>
-      ) : null}
-    </li>
-  );
-}
-
-function StoryRow({ video, stampedBy, stopStamped }: { video: Video; stampedBy: boolean; stopStamped: boolean }) {
-  const cat = useCatalogue();
-  const href = cat.href(video.id);
-  const runtime = cat.runtime(video);
-  const playable = cat.isPlayable(video);
-  const meta = [runtime ? runtimeLabel(runtime) : null, settingLabel(video), video.footage[0] ? FOOTAGE_LABEL[video.footage[0]] : null].filter(Boolean).join(' · ');
-  const verb = stopStamped ? 'Watch' : 'Watch to stamp';
-  return (
-    <li className="pp-story">
-      <Link to={href} className="pp-story-art" tabIndex={-1} aria-hidden="true" data-cursor={playable ? 'play' : 'open'} data-cursor-label={playable ? 'Watch' : 'Details'}>
-        <Art art={video.art} alt="" />
-      </Link>
-      <div className="pp-story-body">
-        <Link to={href} className="pp-story-title">
-          {video.title}
-        </Link>
-        <p className="pp-story-meta">{meta}</p>
-        <p className="pp-story-badges">
-          <AccessBadge video={video} />
-          {stampedBy ? (
-            <span className="pp-story-stamped">
-              <Icon name="check" size={13} /> Stamped this stop
-            </span>
-          ) : null}
-        </p>
-      </div>
-      {playable && !stampedBy ? (
-        <ButtonLink to={href} size="sm" variant={stopStamped ? 'quiet' : 'chrome'} icon="play" className="pp-story-go" aria-label={`${verb}: ${video.title}`} data-cursor="play" data-cursor-label="Watch">
-          {verb}
-        </ButtonLink>
       ) : null}
     </li>
   );

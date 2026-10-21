@@ -1,8 +1,8 @@
 /*
- * CULTURE PASSPORT — in Chrome Bloom.
- * An elegant booklet on glass: a route map in violet, iris and pearl on the left page, and a
- * page of soft chrome seals on the right that turn gold when earned. Below, stops with their
- * stories, image-led ready-made journeys, the builder on glass, and saved journeys.
+ * CULTURE PASSPORT — one editorial column over the living world. The globe on the open side
+ * turns to the next stop and lights every story along the journey; the column holds the
+ * seals, the stops and their stories, ready-made journeys and the builder. No booklet box,
+ * no panels inside panels: hairlines, space and the gold of an earned seal.
  */
 .pp-defs {
   position: absolute;
@@ -11,263 +11,99 @@
   overflow: hidden;
 }
 
-/* ───────────── Page head ───────────── */
+.pp {
+  --pp-col: min(33rem, 42vw);
+  padding: clamp(1.5rem, 5vw, 4.25rem) var(--gutter) var(--section-gap);
+  max-width: 1600px;
+  margin-inline: auto;
+}
+.pp > * {
+  max-width: var(--pp-col);
+}
+@media (max-width: 1023px), (max-aspect-ratio: 9/10) {
+  .pp {
+    --pp-col: 44rem;
+  }
+}
+
+/* ───────────── Head ───────────── */
 .pp-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 440px);
-  gap: clamp(1.5rem, 4vw, 4rem);
-  align-items: end;
-  margin-bottom: clamp(2rem, 4.5vw, 3.5rem);
+  justify-items: start;
+  container-type: inline-size;
 }
-.pp-head-text {
-  display: grid;
-  gap: 1rem;
-}
-/* the hero statement: large and light, like World's */
-.pp-head .page-title {
-  font-weight: 500;
-  letter-spacing: -0.04em;
-}
-/* Passport lives inside World: say so, and give one tap back */
 .pp-crumbs {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.55em;
+  margin-bottom: 1.4rem;
   font-size: var(--step--1);
   color: var(--lilac-dim);
 }
 .pp-crumbs a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
   color: var(--lilac);
   text-decoration: none;
-  transition: color var(--t-mid);
 }
 .pp-crumbs a:hover {
-  color: var(--gold);
+  color: var(--pearl);
 }
 .pp-crumbs [aria-current] {
-  color: var(--pearl);
+  color: var(--lilac-dim);
 }
-@media (pointer: coarse) {
-  .pp-crumbs a {
-    min-height: var(--hit);
-    min-width: var(--hit);
-  }
+.pp-title {
+  margin-top: 0.9rem;
+  /* fitted to the column by its longest word ("Passport") */
+  font-size: min(clamp(3.2rem, 0.9rem + 7.4vw, 10.5rem), calc(100cqi / 5.6));
+  line-height: 0.92;
+  padding-bottom: 0.04em;
 }
-@media (max-width: 899px) {
-  .pp-head {
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
-  }
-}
-@media (max-width: 767px) {
-  .pp-head {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .pp-head-loop {
-    display: none;
-  }
-  .pp-head .page-title {
-    font-size: var(--step-4);
-  }
-  .pp-head .page-lede {
-    font-size: var(--step-0);
-  }
+.pp-lede {
+  margin-top: 1.4rem;
+  max-width: 32rem;
 }
 
-/* ───────────── The booklet ───────────── */
-.pp-booklet-wrap {
-  scroll-margin-top: calc(var(--topbar-h) + 16px);
+/* ───────────── The open journey ───────────── */
+.pp-journey {
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  padding-top: clamp(1.75rem, 3vw, 2.25rem);
+  border-top: 1px solid color-mix(in oklab, var(--gold) 28%, var(--line));
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
 }
-.pp-booklet {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
-  padding: clamp(0.4rem, 0.8vw, 0.65rem);
-  border-radius: var(--radius-panel);
-  border: 1px solid var(--line);
-  background:
-    radial-gradient(60% 80% at 22% 0%, color-mix(in srgb, var(--iris-2) 13%, transparent), transparent 70%),
-    radial-gradient(50% 70% at 90% 100%, color-mix(in srgb, var(--gold) 5%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, var(--plum-2) 80%, transparent), color-mix(in srgb, var(--night-2) 86%, transparent));
-  box-shadow: var(--shadow-float), 0 0 160px -70px var(--iris-glow);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-.pp-page {
-  position: relative;
-  display: grid;
-  align-content: start;
-  gap: 0.9rem;
-  min-width: 0;
-  padding: clamp(1.25rem, 3vw, 2.5rem);
-}
-/* Each page darkens softly toward the fold. */
-.pp-page-map {
-  border-radius: calc(var(--radius-panel) - 8px) 0 0 calc(var(--radius-panel) - 8px);
-  background: linear-gradient(90deg, transparent 78%, color-mix(in srgb, var(--night) 32%, transparent));
-}
-.pp-page-stamps {
-  border-radius: 0 calc(var(--radius-panel) - 8px) calc(var(--radius-panel) - 8px) 0;
-  background: linear-gradient(270deg, transparent 78%, color-mix(in srgb, var(--night) 32%, transparent));
-}
-.pp-spine {
-  background: linear-gradient(180deg, transparent, var(--line-2) 10%, var(--line-2) 90%, transparent);
-}
-.pp-journey-title,
-.pp-stamps-title {
+.pp-journey-title {
+  margin-top: 0.7rem;
   font-family: var(--font-display);
   font-size: var(--step-3);
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.035em;
+  font-weight: 520;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
   color: var(--pearl);
-  overflow-wrap: break-word;
 }
-.pp-map {
-  width: 100%;
-  height: auto;
-  margin-top: 0.4rem;
-}
-.pp-map-foot {
+.pp-journey-meta {
+  margin-top: 0.8rem;
   font-size: var(--step--1);
   color: var(--lilac-dim);
 }
-
-@media (max-width: 899px) {
-  .pp-booklet {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto 1px auto;
-  }
-  .pp-page-map {
-    border-radius: calc(var(--radius-panel) - 8px) calc(var(--radius-panel) - 8px) 0 0;
-    background: linear-gradient(180deg, transparent 82%, color-mix(in srgb, var(--night) 30%, transparent));
-  }
-  .pp-page-stamps {
-    border-radius: 0 0 calc(var(--radius-panel) - 8px) calc(var(--radius-panel) - 8px);
-    background: linear-gradient(0deg, transparent 82%, color-mix(in srgb, var(--night) 30%, transparent));
-  }
-  .pp-spine {
-    background: linear-gradient(90deg, transparent, var(--line-2) 10%, var(--line-2) 90%, transparent);
-  }
-}
-
-/* ───────────── Route map (SVG) ───────────── */
-.pp-map-sea-hi {
-  stop-color: color-mix(in oklab, var(--iris-deep) 62%, var(--night-2));
-}
-.pp-map-sea-lo {
-  stop-color: var(--night);
-}
-.pp-map-grid line {
-  stroke: color-mix(in srgb, var(--lilac) 9%, transparent);
-  stroke-width: 0.6;
-}
-.pp-map-land {
-  fill: color-mix(in srgb, var(--lilac) 7%, transparent);
-  stroke: color-mix(in srgb, var(--lilac) 26%, transparent);
-  stroke-width: 0.8;
-}
-.pp-seg-glow {
-  fill: none;
-  stroke: var(--iris-glow);
-  stroke-width: 9;
-  stroke-linecap: round;
-  opacity: 0;
-}
-/* A route not yet travelled is a quiet pearl dotted line; a travelled one turns iris. */
-.pp-seg-line {
-  fill: none;
-  stroke: color-mix(in srgb, var(--pearl) 62%, transparent);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-dasharray: 0.1 6;
-}
-.pp-seg[data-done] .pp-seg-glow {
-  opacity: 1;
-}
-.pp-seg[data-done] .pp-seg-line {
-  stroke: var(--iris);
-  stroke-width: 2.6;
-  stroke-dasharray: none;
-}
-.pp-mark-halo {
-  fill: color-mix(in srgb, var(--lilac) 12%, transparent);
-}
-.pp-mark-dot {
-  fill: var(--night);
-  stroke: var(--pearl);
-  stroke-width: 1.5;
-}
-.pp-mark-n {
-  font-family: var(--font-display);
-  font-size: 11px;
-  font-weight: 700;
-  text-anchor: middle;
-  fill: var(--pearl);
-}
-.pp-mark[data-on] .pp-mark-halo {
-  fill: var(--iris-glow);
-}
-.pp-mark[data-on] .pp-mark-dot {
-  fill: var(--iris);
-  stroke: var(--pearl);
-}
-.pp-mark[data-on] .pp-mark-n {
-  fill: var(--on-pearl);
-}
-.pp-mark-label {
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 600;
-  fill: var(--pearl);
-  paint-order: stroke;
-  stroke: var(--night);
-  stroke-width: 4px;
-  stroke-linejoin: round;
-}
-.pp-map-frame {
-  fill: none;
-  stroke: var(--line-2);
-}
-/* The map scales down on phones; keep its words readable. */
-@media (max-width: 599px) {
-  .pp-mark-label {
-    font-size: 18px;
-    stroke-width: 5px;
-  }
-  .pp-mark-n {
-    font-size: 13px;
-  }
-}
-.pp-map-empty {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  fill: var(--lilac);
-}
-
-/* ───────────── Seals ───────────── */
 .pp-progress {
   display: grid;
-  gap: 0.6rem;
-  margin: 0.1rem 0 0.5rem;
+  gap: 0.55rem;
+  margin-top: 1.6rem;
+  max-width: 26rem;
 }
 .pp-progress-label {
   display: flex;
   align-items: baseline;
   gap: 0.35em;
-  font-size: var(--step-0);
+  font-size: var(--step--1);
   color: var(--lilac);
 }
 .pp-progress-n {
   font-family: var(--font-display);
   font-size: var(--step-2);
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 500;
+  letter-spacing: -0.03em;
   line-height: 1;
-  color: var(--pearl);
+  color: var(--gold);
 }
 .pp-progress-track {
   display: flex;
@@ -275,23 +111,19 @@
 }
 .pp-progress-track span {
   flex: 1;
-  height: 6px;
-  border-radius: var(--radius-pill);
-  background: var(--glass-2);
-  box-shadow: inset 0 0 0 1px var(--line);
+  height: 3px;
+  border-radius: 3px;
+  background: var(--line-2);
 }
 .pp-progress-track span[data-on] {
-  background: linear-gradient(90deg, var(--iris-2), var(--iris));
-  box-shadow: 0 0 10px var(--iris-glow);
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--gold-glow);
 }
 .pp-complete {
   display: flex;
-  gap: 0.9rem;
+  gap: 0.8rem;
   align-items: center;
-  padding: 0.95rem 1.1rem;
-  border-radius: var(--radius-control);
-  border: 1px solid color-mix(in srgb, var(--gold) 42%, transparent);
-  background: radial-gradient(120% 160% at 0% 0%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 70%);
+  margin-top: 1.2rem;
   color: var(--pearl);
   animation: rise var(--t-slow) var(--ease-out) both;
 }
@@ -301,21 +133,22 @@
   filter: drop-shadow(0 0 8px var(--gold-glow));
 }
 .pp-complete strong {
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: var(--gold);
 }
+
+/* seals */
 .pp-stamps {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(140px, 42%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(112px, 40%), 1fr));
   gap: 1.6rem 1rem;
-  margin: 0.4rem 0 0;
+  margin: 1.8rem 0 0;
   padding: 0;
   list-style: none;
 }
 .pp-stamps-empty {
-  font-size: var(--step-1);
+  margin-top: 1.4rem;
+  font-size: var(--step-0);
   color: var(--lilac);
 }
 .pp-stamp {
@@ -328,25 +161,32 @@
 }
 .pp-stamp-svg {
   width: 100%;
-  max-width: 168px;
+  max-width: 132px;
   height: auto;
   aspect-ratio: 1;
   overflow: visible;
   color: var(--gold);
   transform: rotate(var(--pp-tilt, 0deg));
 }
+/* the stop the globe is turned to */
+.pp-stamp[data-current] .pp-stamp-svg {
+  filter: drop-shadow(0 0 0.5px var(--iris)) drop-shadow(0 0 16px var(--iris-glow));
+}
+.pp-stamp[data-current] .pp-stamp-name {
+  color: var(--iris);
+}
 /* Unearned: a soft lavender chrome disc. */
 .pp-seal-chrome-hi {
   stop-color: var(--pearl);
-  stop-opacity: 0.24;
+  stop-opacity: 0.2;
 }
 .pp-seal-chrome-mid {
   stop-color: var(--lilac);
-  stop-opacity: 0.05;
+  stop-opacity: 0.04;
 }
 .pp-seal-chrome-lo {
   stop-color: var(--lilac);
-  stop-opacity: 0.14;
+  stop-opacity: 0.12;
 }
 /* Earned: a gold seal. */
 .pp-seal-gold-hi {
@@ -363,7 +203,7 @@
 }
 .pp-stamp-empty .pp-seal-disc {
   fill: url(#pp-seal-chrome);
-  stroke: color-mix(in srgb, var(--lilac) 32%, transparent);
+  stroke: color-mix(in srgb, var(--lilac) 30%, transparent);
   stroke-width: 1.2;
 }
 .pp-stamp-empty .pp-stamp-empty-in {
@@ -374,7 +214,7 @@
 .pp-stamp-empty text {
   font-family: var(--font-display);
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 400;
   fill: var(--lilac-dim);
 }
 .pp-seal-on .pp-seal-disc {
@@ -416,7 +256,7 @@
 .pp-stamp-cc {
   font-family: var(--font-display);
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 700;
   fill: currentColor;
 }
 .pp-stamp-rule {
@@ -428,8 +268,14 @@
   animation: pp-seal-in 900ms var(--ease-out) both;
 }
 @keyframes pp-seal-in {
-  0% { transform: rotate(var(--pp-tilt, 0deg)) scale(1.18); opacity: 0; }
-  100% { transform: rotate(var(--pp-tilt, 0deg)) scale(1); opacity: 1; }
+  0% {
+    transform: rotate(var(--pp-tilt, 0deg)) scale(1.18);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(var(--pp-tilt, 0deg)) scale(1);
+    opacity: 1;
+  }
 }
 .pp-stamp-cap {
   display: grid;
@@ -444,322 +290,275 @@
   overflow-wrap: anywhere;
 }
 .pp-stamp-status {
-  font-size: var(--step--2);
+  font-size: 12px;
   color: var(--lilac-dim);
 }
 .pp-stamp[data-on] .pp-stamp-status {
   color: var(--gold);
 }
-
 .pp-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-top: 1.5rem;
+  align-items: center;
+  gap: 0.6rem 0.8rem;
+  margin-top: 2rem;
 }
 
-/* ───────────── Stops and stories ───────────── */
+/* ───────────── Sections ───────────── */
+.pp-sec {
+  margin-top: var(--section-gap);
+  scroll-margin-top: calc(var(--nav-h) + 1rem);
+}
+.pp-textlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--iris);
+  text-decoration: none;
+}
+.pp-textlink:hover {
+  color: var(--pearl);
+}
+
+/* stops and their stories */
 .pp-stoplist {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr));
-  gap: 1.5rem;
-  margin: 0;
+  gap: clamp(2.5rem, 5vw, 3.5rem);
+  margin: 2rem 0 0;
   padding: 0;
   list-style: none;
 }
-.pp-stop {
-  display: grid;
-  align-content: start;
-  gap: 1.25rem;
-  padding: clamp(1.1rem, 2.4vw, 1.6rem);
-  border-radius: var(--radius-panel);
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--plum-2) 70%, transparent), color-mix(in srgb, var(--night-2) 78%, transparent));
-  box-shadow: var(--shadow-float);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-.pp-stop[data-on] {
-  border-color: color-mix(in srgb, var(--gold) 30%, transparent);
-}
 .pp-stop-head {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.5rem 0.9rem;
-  align-items: center;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.2rem 1rem;
+  align-items: start;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+.pp-stop[data-on] .pp-stop-head {
+  border-top-color: color-mix(in oklab, var(--gold) 40%, var(--line));
 }
 .pp-stop-num {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid var(--line-2);
-  background: radial-gradient(circle at 34% 26%, color-mix(in srgb, var(--pearl) 26%, transparent), color-mix(in srgb, var(--lilac) 6%, transparent) 70%);
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--pearl);
+  font-family: var(--font-code);
+  font-size: 12px;
+  line-height: 2.4;
+  color: var(--lilac-dim);
 }
 .pp-stop[data-on] .pp-stop-num {
-  border-color: color-mix(in srgb, var(--gold) 60%, transparent);
-  background: radial-gradient(circle at 34% 26%, color-mix(in srgb, var(--gold) 40%, transparent), color-mix(in srgb, var(--gold) 8%, transparent) 70%);
   color: var(--gold);
-  box-shadow: 0 0 18px -4px var(--gold-glow);
-}
-.pp-stop-id {
-  min-width: 0;
 }
 .pp-stop-name {
   font-family: var(--font-display);
   font-size: var(--step-2);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
+  font-weight: 520;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
 }
 .pp-stop-name a {
+  color: var(--pearl);
   text-decoration: none;
+  transition: color var(--t-fast);
 }
-.pp-stop-name a:hover {
-  text-decoration: underline;
+.pp-stop-name a:hover,
+.pp-stop-head[data-world-lit] .pp-stop-name a {
+  color: var(--iris);
 }
 .pp-stop-trail {
-  margin-top: 0.15rem;
-  font-size: var(--step--1);
+  margin-top: 0.25rem;
+  font-size: 13px;
   color: var(--lilac-dim);
 }
 .pp-stop-status {
-  grid-column: 1 / -1;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: var(--step--1);
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+  font-size: 13px;
   color: var(--lilac);
 }
 .pp-stop-status[data-on] {
   color: var(--gold);
 }
+.pp-locate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0 0.8rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  background: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--iris);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--t-fast),
+    background var(--t-fast),
+    border-color var(--t-fast);
+}
+.pp-locate:hover {
+  color: var(--pearl);
+  background: var(--glass);
+}
+.pp-locate[aria-pressed='true'] {
+  color: var(--pearl);
+  border-color: color-mix(in oklab, var(--iris) 45%, transparent);
+}
+.pp-stories {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(13.5rem, 100%), 1fr));
+  gap: 1.75rem 1.25rem;
+  margin: 1.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pp-stories > li {
+  display: flex;
+  min-width: 0;
+}
+.pp-pod-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+  font-size: 12px;
+  color: var(--lilac-dim);
+}
+.pp-pod-stamp[data-on] {
+  color: var(--gold);
+}
 .pp-stop-empty {
+  margin-top: 1rem;
   font-size: var(--step--1);
   color: var(--lilac-dim);
 }
 .pp-stop-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  min-height: var(--hit);
-  font-size: var(--step--1);
-  color: var(--lilac);
-}
-.pp-stop-more:hover {
-  color: var(--pearl);
-}
-.pp-stories {
-  display: grid;
-  gap: 1rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.pp-story {
-  display: grid;
-  grid-template-columns: 128px minmax(0, 1fr) auto;
-  gap: 1rem;
-  align-items: center;
-}
-.pp-story-art {
-  position: relative;
-  display: block;
-  aspect-ratio: 16 / 9;
-  border-radius: var(--radius-control);
-  overflow: hidden;
-  box-shadow: 0 12px 28px -16px color-mix(in srgb, var(--night) 90%, transparent), 0 0 0 1px var(--line);
-  transition: transform var(--t-mid) var(--ease-out);
-}
-.pp-story:hover .pp-story-art {
-  transform: translateY(-2px);
-}
-.pp-story-art .art {
-  position: absolute;
-  inset: 0;
-}
-.pp-story-body {
-  display: grid;
-  gap: 0.25rem;
-  min-width: 0;
-}
-.pp-story-title {
-  font-weight: 600;
-  line-height: 1.25;
-  color: var(--pearl);
-  text-decoration: none;
-}
-.pp-story-title:hover {
-  text-decoration: underline;
-}
-.pp-story-meta {
-  font-size: var(--step--1);
-  color: var(--lilac-dim);
-}
-.pp-story-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  align-items: center;
-}
-.pp-story-stamped {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: var(--step--2);
-  font-weight: 600;
-  color: var(--gold);
-}
-.pp-story-go {
-  min-height: var(--hit);
-}
-@media (max-width: 559px) {
-  .pp-story {
-    grid-template-columns: 104px minmax(0, 1fr);
-  }
-  .pp-story-go {
-    grid-column: 1 / -1;
-    justify-self: start;
-  }
+  margin-top: 1.2rem;
 }
 
-/* ───────────── Ready-made journeys: image cards with unboxed captions ───────────── */
-.pp-group + .pp-group {
-  margin-top: clamp(2.5rem, 4.5vw, 3.75rem);
+/* ready-made journeys: a poster with a hairline rim, its words beneath */
+.pp-group {
+  margin-top: 2.2rem;
 }
 .pp-group-title {
-  margin-bottom: 1.1rem;
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--pearl);
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--lilac);
 }
 .pp-jcards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-  gap: 2.25rem 1.5rem;
-  margin: 0;
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+  gap: 2rem 1.25rem;
+  margin: 1rem 0 0;
   padding: 0;
   list-style: none;
 }
 .pp-jcard {
-  display: grid;
-  grid-template-rows: auto auto auto auto 1fr auto;
-  align-content: start;
-  gap: 0.45rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-}
-.pp-jcard:has(.pp-jcard-note) {
-  grid-template-rows: auto auto auto auto auto 1fr auto;
 }
 .pp-jcard-art {
   position: relative;
-  aspect-ratio: 16 / 10;
-  margin-bottom: 0.65rem;
-  border-radius: var(--radius-card);
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  background:
-    radial-gradient(80% 90% at 30% 20%, color-mix(in srgb, var(--iris-2) 38%, transparent), transparent 70%),
-    radial-gradient(70% 80% at 85% 90%, color-mix(in srgb, var(--frost) 16%, transparent), transparent 70%),
-    var(--plum-2);
-  box-shadow: var(--shadow-card), 0 0 0 1px var(--line);
+  border-radius: var(--radius-card);
+  background: var(--plum);
+  box-shadow:
+    0 0 0 1px var(--line),
+    var(--shadow-card);
   transition:
     transform var(--t-mid) var(--ease-out),
-    box-shadow var(--t-mid) var(--ease-out);
+    box-shadow var(--t-mid);
 }
-.pp-jcard-art .art {
-  position: absolute;
-  inset: 0;
-}
-.pp-jcard-art::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--night) 60%, transparent));
+.pp-jcard-art .art,
+.pp-jcard-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .pp-jcard:hover .pp-jcard-art,
 .pp-jcard:focus-within .pp-jcard-art {
   transform: translateY(-4px);
-  box-shadow: 0 30px 70px -30px color-mix(in srgb, var(--iris-2) 60%, transparent), 0 0 0 1px var(--line-2);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--gold) 55%, transparent),
+    0 0 26px -6px var(--gold-glow),
+    var(--shadow-card);
 }
 .pp-jcard[data-current] .pp-jcard-art {
-  box-shadow: var(--shadow-card), 0 0 0 2px var(--iris), 0 0 40px -10px var(--iris-glow);
-}
-.pp-jcard-count {
-  position: absolute;
-  left: 14px;
-  bottom: 14px;
-  z-index: 1;
-  padding: 4px 11px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line-2);
-  background: color-mix(in srgb, var(--night) 62%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-size: var(--step--2);
-  font-weight: 600;
-  color: var(--pearl);
-}
-.pp-jcard-count[data-done] {
-  color: var(--gold);
-  border-color: color-mix(in srgb, var(--gold) 50%, transparent);
+  box-shadow:
+    0 0 0 1.5px var(--gold),
+    0 0 26px -6px var(--gold-glow);
 }
 .pp-jcard-meta {
-  font-size: var(--step--1);
+  margin-top: 0.9rem;
+  font-size: 12px;
   color: var(--lilac-dim);
 }
 .pp-jcard-title {
+  margin-top: 0.3rem;
   font-family: var(--font-display);
-  font-size: var(--step-2);
-  font-weight: 700;
-  line-height: 1.06;
-  letter-spacing: -0.03em;
+  font-size: var(--step-1);
+  font-weight: 540;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   color: var(--pearl);
 }
-.pp-jcard-path {
-  font-size: var(--step--1);
-  font-weight: 500;
-  color: var(--iris);
+.pp-jcard-title a {
+  color: inherit;
+  text-decoration: none;
 }
-.pp-jcard-sum {
-  font-size: var(--step--1);
+/* the title link opens the journey from anywhere on the card */
+.pp-jcard-title a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+}
+.pp-jcard-title a:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.pp-jcard-title a:focus-visible::after {
+  outline: 2px solid var(--iris);
+  outline-offset: 4px;
+}
+.pp-jcard-path {
+  margin-top: 0.35rem;
+  font-size: 13px;
   color: var(--lilac);
 }
+.pp-jcard-sum,
 .pp-jcard-note {
-  display: flex;
-  gap: 0.45rem;
-  align-items: flex-start;
-  font-size: var(--step--1);
+  margin-top: 0.35rem;
+  font-size: 13px;
+  line-height: 1.5;
   color: var(--lilac-dim);
 }
-.pp-jcard-note svg {
-  flex: none;
-  margin-top: 3px;
-  color: var(--frost);
-}
 .pp-jcard-foot {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  margin-top: 0.6rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lilac);
 }
-.pp-jcard-foot .btn {
-  min-height: var(--hit);
+.pp-jcard-foot[data-done],
+.pp-jcard[data-current] .pp-jcard-foot {
+  color: var(--gold);
 }
 
 /* ───────────── Builder ───────────── */
 .pp-build {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-  gap: clamp(1.5rem, 3.5vw, 3rem);
-  align-items: start;
+  gap: clamp(2rem, 4vw, 2.75rem);
+  margin-top: 1.8rem;
 }
 .pp-build-form {
   display: grid;
@@ -775,11 +574,10 @@
   gap: 0.75rem;
 }
 .pp-build-sub {
-  font-family: var(--font-display);
-  font-size: var(--step-1);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--pearl);
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--lilac);
 }
 .pp-edit {
   display: grid;
@@ -793,21 +591,17 @@
   grid-template-columns: 34px minmax(0, 1fr) auto;
   gap: 0.85rem;
   align-items: center;
-  padding: 0.6rem 0;
+  padding: 0.5rem 0;
   border-bottom: 1px solid var(--line);
 }
+.pp-edit-row[data-world-lit] .pp-edit-name strong {
+  color: var(--iris);
+}
 .pp-edit-n {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--line-2);
-  background: var(--glass);
-  font-family: var(--font-display);
-  font-size: var(--step--1);
-  font-weight: 700;
-  color: var(--pearl);
+  font-family: var(--font-code);
+  font-size: 12px;
+  text-align: center;
+  color: var(--lilac-dim);
 }
 .pp-edit-name {
   display: grid;
@@ -818,7 +612,7 @@
   color: var(--pearl);
 }
 .pp-edit-name small {
-  font-size: var(--step--1);
+  font-size: 13px;
   color: var(--lilac-dim);
 }
 .pp-edit-btns {
@@ -829,14 +623,9 @@
   width: var(--hit);
   height: var(--hit);
 }
-@media (max-width: 899px) {
-  .pp-build {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 @media (max-width: 479px) {
   .pp-edit-row {
-    grid-template-columns: 32px minmax(0, 1fr);
+    grid-template-columns: 28px minmax(0, 1fr);
   }
   .pp-edit-btns {
     grid-column: 1 / -1;
@@ -891,7 +680,7 @@
   gap: 0 0.75rem;
   min-height: var(--hit);
   padding: 0.55rem 0.8rem;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
 }
 .pp-combo-opt[aria-selected='true'] {
@@ -904,14 +693,14 @@
 }
 .pp-combo-trail {
   grid-column: 1;
-  font-size: var(--step--2);
+  font-size: 12px;
   color: var(--lilac);
 }
 .pp-combo-status {
   grid-column: 2;
   grid-row: 1 / span 2;
   align-self: center;
-  font-size: var(--step--2);
+  font-size: 12px;
   color: var(--lilac-dim);
   white-space: nowrap;
 }
@@ -927,7 +716,7 @@
 /* ───────────── Saved journeys ───────────── */
 .pp-saved-list {
   display: grid;
-  margin: 0;
+  margin: 1.6rem 0 0;
   padding: 0;
   list-style: none;
   border-top: 1px solid var(--line);
@@ -938,7 +727,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem 1rem;
-  padding: 1rem 0.25rem;
+  padding: 0.9rem 0;
   border-bottom: 1px solid var(--line);
 }
 .pp-saved-text {
@@ -947,42 +736,67 @@
 .pp-saved-title {
   font-family: var(--font-display);
   font-size: var(--step-1);
-  font-weight: 700;
+  font-weight: 540;
   letter-spacing: -0.02em;
   color: var(--pearl);
 }
 .pp-saved[data-current] .pp-saved-title {
-  color: var(--iris);
+  color: var(--gold);
 }
 .pp-saved-meta {
-  font-size: var(--step--1);
+  font-size: 13px;
   color: var(--lilac-dim);
 }
 .pp-saved-act {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.8rem;
 }
-.pp-saved-act .btn,
-.pp-saved-act .icon-btn-sm {
-  min-height: var(--hit);
+.pp-saved-open {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
 }
 .pp-saved-act .icon-btn-sm {
   width: var(--hit);
+  height: var(--hit);
 }
 
-/* ═════════════ Touch targets (pointer: coarse) ═════════════
- * Title links keep their typographic size; --tap-pad grows the tap box to >= 44px and the
- * matching negative margin keeps the layout exactly where it was. */
+/* Narrow: the reading column settles the world behind it */
+@media (max-width: 1023px), (max-aspect-ratio: 9/10) {
+  .pp-journey,
+  .pp-sec {
+    position: relative;
+  }
+  .pp-sec::before {
+    content: '';
+    position: absolute;
+    inset: -3rem calc(var(--gutter) * -1) -3rem;
+    z-index: -1;
+    background: rgb(7 6 12 / 0.6);
+    pointer-events: none;
+  }
+}
+
+/* ═════════════ Touch targets (pointer: coarse) ═════════════ */
 @media (pointer: coarse) {
-  .pp-story-title {
-    display: inline-block;
-    padding-block: var(--tap-pad);
-    margin-block: calc(var(--tap-pad) * -1);
+  .pp-stop-name a,
+  .pp-crumbs a,
+  .pp-textlink {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--hit);
   }
-  .pp-stop-name a {
-    display: inline-block;
-    padding-block: var(--tap-pad);
-    margin-block: calc(var(--tap-pad) * -1);
+  .pp-locate {
+    min-height: var(--hit);
   }
+  .pp-crumbs a {
+    min-width: var(--hit);
+    justify-content: center;
+  }
+}
+
+:root[data-motion='reduce'] .pp-stamp[data-fresh] .pp-stamp-svg,
+:root[data-motion='reduce'] .pp-complete {
+  animation: none;
 }

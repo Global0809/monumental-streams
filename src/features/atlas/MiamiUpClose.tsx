@@ -1,19 +1,18 @@
 /**
- * "Miami, up close" — the gateway's complete treatment, shown whenever the selection is the
- * gateway's county or anything inside it:
+ * "Miami, up close" — the gateway's complete treatment, shown in the editorial column whenever
+ * the selection is the gateway's county or anything inside it. The globe holds the city; this
+ * holds what the globe cannot draw at street scale:
  *   1. a neighbourhood tissue map: every place in the county at its true relative position
  *      (local equirectangular projection), with the City of Miami's membrane distinguished
  *      from the separate municipalities (Miami Beach, Coral Gables, Key Biscayne…);
- *   2. the isometric studio loop as an illustrative hero (plays only when autoplay is allowed);
- *   3. the gateway's routes out into (and in from) the world.
+ *   2. an index of every mapped place, numbered to match the map on small screens;
+ *   3. the gateway's routes out into (and in from) the world — following one lights its arc.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import type { ID, Place } from '../../../shared/types.ts';
 import { plural } from '../../lib/format.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
-import { useReducedMotion } from '../../systems/motion.ts';
-import { canAutoplay, releasePreview, requestPreview } from '../../systems/previews.ts';
 import { sound } from '../../systems/sound/engine.ts';
 import { KIND_LABEL, localAspect, municipalityOf, niceKm, placeLabels, projectLocal, roundedHullPath, textWidth, type AtlasModel } from './model.ts';
 import { RouteCard, type HrefFor } from './panels.tsx';
@@ -48,7 +47,7 @@ function useGroups(region: Place): Group[] {
 
 function TissueMap({ groups, numbers, selectedId, hrefFor, model }: { groups: Group[]; numbers: Map<ID, number>; selectedId: ID | null; hrefFor: HrefFor; model: AtlasModel }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [W, setW] = useState(720);
+  const [W, setW] = useState(560);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -60,8 +59,8 @@ function TissueMap({ groups, numbers, selectedId, hrefFor, model }: { groups: Gr
   const all = useMemo(() => groups.flatMap((g) => g.places.map((p) => ({ p, g }))), [groups]);
   const pts = useMemo(() => all.map(({ p }) => ({ id: p.id, lat: p.coords[0], lon: p.coords[1] })), [all]);
   const H = Math.round(Math.min(640, Math.max(300, W * localAspect(pts))));
-  const pad = W < 560 ? 34 : 54;
-  const byNumber = W < 560;
+  const pad = W < 560 ? 34 : 50;
+  const byNumber = W < 520;
 
   const layout = useMemo(() => {
     const { points, pxPerKm } = projectLocal(pts, W, H, pad);
@@ -89,7 +88,6 @@ function TissueMap({ groups, numbers, selectedId, hrefFor, model }: { groups: Gr
   return (
     <div ref={ref} className="atlas-tissue-box">
       <svg className="atlas-tissue-svg" viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="group" aria-label="Schematic map of every mapped place in Miami-Dade County">
-        <rect width={W} height={H} className="atlas-tissue-bg" />
         <g aria-hidden="true">
           {cells.map(({ g, d }) => (
             <path key={g.muni.id} d={d} className="atlas-cell" data-gateway={g.gateway || undefined} />
@@ -162,71 +160,6 @@ function TissueMap({ groups, numbers, selectedId, hrefFor, model }: { groups: Gr
   );
 }
 
-/* ───────────── 2. Isometric hero ───────────── */
-
-function IsoHero() {
-  const cat = useCatalogue();
-  const art = cat.artFor('art:miami-isometric');
-  const reduced = useReducedMotion();
-  const frame = useRef<HTMLDivElement>(null);
-  const vid = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const v = vid.current;
-    const el = frame.current;
-    if (!v || !el || !art?.preview) return;
-    let inView = false;
-    const sync = () => {
-      if (inView && canAutoplay()) {
-        if (!v.getAttribute('src')) v.src = (window.innerWidth < 768 && art.previewSmall) || art.preview!;
-        requestPreview(v);
-      } else releasePreview(v);
-    };
-    const io = new IntersectionObserver(
-      (entries) => {
-        inView = entries.some((e) => e.isIntersecting && e.intersectionRatio >= 0.3);
-        sync();
-      },
-      { threshold: [0, 0.3, 0.6] },
-    );
-    io.observe(el);
-    const onPlay = () => setPlaying(true);
-    const onPause = () => setPlaying(false);
-    v.addEventListener('playing', onPlay);
-    v.addEventListener('pause', onPause);
-    window.addEventListener('ms:previews', sync);
-    return () => {
-      io.disconnect();
-      window.removeEventListener('ms:previews', sync);
-      v.removeEventListener('playing', onPlay);
-      v.removeEventListener('pause', onPause);
-      releasePreview(v);
-      v.removeAttribute('src');
-      v.load();
-      setPlaying(false);
-    };
-  }, [art, reduced]);
-
-  if (!art) return null;
-  return (
-    <figure className="atlas-iso">
-      <div ref={frame} className="atlas-iso-frame" style={{ backgroundImage: `url("${art.lqip}")` }}>
-        <img src={art.poster} srcSet={`${art.posterSmall} 640w, ${art.poster} 1280w`} sizes="(max-width: 1023px) 92vw, 40vw" alt={art.alt} loading="lazy" decoding="async" data-loaded={loaded} onLoad={() => setLoaded(true)} />
-        {art.preview ? <video ref={vid} className="atlas-iso-video" muted loop playsInline preload="none" aria-hidden="true" tabIndex={-1} data-playing={playing} /> : null}
-        <span className="atlas-iso-tags">
-          <span className="badge">Illustrative</span>
-          {art.provisional ? <span className="badge">Provisional art</span> : null}
-        </span>
-      </div>
-      <figcaption className="atlas-iso-cap">
-        Illustrative studio loop{playing ? ' (playing silently)' : ''} — an impression of the Miami waterfront. Not a map, not to scale.
-      </figcaption>
-    </figure>
-  );
-}
-
 /* ───────────── Section ───────────── */
 
 export default function MiamiUpClose({ region, selectedId, routeId, hrefFor, model }: { region: Place; selectedId: ID | null; routeId: ID | null; hrefFor: HrefFor; model: AtlasModel }) {
@@ -245,96 +178,88 @@ export default function MiamiUpClose({ region, selectedId, routeId, hrefFor, mod
 
   return (
     <section id="atlas-miami" className="atlas-miami" aria-labelledby="atlas-miami-h">
-      <div className="wrap">
-        <header className="atlas-miami-head">
-          <p className="kicker atlas-kicker">Gateway · {region.name}</p>
-          <h2 id="atlas-miami-h" className="atlas-miami-title">
-            Miami, <em>up close</em>
-          </h2>
-          <p className="atlas-miami-lede">{region.summary}</p>
-        </header>
+      <p className="eyebrow">The gateway · {region.name}</p>
+      <h2 id="atlas-miami-h" className="atlas-miami-title">
+        Miami, <em>up close</em>
+      </h2>
+      <p className="atlas-note atlas-miami-lede">{region.summary}</p>
 
-        <div className="atlas-miami-grid">
-          <figure className="atlas-tissue">
-            <TissueMap groups={groups} numbers={numbers} selectedId={selectedId} hrefFor={hrefFor} model={model} />
-            <figcaption className="atlas-tissue-cap">A schematic: positions are to scale, the coastline is not drawn.</figcaption>
-            <ul className="atlas-tissue-legend" aria-label="Map key">
-              {gatewayGroup ? (
-                <li>
-                  <span className="atlas-swatch atlas-swatch-cell-gateway" aria-hidden="true" />
-                  City of {gatewayGroup.muni.name} and its neighbourhoods
-                </li>
-              ) : null}
-              {separate.length ? (
-                <li>
-                  <span className="atlas-swatch atlas-swatch-cell" aria-hidden="true" />
-                  Separate municipality — {separate.join(', ')}
-                </li>
-              ) : null}
-              <li>
-                <span className="atlas-swatch atlas-swatch-active" aria-hidden="true" />
-                Stories here
-              </li>
-              <li>
-                <span className="atlas-swatch atlas-swatch-expanding" aria-hidden="true" />
-                Expanding — mapped, no stories yet
-              </li>
-            </ul>
-          </figure>
-          <div className="atlas-miami-side">
-            <IsoHero />
-            <div className="atlas-index">
-              <h3 className="atlas-index-title">Every place in {region.name}</h3>
-              <ul className="atlas-index-groups">
-                {groups.map((g) => (
-                  <li key={g.muni.id} data-gateway={g.gateway || undefined}>
-                    <p className="atlas-index-muni">{g.gateway ? `City of ${g.muni.name}` : `${g.muni.name} · separate municipality`}</p>
-                    <ul className="atlas-index-list">
-                      {g.places.map((p) => {
-                        const n = model.counts.get(p.id) ?? 0;
-                        return (
-                          <li key={p.id}>
-                            <Link to={hrefFor(p.slug)} className="atlas-index-link" aria-current={p.id === selectedId ? 'page' : undefined} data-status={p.status}>
-                              <span className="atlas-index-num" aria-hidden="true">
-                                {numbers.get(p.id)}
-                              </span>
-                              <span className="atlas-index-name">{p.name}</span>
-                              <span className="atlas-index-count">
-                                <span className="sr-only">, </span>
-                                {p.status === 'expanding' && !n ? 'Expanding' : plural(n, 'story', 'stories')}
-                              </span>
-                            </Link>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </li>
-                ))}
+      <figure className="atlas-tissue">
+        <TissueMap groups={groups} numbers={numbers} selectedId={selectedId} hrefFor={hrefFor} model={model} />
+        <figcaption className="atlas-tissue-cap">A schematic: positions are to scale, the coastline is not drawn.</figcaption>
+        <ul className="atlas-tissue-legend" aria-label="Map key">
+          {gatewayGroup ? (
+            <li>
+              <span className="atlas-swatch atlas-swatch-cell-gateway" aria-hidden="true" />
+              City of {gatewayGroup.muni.name} and its neighbourhoods
+            </li>
+          ) : null}
+          {separate.length ? (
+            <li>
+              <span className="atlas-swatch atlas-swatch-cell" aria-hidden="true" />
+              Separate municipality — {separate.join(', ')}
+            </li>
+          ) : null}
+          <li>
+            <span className="atlas-swatch atlas-swatch-active" aria-hidden="true" />
+            Stories here
+          </li>
+          <li>
+            <span className="atlas-swatch atlas-swatch-expanding" aria-hidden="true" />
+            Expanding — mapped, no stories yet
+          </li>
+        </ul>
+      </figure>
+
+      <div className="atlas-index">
+        <h3 className="atlas-sub">Every place in {region.name}</h3>
+        <ul className="atlas-index-groups">
+          {groups.map((g) => (
+            <li key={g.muni.id} data-gateway={g.gateway || undefined}>
+              <p className="atlas-index-muni">{g.gateway ? `City of ${g.muni.name}` : `${g.muni.name} · separate municipality`}</p>
+              <ul className="atlas-index-list">
+                {g.places.map((p) => {
+                  const n = model.counts.get(p.id) ?? 0;
+                  return (
+                    <li key={p.id}>
+                      <Link to={hrefFor(p.slug)} className="atlas-index-link" aria-current={p.id === selectedId ? 'page' : undefined} data-status={p.status}>
+                        <span className="atlas-index-num" aria-hidden="true">
+                          {numbers.get(p.id)}
+                        </span>
+                        <span className="atlas-index-name">{p.name}</span>
+                        <span className="atlas-index-count">
+                          <span className="sr-only">, </span>
+                          {p.status === 'expanding' && !n ? 'Expanding' : plural(n, 'story', 'stories')}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
-            </div>
-          </div>
-        </div>
-
-        <section className="atlas-gw" aria-labelledby="atlas-gw-h">
-          <h3 id="atlas-gw-h" className="atlas-gw-title">
-            From the gateway <em>into the world</em>
-          </h3>
-          {routes.length ? (
-            <ul className="atlas-gw-routes">
-              {routes.map((r) => {
-                const from = gatewayGroup && (gatewayScope.has(r.from) || gatewayScope.has(r.to)) ? gatewayGroup.muni : region;
-                return (
-                  <li key={r.id}>
-                    <RouteCard route={r} fromPlace={from} hrefFor={hrefFor} level={4} current={r.id === routeId} />
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p className="atlas-sec-note">No routes touch {region.name} yet.</p>
-          )}
-        </section>
+            </li>
+          ))}
+        </ul>
       </div>
+
+      <section className="atlas-gw" aria-labelledby="atlas-gw-h">
+        <h3 id="atlas-gw-h" className="atlas-sub">
+          From the gateway into the world
+        </h3>
+        {routes.length ? (
+          <ul className="atlas-routes">
+            {routes.map((r) => {
+              const from = gatewayGroup && (gatewayScope.has(r.from) || gatewayScope.has(r.to)) ? gatewayGroup.muni : region;
+              return (
+                <li key={r.id}>
+                  <RouteCard route={r} fromPlace={from} hrefFor={hrefFor} level={4} current={r.id === routeId} />
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="atlas-note">No routes touch {region.name} yet.</p>
+        )}
+      </section>
     </section>
   );
 }

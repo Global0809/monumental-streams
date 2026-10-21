@@ -1,6 +1,7 @@
 /**
- * The chapter rail: on long pages, a slim right-edge column showing scroll progress and one
- * node per page chapter (registered with useChapters). Desktop only.
+ * The chapter rail: on long pages, the page's own small spine on the right edge — a gold cord
+ * that fills with scroll progress and one vertebra per page chapter (registered with
+ * useChapters); the current chapter's vertebra is lit. Desktop only.
  */
 import { jumpTo, useChapterState } from './chapters.ts';
 

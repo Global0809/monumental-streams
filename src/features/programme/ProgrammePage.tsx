@@ -1,28 +1,34 @@
 /**
- * PROGRAMME: a series, chapter, artist campaign or demonstration series. A cinematic header
- * leads with the honest status (what exists today); then what it is and who presents it, the
- * route for journey programmes, what is in it as image rows (series order, access, footage
- * labelling, progress), its chapters and its connections.
+ * PROGRAMME: a series, chapter, artist campaign or demonstration series.
+ *
+ * The living world holds the programme in FOCUS: the entry the page offers first (resume, or the
+ * first playable) is the seed in front, its episodes ring it on light filaments and are the
+ * highlighted seeds (anything merely related recedes). The page is the editorial layer over that
+ * world — no header screen of its own: the title, the honest status (what exists today), one
+ * gold action; then what it is and who presents it, the route for journey programmes, the
+ * episodes in series order (hovering a row lights its seed; a seed under the pointer lights its
+ * row), its chapters, its threads and related programmes.
  */
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, type CSSProperties } from 'react';
 import { Link, useParams } from 'react-router';
 import type { ID, Person, Programme, Video } from '../../../shared/types.ts';
 import { connectionsFor } from '../../../shared/relations.ts';
 import { useChapters } from '../../app/chapters.ts';
-import { runtimeLabel } from '../../lib/format.ts';
+import { FOOTAGE_LABEL, plural, runtimeLabel, settingLabel } from '../../lib/format.ts';
+import { useArrangement } from '../../stage/store.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
 import { isSaved, libraryActions, useLibrary } from '../../state/library.ts';
 import { sound } from '../../systems/sound/engine.ts';
 import { ButtonLink } from '../../ui/controls.tsx';
-import { EmptyState, toast } from '../../ui/feedback.tsx';
+import { EmptyState } from '../../ui/feedback.tsx';
 import { Icon } from '../../ui/Icon.tsx';
-import { AccessBadge, Art, FootageBadges, SectionHeader, useAccessState } from '../../ui/Pod.tsx';
-import { LoopToggle, OriginalBadge, ProgrammeCard, StatusBadge } from './ProgrammeCard.tsx';
-import { RouteStrip } from './RouteStrip.tsx';
-import { entryLabel, episodeGroups, firstPlayable, PROGRAMME_KIND_LABEL, PROGRAMME_STATUS_LABEL, routeHref, routeStops } from './programme-model.ts';
-import { useLoop } from './useLoop.ts';
-import './programme.css';
+import { Art, SectionHeader, useAccessState } from '../../ui/Pod.tsx';
 import { announceSave } from '../../ui/save.ts';
+import { releaseSeed, seedHover, useSeedLit } from '../watch/seed.ts';
+import { ProgrammeCard, StatusBadge } from './ProgrammeCard.tsx';
+import { RouteStrip } from './RouteStrip.tsx';
+import { entryLabel, episodeGroups, firstPlayable, longestWordEm, PROGRAMME_KIND_LABEL, PROGRAMME_STATUS_LABEL, routeHref, routeStops } from './programme-model.ts';
+import './programme.css';
 
 export default function ProgrammePage() {
   const { slug = '' } = useParams();
@@ -37,21 +43,24 @@ export default function ProgrammePage() {
 
 function MissingProgramme({ slug }: { slug: string }) {
   const cat = useCatalogue();
+  useArrangement({ kind: 'quiet' });
   return (
-    <div className="page wrap">
+    <div className="page wrap prog-missing">
       <header className="page-head">
-        <p className="kicker">Programme</p>
-        <h1 className="page-title">Nothing lives at this address</h1>
+        <p className="eyebrow">Programme</p>
+        <h1 className="title-monument prog-missing-title">Nothing lives at this address</h1>
       </header>
       <EmptyState
         icon="info"
         title="No programme matches this link"
         actions={
           <>
-            <ButtonLink to="/catalogue" variant="primary" icon="search">
+            <ButtonLink to="/search" variant="primary" icon="search">
               Search the catalogue
             </ButtonLink>
-            <ButtonLink to="/">Back to Stream</ButtonLink>
+            <ButtonLink to="/" variant="quiet">
+              Back to Home
+            </ButtonLink>
           </>
         }
       >
@@ -71,14 +80,11 @@ function MissingProgramme({ slug }: { slug: string }) {
 function ProgrammeView({ programme: p }: { programme: Programme }) {
   const cat = useCatalogue();
   const lib = useLibrary();
-  const art = cat.artFor(p.art);
-  const vid = useRef<HTMLVideoElement>(null);
-  const loop = useLoop(vid, art?.preview || art?.previewSmall ? { large: art.preview, small: art.previewSmall } : null, { autoplay: true });
-
   const parent = p.parent ? (cat.get(p.parent) as Programme | undefined) : undefined;
   const children = cat.programmeChildren(p.id);
   const groups = useMemo(() => episodeGroups(cat, p), [cat, p]);
   const all = groups.flatMap((g) => g.videos);
+  const playableCount = all.filter((v) => cat.isPlayable(v)).length;
   const resume = all.find((v) => {
     const e = lib.progress[v.id];
     return e && !e.done && e.pos > 5 && cat.isPlayable(v);
@@ -96,128 +102,107 @@ function ProgrammeView({ programme: p }: { programme: Programme }) {
     [cat, p.id, childKey],
   );
   const kind = PROGRAMME_KIND_LABEL[p.kind];
+  const lead = resume ?? first;
 
-  const chapters = [
+  /* The world: this programme in focus, its episodes lit (related stories recede). */
+  const memberIds = useMemo(() => all.map((v) => v.id), [all]);
+  useArrangement(lead ? { kind: 'focus', programme: p.id, video: lead.id } : { kind: 'focus', programme: p.id }, memberIds.length ? memberIds : null);
+
+  useChapters([
     { id: 'prog-overview', label: 'Overview' },
     ...(hasRoute ? [{ id: 'prog-route', label: 'Route' }] : []),
     { id: 'prog-episodes', label: 'In this programme' },
     ...(children.length ? [{ id: 'prog-chapters', label: 'Chapters' }] : []),
     { id: 'prog-threads', label: 'Threads' },
     ...(related.length ? [{ id: 'prog-related', label: 'Related' }] : []),
-  ];
-  useChapters(chapters);
+  ]);
 
   const cta = resume
     ? { to: cat.href(resume.id), label: `Resume “${resume.title}”` }
     : first
-      ? { to: cat.href(first.id), label: first.kind === 'teaser' ? (p.original ? 'Watch the motion teaser' : 'Watch the teaser') : all.filter((v) => cat.isPlayable(v)).length > 1 ? 'Play from the start' : 'Watch now' }
+      ? { to: cat.href(first.id), label: first.kind === 'teaser' ? (p.original ? 'Watch the motion teaser' : 'Watch the teaser') : playableCount > 1 ? 'Play from the start' : 'Watch now' }
       : null;
 
-  const threads: { label: string; ids: ID[] }[] = [
-    { label: 'Interests', ids: p.categories },
-    { label: 'Themes', ids: p.themes },
-    { label: 'Places', ids: p.places },
-    { label: 'Movements', ids: p.movements ?? [] },
-    { label: 'Periods', ids: p.periods },
+  const threads: { label: string; tone: string; ids: ID[] }[] = [
+    { label: 'Interests', tone: 'iris', ids: p.categories },
+    { label: 'Themes', tone: 'lilac', ids: p.themes },
+    { label: 'Places', tone: 'world', ids: p.places },
+    { label: 'Movements', tone: 'frost', ids: p.movements ?? [] },
+    { label: 'Periods', tone: 'frost', ids: p.periods },
   ].filter((t) => t.ids.length > 0);
+
+  const titleStyle = { '--title-word': longestWordEm(p.title).toFixed(2) } as CSSProperties;
 
   return (
     <article className="prog" data-kind={p.kind}>
-      <header
-        className="prog-hero"
-        id="prog-overview"
-        data-playing={loop.playing || undefined}
-        onPointerEnter={loop.wake}
-        onPointerLeave={loop.sleep}
-        onFocus={loop.wake}
-        onBlur={loop.sleep}
-      >
-        <div className="prog-hero-ambient" aria-hidden="true">
-          <Art art={p.art} alt="" sizes="large" eager />
-        </div>
-        <div className="wrap prog-hero-inner">
-          <div className="prog-hero-copy">
-            <nav className="prog-crumbs" aria-label="Breadcrumb">
-              <ol>
-                <li>
-                  <Link to="/catalogue">Catalogue</Link>
-                </li>
-                {parent ? (
-                  <li>
-                    <Link to={cat.href(parent.id)}>{parent.title}</Link>
-                  </li>
-                ) : null}
-                <li aria-current="page">{kind}</li>
-              </ol>
-            </nav>
-            <div className="prog-hero-badges">
+      <header className="wrap prog-hero" id="prog-overview">
+        <div className="prog-hero-copy">
+          <p className="eyebrow prog-eyebrow">
+            {parent ? (
+              <Link to={cat.href(parent.id)} onClick={() => sound.play('transition')}>
+                <span className="sr-only">Part of </span>
+                {parent.title}
+              </Link>
+            ) : p.original ? (
+              <b>Monumental Original</b>
+            ) : null}
+            <span className="prog-eyebrow-kind">{kind}</span>
+          </p>
+          <h1 className="prog-title" data-long={p.title.length > 30 || undefined} style={titleStyle}>
+            {p.title}
+          </h1>
+          <p className="prog-tagline">{p.tagline}</p>
+          <div className="prog-now" data-status={p.status} role="note" aria-label="What exists today">
+            <p className="prog-now-status">
               <StatusBadge status={p.status} />
-              {p.original ? <OriginalBadge /> : null}
-            </div>
-            <h1 className="prog-title" data-long={p.title.length > 34 || undefined}>
-              <span>{p.title}</span>
-            </h1>
-            <p className="prog-tagline">{p.tagline}</p>
-            <div className="prog-status-panel" data-status={p.status} role="note" aria-label="What exists today">
-              <Icon name="info" size={20} />
-              <div>
-                <p className="prog-status-label">
-                  Status: <b>{PROGRAMME_STATUS_LABEL[p.status]}</b>
-                </p>
-                <p className="prog-status-note">{p.statusNote}</p>
-              </div>
-            </div>
-            <div className="prog-actions">
-              {cta ? (
-                <ButtonLink to={cta.to} variant="primary" size="lg" icon="play" data-cursor="play" data-cursor-label="Watch">
-                  {cta.label}
-                </ButtonLink>
-              ) : null}
-              {route ? (
-                <ButtonLink to={route} variant="chrome" size="lg" icon="globe" data-cursor-label="Atlas">
-                  Follow the route
-                </ButtonLink>
-              ) : null}
-              <ButtonLink to={`/synapse/programme/${p.slug}`} variant="ghost" size="lg" icon="synapse" data-cursor-label="Synapse">
-                Connections
+              <span className="prog-now-tally">
+                {all.length ? `${plural(all.length, 'entry', 'entries')} · ${playableCount} playable now` : 'Nothing published yet'}
+              </span>
+            </p>
+            <p className="prog-now-note">{p.statusNote}</p>
+          </div>
+          <div className="prog-actions">
+            {cta ? (
+              <ButtonLink to={cta.to} variant="primary" size="lg" icon="play" data-cursor="play" data-cursor-label="Watch" {...(lead ? seedHover(lead.id) : {})}>
+                {cta.label}
               </ButtonLink>
-            </div>
+            ) : null}
+            {route ? (
+              <ButtonLink to={route} variant="ghost" icon="globe" data-cursor-label="World">
+                Follow the route
+              </ButtonLink>
+            ) : null}
+            <ButtonLink to={`/synapse/programme/${p.slug}`} variant="quiet" icon="synapse" data-cursor-label="Synapse">
+              Connections
+            </ButtonLink>
           </div>
-          <div className="prog-hero-screen">
-            <Art art={p.art} alt="" sizes="large" eager />
-            {art?.preview || art?.previewSmall ? <video ref={vid} className="prog-hero-video" muted loop playsInline preload="none" tabIndex={-1} aria-hidden="true" /> : null}
-            {art?.preview || art?.previewSmall ? <LoopToggle playing={loop.playing} onToggle={loop.toggle} className="prog-hero-toggle" label="header motion" /> : null}
-          </div>
-          {art?.provisional ? <p className="prog-art-note">Header art is a provisional studio motion concept</p> : null}
         </div>
       </header>
 
-      <div className="wrap prog-about">
+      <section className="wrap prog-about" aria-labelledby="prog-about-title">
+        <h2 id="prog-about-title" className="sr-only">
+          About {p.title}
+        </h2>
         <p className="prog-desc">{p.description}</p>
         {presenters.length ? (
           <div className="prog-presenters">
-            <h2 className="prog-presenters-title" id="prog-presenters-title">
+            <p className="eyebrow" id="prog-presenters-title">
               Presented by
-            </h2>
+            </p>
             <ul aria-labelledby="prog-presenters-title">
               {presenters.map((person) => (
                 <li key={person.id}>
                   <Link to={cat.href(person.id)} className="prog-presenter" data-cursor-label="Connections" onClick={() => sound.play('transition')}>
-                    <span className="prog-presenter-mark" aria-hidden="true">
-                      {person.name.slice(0, 1)}
-                    </span>
-                    <span>
-                      <span className="prog-presenter-name">{person.name}</span>
-                      <span className="prog-presenter-role">{person.provisional ? 'Profile awaiting approval' : (person.roles[0] ?? 'Presenter')}</span>
-                    </span>
-                    <Icon name="arrow" size={18} />
+                    <span className="prog-presenter-name">{person.name}</span>
+                    <span className="prog-presenter-role">{person.provisional ? 'Profile awaiting approval' : (person.roles[0] ?? 'Presenter')}</span>
+                    <Icon name="arrow" size={16} />
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
         ) : null}
-      </div>
+      </section>
 
       {hasRoute ? (
         <section className="section wrap prog-route-section" id="prog-route" aria-labelledby="prog-route-title">
@@ -227,20 +212,20 @@ function ProgrammeView({ programme: p }: { programme: Programme }) {
             action={
               route ? (
                 <ButtonLink to={route} variant="quiet" iconAfter="arrow">
-                  Open in the atlas
+                  Open in World
                 </ButtonLink>
               ) : undefined
             }
           >
-            Each stop opens the Living Atlas; each leg shows the catalogued route.
+            Each stop opens in World; each leg shows the catalogued route.
           </SectionHeader>
           <RouteStrip programme={p} />
         </section>
       ) : null}
 
       <section className="section wrap" id="prog-episodes" aria-labelledby="prog-episodes-title">
-        <SectionHeader kicker="Series order" title="In this programme" id="prog-episodes-title">
-          {all.length ? `${all.length} ${all.length === 1 ? 'entry' : 'entries'} · ${all.filter((v) => cat.isPlayable(v)).length} playable now` : undefined}
+        <SectionHeader title="In this programme" id="prog-episodes-title">
+          {all.length ? `In series order. ${plural(all.length, 'entry', 'entries')}, ${playableCount} playable now — each one lit in the world beside you.` : undefined}
         </SectionHeader>
         {groups.length === 0 ? (
           <EmptyState
@@ -255,7 +240,7 @@ function ProgrammeView({ programme: p }: { programme: Programme }) {
                   </ButtonLink>
                 ))}
                 {p.categories[0] ? (
-                  <ButtonLink to={`/catalogue?interest=${(cat.get(p.categories[0]) as { slug: string } | undefined)?.slug ?? ''}`} icon="search">
+                  <ButtonLink to={`/search?interest=${(cat.get(p.categories[0]) as { slug: string } | undefined)?.slug ?? ''}`} variant="quiet" icon="search">
                     Browse {cat.label(p.categories[0])}
                   </ButtonLink>
                 ) : null}
@@ -284,9 +269,9 @@ function ProgrammeView({ programme: p }: { programme: Programme }) {
                   </h3>
                 ) : null}
                 <ol className="prog-ep-list">
-                  {g.videos.map((v, i) => (
+                  {g.videos.map((v) => (
                     <li key={v.id}>
-                      <EpisodeRow video={v} index={i} level={titled ? 4 : 3} primary={v.id === (resume ?? first)?.id} />
+                      <EpisodeRow video={v} level={titled ? 4 : 3} lead={v.id === lead?.id} />
                     </li>
                   ))}
                 </ol>
@@ -298,7 +283,9 @@ function ProgrammeView({ programme: p }: { programme: Programme }) {
 
       {children.length ? (
         <section className="section wrap" id="prog-chapters" aria-labelledby="prog-chapters-title">
-          <SectionHeader kicker={`${children.length} ${children.length === 1 ? 'chapter' : 'chapters'}`} title="Chapters" id="prog-chapters-title" />
+          <SectionHeader title="Chapters" id="prog-chapters-title">
+            {plural(children.length, 'chapter')} of {p.title}.
+          </SectionHeader>
           <ul className="prog-card-grid">
             {children.map((c) => (
               <li key={c.id}>
@@ -310,19 +297,27 @@ function ProgrammeView({ programme: p }: { programme: Programme }) {
       ) : null}
 
       <section className="section wrap" id="prog-threads" aria-labelledby="prog-threads-title">
-        <SectionHeader kicker="Connected through" title="Threads" id="prog-threads-title" />
+        <SectionHeader
+          title="Threads"
+          id="prog-threads-title"
+          action={
+            <ButtonLink to={`/synapse/programme/${p.slug}`} variant="quiet" icon="synapse" data-cursor-label="Synapse">
+              See every connection
+            </ButtonLink>
+          }
+        />
         {threads.length ? (
           <dl className="prog-threads">
             {threads.map((t) => (
-              <div key={t.label} className="prog-thread">
+              <div key={t.label} className="prog-thread" data-tone={t.tone}>
                 <dt className="prog-thread-label">{t.label}</dt>
                 <dd>
                   <ul>
                     {t.ids.map((id) => (
                       <li key={id}>
-                        <Link to={cat.href(id)} className="prog-tag" data-kind={id.slice(0, id.indexOf(':'))} onClick={() => sound.play('select')}>
+                        <Link to={cat.href(id)} className="prog-tag" onClick={() => sound.play('select')}>
                           <span className="prog-tag-node" aria-hidden="true" />
-                          {cat.label(id)}
+                          <span>{cat.label(id)}</span>
                         </Link>
                       </li>
                     ))}
@@ -334,16 +329,11 @@ function ProgrammeView({ programme: p }: { programme: Programme }) {
         ) : (
           <p className="muted">No interests, themes or places are linked to this programme yet.</p>
         )}
-        <p className="prog-threads-more">
-          <ButtonLink to={`/synapse/programme/${p.slug}`} variant="chrome" icon="synapse" data-cursor-label="Synapse">
-            See every connection
-          </ButtonLink>
-        </p>
       </section>
 
       {related.length ? (
         <section className="section wrap" id="prog-related" aria-labelledby="prog-related-title">
-          <SectionHeader kicker="Why these" title="Related programmes" id="prog-related-title" />
+          <SectionHeader title="Related programmes" id="prog-related-title" />
           <ul className="prog-card-grid">
             {related.map((r) => (
               <li key={r.programme.id}>
@@ -357,7 +347,8 @@ function ProgrammeView({ programme: p }: { programme: Programme }) {
   );
 }
 
-function EpisodeRow({ video: v, index, level, primary }: { video: Video; index: number; level: 3 | 4; primary: boolean }) {
+/** One entry in series order. Its seed is in the world's ring: hover lights it, and vice versa. */
+function EpisodeRow({ video: v, level, lead }: { video: Video; level: 3 | 4; lead: boolean }) {
   const cat = useCatalogue();
   const lib = useLibrary();
   const access = useAccessState(v);
@@ -369,14 +360,16 @@ function EpisodeRow({ video: v, index, level, primary }: { video: Video; index: 
   const saved = isSaved(lib, v.id);
   const href = cat.href(v.id);
   const Title = level === 3 ? 'h3' : 'h4';
+  const lit = useSeedLit(v.id);
+  useEffect(() => () => releaseSeed(v.id), [v.id]);
 
   const toggleSave = (e: React.MouseEvent<HTMLElement>) => {
     const now = libraryActions.toggleSave(v.id);
-    announceSave({ saved: now, title: v.title, from: e.currentTarget, undo: () => libraryActions.toggleSave(v.id) });
+    announceSave({ saved: now, title: v.title, from: e.currentTarget, id: v.id, undo: () => libraryActions.toggleSave(v.id) });
   };
 
   return (
-    <article className="prog-ep" data-playable={playable || undefined} data-access={access.key}>
+    <article className="prog-ep" data-playable={playable || undefined} data-access={access.key} data-lead={lead || undefined} data-world-lit={lit || undefined} {...seedHover(v.id)}>
       <div className="prog-ep-thumb">
         {playable ? (
           <Link to={href} tabIndex={-1} aria-hidden="true" data-cursor="play" data-cursor-label={access.locked ? 'Preview' : 'Watch'}>
@@ -385,6 +378,7 @@ function EpisodeRow({ video: v, index, level, primary }: { video: Video; index: 
         ) : (
           <Art art={v.art} alt="" />
         )}
+        {access.key !== 'free' ? <span className={`prog-ep-mark prog-ep-mark-${access.key}`}>{access.label}</span> : null}
         {runtime ? <span className="prog-ep-runtime">{runtimeLabel(runtime)}</span> : null}
         {pct > 0 ? (
           <span className="prog-ep-vein" aria-hidden="true">
@@ -403,10 +397,11 @@ function EpisodeRow({ video: v, index, level, primary }: { video: Video; index: 
             v.title
           )}
         </Title>
-        <div className="prog-ep-badges">
-          <AccessBadge video={v} />
-          <FootageBadges video={v} max={4} />
-        </div>
+        <p className="prog-ep-meta">
+          <span>{settingLabel(v)}</span>
+          {v.footage.length ? <span>{v.footage.map((f) => FOOTAGE_LABEL[f]).join(', ')}</span> : null}
+          {access.key === 'free' ? null : <span className="sr-only">{access.label}</span>}
+        </p>
         <p className="prog-ep-summary">{v.summary}</p>
         {!playable ? (
           <p className="prog-ep-status">
@@ -421,7 +416,7 @@ function EpisodeRow({ video: v, index, level, primary }: { video: Video; index: 
       </div>
       <div className="prog-ep-actions">
         {playable ? (
-          <ButtonLink to={href} variant={primary ? 'primary' : 'chrome'} size="sm" icon="play" aria-label={`${resumable ? 'Resume' : 'Watch'} ${v.title}`} data-cursor="play" data-cursor-label="Watch">
+          <ButtonLink to={href} variant="ghost" size="sm" icon="play" aria-label={`${resumable ? 'Resume' : 'Watch'} ${v.title}`} data-cursor="play" data-cursor-label="Watch">
             {resumable ? 'Resume' : 'Watch'}
           </ButtonLink>
         ) : (

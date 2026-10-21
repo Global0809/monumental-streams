@@ -11,7 +11,7 @@
  */
 import { overlaps, type Catalogue } from '../../../shared/catalogue.ts';
 import { connectionsFor } from '../../../shared/relations.ts';
-import type { ID, Movement, Period, Person, Place, Programme, Reason, Video } from '../../../shared/types.ts';
+import type { ID, Movement, Period, Person, Place, Reason, Video } from '../../../shared/types.ts';
 
 export type Lens = 'setting' | 'made' | 'published';
 export const LENSES: readonly Lens[] = ['setting', 'made', 'published'];
@@ -19,7 +19,6 @@ export const LENSES: readonly Lens[] = ['setting', 'made', 'published'];
 export const LENS_LABEL: Record<Lens, string> = { setting: 'Set in', made: 'Made in', published: 'Published' };
 /** Lens used in a sentence: "Stories set in the 1940s". */
 export const LENS_VERB: Record<Lens, string> = { setting: 'set in', made: 'made in', published: 'published in' };
-export const LENS_EXPLAIN = 'Set in is when a story takes place. Made in is when the footage was originally produced. Published is when it arrived on Monumental Streams.';
 
 export function parseLens(value: string | null | undefined): Lens {
   return value === 'made' || value === 'published' ? value : 'setting';
@@ -212,7 +211,7 @@ export function decadeContext(cat: Catalogue, period: Period, results: Video[]):
 }
 
 /**
- * Context for any span of years — a decade on the dial or one year on the strand: the movements
+ * Context for any span of years — a decade or one year chosen on the time control: the movements
  * alive then, the places and people they touch (or the stories in view feature), their roots,
  * their echoes forward, and what on Monumental today carries the thread.
  */
@@ -302,18 +301,12 @@ export function rangeContext(cat: Catalogue, period: { start: number; end: numbe
   return { movements, places, people, roots, echoes, today };
 }
 
-/** Programmes a decade's stories belong to (for "part of" hints); unused ids are skipped. */
-export function programmesOf(cat: Catalogue, videos: Video[]): Programme[] {
-  const ids = [...new Set(videos.map((v) => v.programme).filter((x): x is ID => !!x))];
-  return ids.map((id) => cat.get(id) as Programme | undefined).filter((p): p is Programme => !!p);
-}
-
-/** aria-valuetext for the dial: "1940s — 3 stories, 2 movements". */
+/** aria-valuetext for the decade scrubber: "1940s — 3 stories, 2 movements". */
 export function dialValueText(p: Period, stories: number, movements: number): string {
   return `${p.label} — ${stories} ${stories === 1 ? 'story' : 'stories'}, ${movements} ${movements === 1 ? 'movement' : 'movements'}`;
 }
 
-/** Map a clock angle (degrees, 0 = 12 o'clock, clockwise) to the nearest detent on an arc. */
+/** Map a clock angle (degrees, 0 = 12 o'clock, clockwise) to the nearest detent on an arc (kept for its unit tests; the page no longer draws a dial). */
 export function angleToIndex(angle: number, count: number, startDeg: number, stepDeg: number): number {
   let a = angle;
   // Normalise into (-180, 180]

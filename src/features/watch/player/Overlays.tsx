@@ -1,4 +1,7 @@
-/** Player overlays: poster, premium gate, planned / unavailable, errors, end card, shortcuts. */
+/**
+ * Player overlays: poster, premium gate, planned / unavailable, errors, end card, shortcuts.
+ * The end card's next story and picks are seeds in the world's ring: hovering one lights it.
+ */
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import type { Programme, Video } from '../../../../shared/types.ts';
@@ -10,6 +13,7 @@ import { Icon } from '../../../ui/Icon.tsx';
 import { Button, ButtonLink } from '../../../ui/controls.tsx';
 import { Dialog } from '../../../ui/feedback.tsx';
 import { announceSave } from '../../../ui/save.ts';
+import { releaseSeed, seedHover } from '../seed.ts';
 import { SHORTCUTS } from './keys.ts';
 import type { StartPlan } from './resume.ts';
 
@@ -67,6 +71,7 @@ function SaveForLater({ video }: { video: Video }) {
           saved: now,
           title: video.title,
           from: e.currentTarget,
+          id: video.id,
           message: now ? `Saved “${video.title}” — it will be waiting in My World` : undefined,
           undo: () => libraryActions.toggleSave(video.id),
         });
@@ -81,10 +86,10 @@ export function GateOverlay({ video, signedIn, message, signInHref, tierName }: 
   return (
     <div className="pl-state pl-state-gate" role="group" aria-label="Premium">
       <div className="pl-state-card">
-        <p className="kicker pl-k-gold">
+        <p className="eyebrow pl-k-gold">
           <Icon name="lock" size={13} strokeWidth={2} /> {tierName}
         </p>
-        <p className="pl-state-title serif">This story is part of Premium.</p>
+        <p className="pl-state-title">This story is part of Premium.</p>
         <p className="pl-state-text">
           {message} {video.availability.note ? <span className="pl-state-note">{video.availability.note}</span> : null}
         </p>
@@ -124,10 +129,8 @@ export function PlannedOverlay({ video, programme, serverMessage }: { video: Vid
   return (
     <div className="pl-state pl-state-planned" role="group" aria-label={word}>
       <div className="pl-state-card">
-        <p className="kicker pl-k-rose">
-          {word}
-        </p>
-        <p className="pl-state-title serif">{mediaMissing ? 'This stream isn’t ready to play yet.' : 'Not released yet — nothing to play here today.'}</p>
+        <p className="eyebrow pl-k-frost">{word}</p>
+        <p className="pl-state-title">{mediaMissing ? 'This stream isn’t ready to play yet.' : 'Not released yet — nothing to play here today.'}</p>
         <p className="pl-state-text">
           {mediaMissing ? `${serverMessage ?? 'The server can’t play this video right now.'} Its stream hasn’t been published to the server yet.` : (a.note ?? programme?.statusNote ?? serverMessage ?? 'This video isn’t available to watch yet.')}
         </p>
@@ -149,10 +152,10 @@ export function ProblemOverlay({ title, detail, onRetry, onNative, busy }: { tit
   return (
     <div className="pl-state pl-state-error" role="alert">
       <div className="pl-state-card">
-        <p className="kicker pl-k-danger">
+        <p className="eyebrow pl-k-danger">
           <Icon name="info" size={13} strokeWidth={2} /> Playback interrupted
         </p>
-        <p className="pl-state-title serif">{title}</p>
+        <p className="pl-state-title">{title}</p>
         <p className="pl-state-text">{detail}</p>
         <div className="pl-state-actions">
           <Button variant="primary" icon="replay" onClick={onRetry} busy={busy}>
@@ -184,6 +187,9 @@ export function EndCard({ video, next, picks, autoNext, onReplay, onNext }: { vi
   const [left, setLeft] = useState<number | null>(next && autoNext ? COUNTDOWN : null);
   const onNextRef = useRef(onNext);
   onNextRef.current = onNext;
+  const litIds = useRef<string[]>([]);
+  litIds.current = [...(next ? [next.video.id] : []), ...picks.map((v) => v.id)];
+  useEffect(() => () => litIds.current.forEach(releaseSeed), []);
 
   useEffect(() => {
     if (left === null) return;
@@ -200,14 +206,14 @@ export function EndCard({ video, next, picks, autoNext, onReplay, onNext }: { vi
   return (
     <div className="pl-end" role="group" aria-label="Finished">
       <div className="pl-end-inner">
-        <p className="kicker pl-k-iris">You reached the end</p>
-        <p className="pl-end-title serif">{video.title}</p>
+        <p className="eyebrow pl-k-iris">You reached the end</p>
+        <p className="pl-end-title">{video.title}</p>
         <div className="pl-end-actions">
           <Button variant="ghost" icon="replay" onClick={onReplay}>
             Replay
           </Button>
           {next ? (
-            <button type="button" className="pl-next" onClick={onNext} data-cursor="play" data-cursor-label="Next" data-counting={counting || undefined}>
+            <button type="button" className="pl-next" onClick={onNext} data-cursor="play" data-cursor-label="Next" data-counting={counting || undefined} {...seedHover(next.video.id)}>
               {nextArt ? <img src={nextArt.posterSmall} alt="" className="pl-next-art" loading="lazy" /> : null}
               <span className="pl-next-body">
                 <span className="pl-next-kicker mono">{counting ? `Up next in ${left}` : next.label}</span>
@@ -239,7 +245,7 @@ export function EndCard({ video, next, picks, autoNext, onReplay, onNext }: { vi
                 const a = cat.artFor(v.art);
                 return (
                   <li key={v.id}>
-                    <Link to={cat.href(v.id)} className="pl-pick" onClick={() => sound.play('transition')}>
+                    <Link to={cat.href(v.id)} className="pl-pick" onClick={() => sound.play('transition')} {...seedHover(v.id)}>
                       {a ? <img src={a.posterSmall} alt="" loading="lazy" /> : null}
                       <span>{v.title}</span>
                     </Link>

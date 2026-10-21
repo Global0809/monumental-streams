@@ -1,24 +1,32 @@
 /**
- * /movies /music /sports /gaming /news /fashion /culture /kids — eight category pages, ONE engine.
+ * /movies /music /sports /gaming /news /fashion /culture /kids — eight category pages, ONE engine,
+ * written as an editorial layer over the category's CHAMBER in the living world: the section's
+ * organ fills the scene and draws its stories in as seeds. The organ is the hero; the page
+ * paints no scene of its own.
  *
  *   section      read from the pathname (SECTIONS, kind "category")
+ *   world        useArrangement({ kind: 'category', section }); the seeds the page is showing
+ *                are highlighted (facet / search results), everything else dims
  *   membership   videosForSection: a title is here because its record carries the interest
  *   state        ?facet=&sort=&q=&group= in the URL (shareable, refresh-safe, Back undoes a
  *                filter); typing replaces the URL after a pause, everything else pushes
- *   presentation section.layout picks one of eight families (heroes.tsx + results.tsx)
- *   context      places (World) and eras (Time Machine) follow whatever is showing
+ *   composition  monumental title → the leading story and its action → the collection with
+ *                quiet controls → where and when (World, Time Machine)
+ *   presentation section.layout picks one of eight families (results.tsx), told through
+ *                composition and type
  *   honesty      a category with no titles gets a designed empty state, never fake titles
  *
- * Switching category (switcher or navigation) glides the switcher highlight from the last
- * category, cross-fades the page and lets the new collection rise in; keyboard focus stays on
- * the switcher when it was used.
+ * Switching category (switcher or navigation) re-forms the chamber: the seeds migrate to the
+ * new organ; keyboard focus stays on the switcher when it was used.
  */
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import { SECTIONS, type CategoryLayout, type Section } from '../../../shared/sections.ts';
+import type { ID } from '../../../shared/types.ts';
 import { useChapters } from '../../app/chapters.ts';
 import { plural } from '../../lib/format.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
+import { setHighlight, useArrangement } from '../../stage/store.ts';
 import { ButtonLink } from '../../ui/controls.tsx';
 import { EmptyState } from '../../ui/feedback.tsx';
 import {
@@ -35,35 +43,23 @@ import {
   type CatState,
   type GroupMode,
 } from './engine.ts';
-import { CinemaScreen, Constellation, HeroFrame, LightBoard, Masthead, PrimaryWatch, Runway, Spectrum, Stadium, ToyBox, Wire } from './heroes.tsx';
-import { ContextSection, EmptyCategory, NoMatches, Toolbar } from './parts.tsx';
+import { ContextSection, EmptyContext, EmptyStatement, LeadStory, NoMatches, Switcher, Toolbar } from './parts.tsx';
+import { useWorldEcho } from './world.ts';
 import { ArcadeResults, ArenaResults, BroadsheetResults, CinemaResults, MosaicResults, PlayroomResults, RunwayResults, SoundstageResults, type ResultsProps } from './results.tsx';
 import './category.css';
 
 const TYPE_DELAY = 250;
 
-/** Family voice: the hero's eyebrow, the collection's heading, the noun for a title. */
-const FAMILY: Record<CategoryLayout, { kicker: string; collection: string; noun: [string, string]; filled: string; empty: string }> = {
-  cinema: { kicker: 'Screening room', collection: 'The bill', noun: ['film', 'films'], filled: '', empty: '' },
-  soundstage: {
-    kicker: 'Soundstage',
-    collection: 'On the soundstage',
-    noun: ['title', 'titles'],
-    filled: 'One cluster of bars per title — wider runs longer. Hollow clusters are planned, not yet watchable.',
-    empty: 'No titles yet — the soundstage is silent.',
-  },
-  arena: { kicker: 'Arena', collection: 'Fixtures', noun: ['title', 'titles'], filled: 'Every runner on the track is a title in Sports.', empty: 'No titles yet — the track is empty.' },
-  arcade: { kicker: 'Arcade', collection: 'Level select', noun: ['title', 'titles'], filled: 'Every lit cell on the board is a title in Gaming.', empty: 'No titles yet — no cell on the board is lit.' },
-  broadsheet: { kicker: 'The newsroom', collection: 'This edition', noun: ['report', 'reports'], filled: '', empty: '' },
-  runway: { kicker: 'Runway', collection: 'The lookbook', noun: ['title', 'titles'], filled: 'Every light along the runway is a title in Fashion.', empty: 'No titles yet — the runway is dark.' },
-  'atlas-of-ideas': {
-    kicker: 'Movements and places',
-    collection: 'The mosaic',
-    noun: ['title', 'titles'],
-    filled: 'The places these titles live in, joined by real routes and journeys. Select one to open it in World.',
-    empty: 'No titles yet — no places to join.',
-  },
-  playroom: { kicker: 'Playroom', collection: 'Family-friendly picks', noun: ['title', 'titles'], filled: 'Every shape is a family-friendly title.', empty: 'No titles yet — the toy box is empty.' },
+/** Family voice: the eyebrow, the lead's label, the collection's heading, the noun for a title. */
+const FAMILY: Record<CategoryLayout, { kicker: string; lead: string; collection: string; noun: [string, string] }> = {
+  cinema: { kicker: 'Screening room', lead: 'Top of the bill', collection: 'The bill', noun: ['film', 'films'] },
+  soundstage: { kicker: 'Soundstage', lead: 'Lead track', collection: 'On the soundstage', noun: ['title', 'titles'] },
+  arena: { kicker: 'Arena', lead: 'Main event', collection: 'Fixtures', noun: ['title', 'titles'] },
+  arcade: { kicker: 'Arcade', lead: 'Level one', collection: 'Level select', noun: ['title', 'titles'] },
+  broadsheet: { kicker: 'The newsroom', lead: 'Lead report', collection: 'This edition', noun: ['report', 'reports'] },
+  runway: { kicker: 'Runway', lead: 'First look', collection: 'The lookbook', noun: ['title', 'titles'] },
+  'atlas-of-ideas': { kicker: 'Movements and places', lead: 'Lead story', collection: 'The mosaic', noun: ['title', 'titles'] },
+  playroom: { kicker: 'Playroom', lead: 'First pick', collection: 'Family-friendly picks', noun: ['title', 'titles'] },
 };
 
 const RESULTS: Record<CategoryLayout, (p: ResultsProps) => ReactNode> = {
@@ -161,9 +157,21 @@ function CategoryBody({ section }: { section: Section }) {
   const modes = groupModes(section);
   const group: GroupMode = urlState.group ?? modes[0] ?? 'all';
   const empty = view.all.length === 0;
-  // the hero's one action leads with the same title the collection leads with by default
+  // the lead is the title the collection leads with by default (watchable first)
   const lead = useMemo(() => sortVideos(cat, view.all, defaultSort(section), { section }), [cat, view.all, section]);
   const top = lead.find((v) => cat.isPlayable(v)) ?? lead[0];
+
+  /* ── the world: this category's chamber; what is showing is what is lit ── */
+  useArrangement({ kind: 'category', section: section.id });
+  const narrowed = !!deferred.facet || deferred.q.trim() !== '';
+  const highlight = useMemo<ID[] | null>(() => (narrowed ? view.results.map((v) => v.id) : null), [narrowed, view.results]);
+  const highlightKey = highlight === null ? '*' : `[${highlight.join('|')}]`;
+  useEffect(() => {
+    setHighlight(highlight);
+    // keyed by the ids, not the array identity
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightKey]);
+  useWorldEcho(pageRef);
 
   useEffect(() => {
     document.title = `${section.label} · Monumental Streams`;
@@ -182,7 +190,7 @@ function CategoryBody({ section }: { section: Section }) {
     empty
       ? [
           { id: 'cat-top', label: section.label },
-          { id: 'cat-collection', label: 'Nothing yet' },
+          { id: 'cat-context', label: 'Already here' },
         ]
       : [
           { id: 'cat-top', label: section.label },
@@ -191,73 +199,41 @@ function CategoryBody({ section }: { section: Section }) {
         ],
   );
 
-  const heroStats = [
-    { n: stats.titles, label: stats.titles === 1 ? family.noun[0] : family.noun[1], tone: 'gold' as const },
-    { n: stats.watchNow, label: 'watch now', tone: 'iris' as const },
-    { n: stats.places, label: stats.places === 1 ? 'place' : 'places' },
-    { n: stats.eras, label: stats.eras === 1 ? 'era' : 'eras', tone: 'frost' as const },
-  ];
-  const caption = empty ? family.empty : family.filled;
-
-  const hero = (() => {
-    const common = { section, kicker: family.kicker, stats: heroStats, className: `is-${layout}` };
-    switch (layout) {
-      case 'cinema':
-        return <HeroFrame {...common} viz={view.all.length ? <CinemaScreen films={view.all} pageRef={pageRef} /> : undefined} />;
-      case 'soundstage':
-        return (
-          <HeroFrame {...common} viz={<Spectrum videos={view.all} pageRef={pageRef} />} vizLabel={caption}>
-            {top ? <PrimaryWatch video={top} /> : null}
-          </HeroFrame>
-        );
-      case 'arena':
-        return (
-          <HeroFrame {...common} viz={<Stadium videos={view.all} />} vizLabel={caption}>
-            {top ? <PrimaryWatch video={top} /> : null}
-          </HeroFrame>
-        );
-      case 'arcade':
-        return (
-          <HeroFrame {...common} viz={<LightBoard videos={view.all} />} vizLabel={caption}>
-            {top ? <PrimaryWatch video={top} /> : null}
-          </HeroFrame>
-        );
-      case 'broadsheet':
-        return (
-          <HeroFrame {...common} before={<Masthead count={view.all.length} />} viz={<Wire videos={view.all} />}>
-            {top ? <PrimaryWatch video={top} /> : null}
-          </HeroFrame>
-        );
-      case 'runway':
-        return (
-          <HeroFrame {...common} viz={<Runway videos={view.all} />} vizLabel={caption}>
-            {top ? <PrimaryWatch video={top} /> : null}
-          </HeroFrame>
-        );
-      case 'atlas-of-ideas':
-        return (
-          <HeroFrame {...common} viz={<Constellation videos={view.all} />} vizLabel={caption}>
-            {top ? <PrimaryWatch video={top} /> : null}
-          </HeroFrame>
-        );
-      case 'playroom':
-        return (
-          <HeroFrame {...common} viz={<ToyBox videos={view.all} />} vizLabel={caption}>
-            {top ? <PrimaryWatch video={top} /> : null}
-          </HeroFrame>
-        );
-    }
-  })();
+  const facts = empty
+    ? null
+    : [
+        plural(stats.titles, family.noun[0], family.noun[1]),
+        stats.watchNow === stats.titles ? 'all watchable now' : `${stats.watchNow} watchable now`,
+        stats.places ? `set in ${plural(stats.places, 'place')}` : null,
+        stats.eras ? `across ${plural(stats.eras, 'era')}` : null,
+      ]
+        .filter(Boolean)
+        .join(' · ');
 
   const Results = RESULTS[layout];
   const clearQuery = () => update((s) => ({ ...s, q: '' }));
   const clearFacet = () => update((s) => ({ ...s, facet: null }));
 
   return (
-    <div ref={pageRef} className={`catpage fam-${layout} ${empty ? 'is-empty' : ''}`} data-section={section.id}>
-      {hero}
+    <div ref={pageRef} className={`catpage fam-${layout} ${empty ? 'is-empty' : ''}`} data-section={section.id} data-hue={section.id}>
+      <section className="cat-hero" id="cat-top" aria-labelledby="cat-title">
+        <div className="wrap cat-hero-inner">
+          <Switcher current={section} />
+          <div className="cat-hero-head">
+            <p className="eyebrow cat-eyebrow">{family.kicker}</p>
+            <h1 id="cat-title" className="title-monument cat-title">
+              {section.label}
+            </h1>
+            <p className="lede cat-tagline">{section.tagline}</p>
+            {facts ? <p className="cat-facts">{facts}</p> : null}
+          </div>
+          <div className="cat-hero-open" aria-hidden="true" />
+          {empty ? <EmptyStatement section={section} /> : top ? <LeadStory video={top} label={family.lead} news={layout === 'broadsheet'} /> : null}
+        </div>
+      </section>
+
       {empty ? (
-        <EmptyCategory section={section} />
+        <EmptyContext section={section} />
       ) : (
         <>
           <section className="cat-collection" id="cat-collection" aria-labelledby="cat-collection-title">
@@ -266,9 +242,7 @@ function CategoryBody({ section }: { section: Section }) {
                 <h2 id="cat-collection-title" className="cat-h2">
                   {family.collection}
                 </h2>
-                <p className="cat-collection-sub">
-                  Every title tagged {membershipLabel(cat, section)} — {plural(view.all.length, family.noun[0], family.noun[1])} today. New ones join automatically when they are published.
-                </p>
+                <p className="cat-sub">Every title tagged {membershipLabel(cat, section)}. New ones join the moment they are published.</p>
               </header>
               <Toolbar
                 section={section}
@@ -285,13 +259,13 @@ function CategoryBody({ section }: { section: Section }) {
                 onGroup={(g) => update((s) => ({ ...s, group: g }))}
                 onClearAll={() => update((s) => ({ ...s, q: '', facet: null, sort: defaultSort(section) }))}
               />
-            </div>
-            <div className="wrap cat-results" aria-busy={state !== deferred || undefined}>
-              {view.results.length ? (
-                <Results section={section} videos={view.results} group={group} pageRef={pageRef} />
-              ) : (
-                <NoMatches section={section} q={deferred.q} facet={view.facet} onClearQuery={clearQuery} onClearFacet={clearFacet} />
-              )}
+              <div className="cat-results" aria-busy={state !== deferred || undefined}>
+                {view.results.length ? (
+                  <Results section={section} videos={view.results} group={group} />
+                ) : (
+                  <NoMatches section={section} q={deferred.q} facet={view.facet} onClearQuery={clearQuery} onClearFacet={clearFacet} />
+                )}
+              </div>
             </div>
           </section>
           <ContextSection section={section} videos={view.results.length ? view.results : view.all} showConnections={layout !== 'soundstage'} />

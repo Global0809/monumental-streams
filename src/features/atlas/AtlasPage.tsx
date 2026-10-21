@@ -1,33 +1,46 @@
 /**
- * WORLD — the living globe of places, the stories set there and the routes between them.
+ * WORLD — an editorial layer over the living globe. The page owns no 3D of its own: it asks
+ * the shared stage for the `world` arrangement and steers it.
  *
- *   /world                     whole globe, centred on the Atlantic, gateway highlighted, intro
- *   /world/:slug               a place: camera flies there, place panel opens
- *   ?route=<id without prefix> highlights a route (and frames it)
- *   ?view=globe|map|list       globe (WebGL, default where capable) · flat SVG map · accessible list
- *   ?cat ?facet ?era ?access ?stories   the lens (filters.ts) — re-lights every view
+ *   /world                     the whole globe, Miami glowing as the gateway, intro column
+ *   /world/:slug               a place: the camera flies there, the column tells its story
+ *   ?route=<id without prefix> a route: its arc lights and the camera frames it
+ *   ?view=globe|map|list       the living globe (default where the stage runs) · the flat
+ *                              SVG map · the accessible list of every place
+ *   ?cat ?facet ?era ?access ?stories   the lens (filters.ts): matching seeds glow on the
+ *                              globe (the stage highlight) and every list re-ranks
  *
- * The URL is the only source of truth for selection, route, view and lens, so refresh restores
- * the state, a link shares it and the back button steps through earlier explorations (and
- * lands back on the same place, lens and panel position after watching a story). A session
- * trail of recent places sits above the panel for hopping back.
+ * World ⇄ page, both ways:
+ *   · selecting a place in the column, the list, the map, search or the URL → the camera
+ *     flies there; clicking a place on the globe (placeActivate) → the same URL change
+ *   · hovering / focusing a place row lights it on the globe; a place under the pointer on
+ *     the globe lights its rows and previews it beside the globe (stageStore.hoveredPlace)
+ *   · story cards light their seeds and the reverse (VideoPod); saving sends the seed home
+ *
+ * The URL is the only source of truth for selection, route, view and lens, so refresh
+ * restores the state, a link shares it and the back button steps through earlier
+ * explorations; the window scroll is restored when coming back from a story.
  */
-import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { useLocation, useNavigate, useNavigationType, useParams, useSearchParams } from 'react-router';
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { kindOf } from '../../../shared/catalogue.ts';
-import type { ID, Place, Route } from '../../../shared/types.ts';
+import type { ID, Place, Route, Video } from '../../../shared/types.ts';
 import { useChapters } from '../../app/chapters.ts';
+import type { Arrangement } from '../../stage/contract.ts';
+import { chooseQuality } from '../../stage/Stage.tsx';
+import { setHighlight, stageStore, useArrangement, useStageEvent } from '../../stage/store.ts';
+import { plural } from '../../lib/format.ts';
 import { useCatalogue } from '../../state/catalogue.tsx';
-import { deviceTier, hasWebGL } from '../../systems/device.ts';
 import { useReducedMotion } from '../../systems/motion.ts';
 import { sound } from '../../systems/sound/engine.ts';
 import { Segmented } from '../../ui/controls.tsx';
-import { Pulse } from '../../ui/feedback.tsx';
 import type { IconName } from '../../ui/Icon.tsx';
+import { Art } from '../../ui/Pod.tsx';
 import {
   eraDensity,
   facetCounts,
   isFiltering,
+  matchesVideo,
   narrowsStories,
   NO_FILTERS,
   parseFilters,
@@ -36,34 +49,18 @@ import {
   pushTrail,
   sectionCounts,
   sectionOf,
+  type PlaceSignal,
   type WorldFilters,
 } from './filters.ts';
 import { Lens } from './Lens.tsx';
 import ListView from './ListView.tsx';
 import MapView from './MapView.tsx';
 import MiamiUpClose from './MiamiUpClose.tsx';
-import { atlasHref, buildAtlasModel, focusFor, gatewayRegion, isWithin, mapFocus, parseView, placeTree, pruneEmpty, withCounts, type AtlasView } from './model.ts';
-import { IntroPanel, PlacePanel, UnknownPlace } from './panels.tsx';
-import { HotContext, Legend, Trail } from './parts.tsx';
-import { buildStageNodes, buildStageRoutes } from './stage.ts';
+import { atlasHref, buildAtlasModel, gatewayRegion, isWithin, KIND_LABEL, mapFocus, parseView, placeTree, pruneEmpty, withCounts, type AtlasModel, type AtlasView } from './model.ts';
+import { IntroBody, IntroHead, PlaceBody, PlaceHead, UnknownPlace, usePlaceData } from './panels.tsx';
+import { isDomHot, Legend, setHotPlace, Trail, useHoveredPlace } from './parts.tsx';
+import { buildStageNodes, buildStageRoutes, type StageInput } from './stage.ts';
 import './atlas.css';
-import './world.css';
-
-const GlobeView = lazy(() => import('./GlobeView.tsx'));
-
-/** Any render error inside the globe falls back to the flat map instead of breaking the page. */
-class GlobeBoundary extends Component<{ onError: (msg: string) => void; children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  componentDidCatch(err: unknown) {
-    this.props.onError(err instanceof Error ? err.message : String(err));
-  }
-  render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
 
 const VIEW_OPTIONS: { value: AtlasView; label: string; icon: IconName }[] = [
   { value: 'globe', label: 'Globe', icon: 'globe' },
@@ -71,13 +68,9 @@ const VIEW_OPTIONS: { value: AtlasView; label: string; icon: IconName }[] = [
   { value: 'list', label: 'List', icon: 'list' },
 ];
 
-/** Angular radius of the land glow around a selection, as a cosine. */
-const GLOW_COS: Partial<Record<Place['kind'], number>> = { country: 0.978, 'constituent-country': 0.99, state: 0.993, territory: 0.998 };
-
 /* ───────────── Exploration memory (session) ───────────── */
 
 const TRAIL_KEY = 'ms.world.trail.v1';
-const SCROLL_KEY = 'ms.world.panel.v1';
 
 function readSession<T>(key: string, fallback: T): T {
   try {
@@ -97,16 +90,27 @@ function writeSession(key: string, value: unknown) {
 
 const FILTER_PARAMS = ['cat', 'facet', 'era', 'access', 'stories'];
 
+/**
+ * Whether the living globe can carry the World: the same capability decision the stage makes,
+ * and false once the stage has run and stopped (lost context, failed engine).
+ */
+function useGlobeAvailable(): boolean {
+  const [capable] = useState(() => chooseQuality() !== 'off');
+  const quality = useSyncExternalStore(stageStore.subscribe, () => stageStore.get().quality, () => 'off' as const);
+  const [wasOn, setWasOn] = useState(false);
+  useEffect(() => {
+    if (quality !== 'off') setWasOn(true);
+  }, [quality]);
+  return capable && !(wasOn && quality === 'off');
+}
+
 export default function AtlasPage() {
   const cat = useCatalogue();
   const { slug } = useParams();
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const navType = useNavigationType();
   const reduced = useReducedMotion();
-  const panelRef = useRef<HTMLDivElement>(null);
-  const topRef = useRef<HTMLDivElement>(null);
 
   const model = useMemo(() => buildAtlasModel(cat), [cat]);
   const region = useMemo(() => gatewayRegion(cat), [cat]);
@@ -122,12 +126,10 @@ export default function AtlasPage() {
   const filters = useMemo(() => parseFilters(params, cat), [cat, filterKey]);
   const lensed = narrowsStories(filters);
 
-  const [caps] = useState(() => ({ webgl: hasWebGL(), tier: deviceTier() }));
-  const [globeError, setGlobeError] = useState<string | null>(null);
-  const preferred: AtlasView = caps.webgl && caps.tier !== 'low' ? 'globe' : 'map';
-  const requested = viewParam ?? preferred;
-  const view: AtlasView = requested === 'globe' && (!caps.webgl || globeError) ? 'map' : requested;
-  const fellBack = requested === 'globe' && view !== 'globe';
+  const globeOk = useGlobeAvailable();
+  const requested = viewParam ?? (globeOk ? 'globe' : 'map');
+  const view: AtlasView = requested === 'globe' && !globeOk ? 'map' : requested;
+  const fellBack = viewParam === 'globe' && view !== 'globe';
 
   const hrefFor = useCallback((s: string | null, r?: string | null) => atlasHref(s, { route: r ?? null, view: viewParam, filters }), [viewParam, filters]);
   const hrefSlug = useCallback((s: string) => hrefFor(s), [hrefFor]);
@@ -143,15 +145,40 @@ export default function AtlasPage() {
     document.title = place ? `${place.name} · World · Monumental Streams` : 'World · Monumental Streams';
   }, [place]);
 
-  /* ── The frame fills the viewport below whatever chrome sits above it ── */
-  useLayoutEffect(() => {
-    const el = topRef.current;
-    if (!el) return;
-    const measure = () => el.style.setProperty('--atlas-offset', `${Math.max(0, Math.round(el.getBoundingClientRect().top + window.scrollY))}px`);
-    measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-  }, []);
+  /* ── The world: arrangement + highlight ── */
+  const arrangement = useMemo<Arrangement>(() => {
+    const a: Extract<Arrangement, { kind: 'world' }> = { kind: 'world' };
+    if (place) a.place = place.id;
+    if (route) a.route = route.id;
+    return a;
+  }, [place, route]);
+  const matches = useMemo(() => (lensed ? placedMatches(cat, filters) : null), [cat, filters, lensed]);
+  const highlight = useMemo(() => (matches ? matches.map((v) => v.id) : null), [matches]);
+  useArrangement(arrangement);
+  // set apart from useArrangement: an empty match ([] — nothing glows) must differ from no lens (null)
+  const highlightKey = highlight ? `ids:${highlight.join('|')}` : 'all';
+  useEffect(() => {
+    setHighlight(highlight);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [highlightKey]);
+
+  // a place clicked on the globe opens here, keeping the lens, the view and a route it belongs to
+  const onPlaceActivate = useCallback(
+    ({ id }: { id: ID }) => {
+      const p = cat.get(id) as Place | undefined;
+      if (!p || kindOf(id) !== 'place') return;
+      const keep = route && (route.from === id || route.to === id) ? route.id : null;
+      const next = hrefFor(p.slug, keep);
+      if (next === hrefFor(place?.slug ?? null, route?.id ?? null)) return; // already here — no duplicate history entry
+      navigate(next);
+    },
+    [cat, route, place, hrefFor, navigate],
+  );
+  useStageEvent('placeActivate', onPlaceActivate);
+
+  // what the DOM lit is cleared when the page moves on or closes
+  useEffect(() => setHotPlace(null), [location.key]);
+  useEffect(() => () => setHotPlace(null), []);
 
   /* ── Trail: places visited this session ── */
   const [trail, setTrail] = useState<string[]>(() => readSession<string[]>(TRAIL_KEY, []));
@@ -170,38 +197,6 @@ export default function AtlasPage() {
     setTrail(keep);
   };
 
-  /* ── Panel position memory: back from a story lands where you were ── */
-  useLayoutEffect(() => {
-    const el = panelRef.current;
-    if (!el) return;
-    const saved = readSession<Record<string, number>>(SCROLL_KEY, {})[location.key];
-    if (navType === 'POP' && saved) el.scrollTop = saved;
-    else if (navType !== 'POP' && !location.state) el.scrollTop = 0;
-    // filter changes (state.keepFocus) keep the panel where it is
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.key]);
-  useEffect(() => {
-    const el = panelRef.current;
-    if (!el) return;
-    let frame = 0;
-    const save = () => {
-      frame = 0;
-      const all = readSession<Record<string, number>>(SCROLL_KEY, {});
-      all[location.key] = el.scrollTop;
-      const keys = Object.keys(all);
-      for (const k of keys.slice(0, Math.max(0, keys.length - 40))) delete all[k];
-      writeSession(SCROLL_KEY, all);
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(save);
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      el.removeEventListener('scroll', onScroll);
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, [location.key]);
-
   const inRegion = !!(place && region && isWithin(cat, place.id, region.id));
   useChapters(inRegion ? [{ id: 'atlas-place', label: 'This place' }, { id: 'atlas-miami', label: 'Miami, up close' }] : []);
 
@@ -218,162 +213,166 @@ export default function AtlasPage() {
     [cat, filters],
   );
   const summary = useMemo(() => {
-    const stories = placedMatches(cat, filters).length;
+    const stories = matches ? matches.length : placedMatches(cat, filters).length;
     // places glowing at world scale (what the globe and the ranked list show)
     const places = lensModel.nodes.filter((n) => n.level === 'city' && n.count > 0).length;
     return { stories, places };
-  }, [cat, filters, lensModel]);
+  }, [cat, filters, matches, lensModel]);
   const tree = useMemo(() => {
     const t = placeTree(cat, lensModel.counts);
     return filters.storiesOnly ? pruneEmpty(t, place?.id ?? null) : t;
   }, [cat, lensModel, filters.storiesOnly, place?.id]);
 
-  /* ── Stage ── */
-  const [hot, setHot] = useState<ID | null>(null);
-  useEffect(() => setHot(null), [location.key]);
   const scope = useMemo(() => (place ? cat.placeScope(place.id) : null), [cat, place]);
-  const stageInput = useMemo(() => ({ place, route, scope, filters, signals, hot }), [place, route, scope, filters, signals, hot]);
-  const nodes = useMemo(() => buildStageNodes(model, stageInput), [model, stageInput]);
-  const routes = useMemo(() => buildStageRoutes(cat, stageInput), [cat, stageInput]);
+  const stageInput = useMemo<StageInput>(() => ({ place, route, scope, filters, signals }), [place, route, scope, filters, signals]);
   const coordsOf = useCallback((id: ID) => (cat.get(id) as Place | undefined)?.coords, [cat]);
-
-  const ends = useMemo(() => new Set<ID>(route ? [route.from, route.to] : []), [route]);
-  const globeNodes = useMemo(() => nodes.filter((n) => n.level === 'city' || n.state === 3 || ends.has(n.id) || n.id === hot), [nodes, ends, hot]);
   const routeGeo = useMemo(() => {
     const a = route && coordsOf(route.from);
     const b = route && coordsOf(route.to);
     return a && b ? { from: a, to: b } : undefined;
   }, [route, coordsOf]);
-  const focus = useMemo(() => focusFor(place, routeGeo), [place, routeGeo]);
-  const flatFocus = useMemo(() => mapFocus(place, routeGeo), [place, routeGeo]);
-  const focusKey = place || routeGeo ? `${place?.id ?? ''}|${route?.id ?? ''}` : 'world';
-  const focusPoint = useMemo(() => (place ? { lat: place.coords[0], lon: place.coords[1], cos: GLOW_COS[place.kind] ?? 0.9988 } : null), [place]);
 
-  const onGlobeSelect = useCallback(
-    (id: string) => {
-      const p = cat.get(id) as Place | undefined;
-      if (!p) return;
-      sound.play('select');
-      const keep = route && (route.from === id || route.to === id) ? route.id : null;
-      const next = hrefFor(p.slug, keep);
-      if (next === hrefFor(place?.slug ?? null, route?.id ?? null)) return; // already here — no duplicate history entry
-      navigate(next);
-    },
-    [cat, route, place, hrefFor, navigate],
-  );
-  const nameOf = useCallback((id: string) => cat.label(id), [cat]);
-  const onGlobeFail = useCallback((msg: string) => setGlobeError(msg || 'unknown error'), []);
+  const placeData = usePlaceData(place, filters);
 
   const changeView = (v: AtlasView) => {
     if (v === view) return;
     navigate(atlasHref(slug ?? null, { route: route?.id ?? null, view: v, filters }), { preventScrollReset: true, state: { keepFocus: true } });
   };
-  const options = caps.webgl ? VIEW_OPTIONS : VIEW_OPTIONS.filter((o) => o.value !== 'globe');
+  const options = globeOk ? VIEW_OPTIONS : VIEW_OPTIONS.filter((o) => o.value !== 'globe');
   const section = sectionOf(filters.section);
-  const nothingLit = lensed && summary.stories === 0 && !nodes.some((n) => n.state === 0 && n.expanding);
+  const nothingLit = lensed && summary.stories === 0;
 
   return (
-    <HotContext.Provider value={setHot}>
-      <div className="atlas" data-view={view} data-lensed={lensed || undefined}>
-        <div className="atlas-top" ref={topRef}>
-          <Lens
-            filters={filters}
-            sectionCounts={counts.sections}
-            facetCounts={counts.facets}
-            density={counts.density}
-            allStories={counts.all}
-            onChange={setFilters}
-          />
-          <div className="atlas-body">
-            <section className="atlas-stage" data-view={view} aria-label={view === 'list' ? 'Every place in the world' : view === 'map' ? 'Flat map of the world' : 'Globe'}>
-              <div className="atlas-toolbar">
-                <Segmented label="World view" hideLabel value={view} options={options} onChange={changeView} />
-              </div>
-              <p className="atlas-sum" aria-live="polite" aria-atomic="true" data-lensed={lensed || undefined}>
-                {summary.stories ? (
-                  <>
-                    <span className="atlas-sum-pulse" aria-hidden="true" />
-                    <strong>{summary.places}</strong> {summary.places === 1 ? 'place' : 'places'} · <strong>{summary.stories}</strong> {summary.stories === 1 ? 'story' : 'stories'}
-                    {lensed ? <span className="atlas-sum-tail"> match</span> : null}
-                  </>
-                ) : (
-                  'No placed stories match yet'
-                )}
-              </p>
-              {fellBack ? (
-                <p className="notice atlas-stage-note" role="status">
-                  {globeError ? 'The 3D globe could not start here, so this is the flat map.' : 'This browser can’t draw the 3D globe, so this is the flat map.'} The list view has every place too.
-                </p>
-              ) : null}
-              {view !== 'list' && nothingLit ? (
-                <p className="atlas-stage-empty" role="status">
-                  <strong>{section ? `No ${section.label.toLowerCase()} stories are on the map yet.` : 'Nothing on the map matches.'}</strong>{' '}
-                  {section ? 'Places light up here as soon as those stories join the catalogue.' : 'Try another era or access level.'}
-                </p>
-              ) : null}
-              {view === 'globe' ? (
-                <GlobeBoundary onError={onGlobeFail}>
-                  <Suspense
-                    fallback={
-                      <div className="atlas-stage-wait">
-                        <Pulse label="Waking the globe" />
-                      </div>
-                    }
-                  >
-                    <GlobeView
-                      nodes={globeNodes}
-                      routes={routes}
-                      focus={focus}
-                      focusKey={focusKey}
-                      focusPoint={focusPoint}
-                      autoRotate={!place && !route}
-                      reduced={reduced}
-                      tier={caps.tier}
-                      onSelect={onGlobeSelect}
-                      onFail={onGlobeFail}
-                      nameOf={nameOf}
-                    />
-                  </Suspense>
-                </GlobeBoundary>
-              ) : view === 'map' ? (
-                <MapView nodes={nodes} routes={routes} focus={flatFocus} focusKey={focusKey} reduced={reduced} hrefFor={hrefSlug} />
-              ) : (
-                <ListView tree={tree} selectedId={place?.id ?? null} hrefFor={hrefSlug} lensed={lensed} storiesOnly={filters.storiesOnly} />
-              )}
-              {view !== 'list' ? (
-                <>
-                  <Legend lensed={lensed} />
-                  <p className="atlas-credit">Land from Natural Earth, public domain</p>
-                </>
-              ) : null}
-            </section>
+    <div className="atlas" data-view={view} data-lensed={lensed || undefined} data-place={place ? '' : undefined}>
+      <div className="atlas-grid">
+        <div id="atlas-place" className="atlas-col-head">
+          <Trail slugs={trail} current={place?.slug ?? null} hrefFor={hrefFor} onClear={clearTrail} />
+          {place && placeData ? (
+            <PlaceHead place={place} data={placeData} hrefFor={hrefFor} upClose={inRegion} filters={filters} />
+          ) : slug ? (
+            <UnknownPlace slug={slug} hrefFor={hrefFor} />
+          ) : (
+            <IntroHead model={model} hrefFor={hrefFor} listHref={atlasHref(null, { view: 'list', filters })} />
+          )}
+        </div>
 
-            <div id="atlas-place" ref={panelRef} className="atlas-panel">
-              <span className="atlas-grip" aria-hidden="true" />
-              <Trail slugs={trail} current={place?.slug ?? null} hrefFor={hrefFor} onClear={clearTrail} />
-              {place ? (
-                <PlacePanel
-                  key={place.id}
-                  place={place}
-                  route={route}
-                  routeMissing={!!routeParam && !route}
-                  model={lensModel}
-                  hrefFor={hrefFor}
-                  upClose={inRegion}
-                  filters={filters}
-                  clearLensHref={atlasHref(place.slug, { route: route?.id ?? null, view: viewParam, filters: NO_FILTERS })}
-                />
-              ) : slug ? (
-                <UnknownPlace slug={slug} hrefFor={hrefFor} />
+        <div className="atlas-col-lens">
+          <Lens filters={filters} sectionCounts={counts.sections} facetCounts={counts.facets} density={counts.density} allStories={counts.all} onChange={setFilters} />
+        </div>
+
+        <section className="atlas-world" data-view={view} aria-label={view === 'list' ? 'Every place in the world' : view === 'map' ? 'Flat map of the world' : 'The globe'}>
+          <div className="atlas-world-frame">
+            {fellBack ? (
+              <p className="atlas-world-note" role="status">
+                The living globe isn’t running in this browser, so this is the flat map. The list has every place too.
+              </p>
+            ) : null}
+            {view !== 'list' && nothingLit ? (
+              <p className="atlas-world-note" role="status">
+                <strong>{section ? `No ${section.label.toLowerCase()} stories are on the map yet.` : 'Nothing on the map matches.'}</strong>{' '}
+                {section ? 'Places light up as soon as those stories join the catalogue.' : 'Try another era or access level.'}
+              </p>
+            ) : null}
+            <p className="atlas-sum" aria-live="polite" aria-atomic="true" data-lensed={lensed || undefined}>
+              {summary.stories ? (
+                <>
+                  <span className="atlas-sum-pulse" aria-hidden="true" />
+                  {plural(summary.places, 'place')} · {plural(summary.stories, 'story', 'stories')}
+                  {lensed ? ' match' : ''}
+                </>
               ) : (
-                <IntroPanel model={lensModel} filters={filters} signals={signals} hrefFor={hrefFor} listHref={atlasHref(null, { view: 'list', filters })} />
+                'No placed stories match yet'
+              )}
+            </p>
+            <div className="atlas-dock">
+              <Segmented label="World view" hideLabel value={view} options={options} onChange={changeView} />
+              {view !== 'list' ? <Legend lensed={lensed} /> : null}
+            </div>
+            {view === 'globe' ? <PlacePeek model={lensModel} signals={signals} filters={filters} /> : null}
+            <div className="atlas-view">
+              {view === 'map' ? (
+                <MapStage model={model} input={stageInput} focus={mapFocus(place, routeGeo)} focusKey={place || routeGeo ? `${place?.id ?? ''}|${route?.id ?? ''}` : 'world'} reduced={reduced} hrefFor={hrefSlug} />
+              ) : view === 'list' ? (
+                <ListView tree={tree} selectedId={place?.id ?? null} hrefFor={hrefSlug} lensed={lensed} storiesOnly={filters.storiesOnly} />
+              ) : (
+                <div className="atlas-porthole" aria-hidden="true" />
               )}
             </div>
           </div>
-        </div>
+        </section>
 
-        {inRegion && region ? <MiamiUpClose region={region} selectedId={place?.id ?? null} routeId={route?.id ?? null} hrefFor={hrefFor} model={lensModel} /> : null}
+        <div className="atlas-col-body">
+          {place && placeData ? (
+            <PlaceBody
+              key={place.id}
+              place={place}
+              data={placeData}
+              route={route}
+              routeMissing={!!routeParam && !route}
+              model={lensModel}
+              hrefFor={hrefFor}
+              filters={filters}
+              clearLensHref={atlasHref(place.slug, { route: route?.id ?? null, view: viewParam, filters: NO_FILTERS })}
+            />
+          ) : slug ? null : (
+            <IntroBody model={lensModel} filters={filters} signals={signals} hrefFor={hrefFor} />
+          )}
+          {inRegion && region ? <MiamiUpClose region={region} selectedId={place?.id ?? null} routeId={route?.id ?? null} hrefFor={hrefFor} model={lensModel} /> : null}
+        </div>
       </div>
-    </HotContext.Provider>
+    </div>
+  );
+}
+
+/* ───────────── The flat map, lit by the same hover as the globe ───────────── */
+
+function MapStage({ model, input, focus, focusKey, reduced, hrefFor }: { model: AtlasModel; input: StageInput; focus: { cx: number; cy: number; w: number }; focusKey: string; reduced: boolean; hrefFor: (slug: string) => string }) {
+  const cat = useCatalogue();
+  const hot = useHoveredPlace();
+  const full = useMemo(() => ({ ...input, hot }), [input, hot]);
+  const nodes = useMemo(() => buildStageNodes(model, full), [model, full]);
+  const routes = useMemo(() => buildStageRoutes(cat, full), [cat, full]);
+  return <MapView nodes={nodes} routes={routes} focus={focus} focusKey={focusKey} reduced={reduced} hrefFor={hrefFor} />;
+}
+
+/* ───────────── A place under the pointer on the globe, previewed beside it ───────────── */
+
+function PlacePeek({ model, signals, filters }: { model: AtlasModel; signals: Map<ID, PlaceSignal> | null; filters: WorldFilters }) {
+  const cat = useCatalogue();
+  const id = useHoveredPlace();
+  const p = id && !isDomHot(id) && kindOf(id) === 'place' ? (cat.get(id) as Place | undefined) : undefined;
+  const lensed = narrowsStories(filters);
+  const stories = useMemo<Video[]>(() => {
+    if (!p) return [];
+    const list = cat.videosForPlace(p.id).filter((v) => !lensed || matchesVideo(cat, v, filters));
+    return [...list].sort((a, b) => Number(cat.isPlayable(b)) - Number(cat.isPlayable(a)) || b.published.localeCompare(a.published)).slice(0, 3);
+  }, [cat, p, lensed, filters]);
+  if (!p) return null;
+  const n = signals ? (signals.get(p.id)?.stories ?? 0) : (model.counts.get(p.id) ?? 0);
+  const routes = cat.routesForPlace(p.id).length;
+  const parent = cat.placeAncestors(p.id).find((a) => a.kind !== 'county');
+  return (
+    <div className="atlas-peek" aria-hidden="true">
+      <p className="atlas-peek-kind">
+        {p.gateway ? 'Gateway · ' : ''}
+        {KIND_LABEL[p.kind]}
+        {parent ? ` · ${parent.name}` : ''}
+      </p>
+      <p className="atlas-peek-name">{p.name}</p>
+      <p className="atlas-peek-meta">
+        {n ? plural(n, lensed ? 'match' : 'story', lensed ? 'matches' : 'stories') : p.status === 'expanding' ? 'Mapped, still growing' : lensed ? 'No matches' : 'No stories yet'}
+        {routes ? ` · ${plural(routes, 'route')}` : ''}
+      </p>
+      {stories.length ? (
+        <ul className="atlas-peek-art">
+          {stories.map((v) => (
+            <li key={v.id}>
+              <Art art={v.art} alt="" />
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <p className="atlas-peek-hint">Click to open</p>
+    </div>
   );
 }

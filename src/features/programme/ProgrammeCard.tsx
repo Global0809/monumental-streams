@@ -1,6 +1,8 @@
 /**
  * Programme card (series, chapters, campaigns, demonstration series) plus the small
- * shared pieces programme-shaped screens use: the honest status badge and the loop toggle.
+ * shared pieces programme-shaped screens use: the honest status mark and the loop toggle.
+ * A card is a poster behind a hairline luminous rim with one mark (its status) and the
+ * caption below; hovering it lights the programme's stories in the world.
  */
 import { useRef } from 'react';
 import { Link } from 'react-router';
@@ -10,6 +12,7 @@ import { sound } from '../../systems/sound/engine.ts';
 import { Icon } from '../../ui/Icon.tsx';
 import { Art, ReasonChips } from '../../ui/Pod.tsx';
 import { PROGRAMME_KIND_LABEL, PROGRAMME_STATUS_LABEL, programmeTally, tallyLabel } from './programme-model.ts';
+import { useHighlightPreview } from '../watch/seed.ts';
 import { useLoop } from './useLoop.ts';
 import './programme.css';
 
@@ -52,26 +55,37 @@ export function ProgrammeCard({ programme, reasons, compact }: { programme: Prog
   const tally = programmeTally(cat, programme);
   const parent = programme.parent ? cat.get(programme.parent) : undefined;
   const href = cat.href(programme.id);
+  const preview = useHighlightPreview(() => cat.videosForProgramme(programme.id).map((v) => v.id));
+  const wake = () => {
+    loop.wake();
+    preview.start();
+  };
+  const sleep = () => {
+    loop.sleep();
+    preview.end();
+  };
 
   return (
     <article
       className={`prog-card ${compact ? 'prog-card-compact' : ''}`}
       data-status={programme.status}
       data-original={programme.original || undefined}
-      onPointerEnter={loop.wake}
-      onPointerLeave={loop.sleep}
-      onFocus={loop.wake}
-      onBlur={loop.sleep}
+      onPointerEnter={wake}
+      onPointerLeave={sleep}
+      onFocus={wake}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) sleep();
+      }}
     >
       <div className="prog-card-art" aria-hidden="true">
         <Art art={programme.art} alt="" />
         {art?.previewSmall ? <video ref={vid} className="prog-card-preview" muted loop playsInline preload="none" tabIndex={-1} data-on={loop.playing || undefined} /> : null}
+        <span className="prog-card-rim" />
+        <span className="prog-card-mark">
+          <StatusBadge status={programme.status} />
+        </span>
       </div>
       <div className="prog-card-body">
-        <div className="prog-card-badges">
-          <StatusBadge status={programme.status} />
-          {programme.original ? <OriginalBadge /> : null}
-        </div>
         <h3 className="prog-card-title">
           <Link to={href} data-cursor="open" data-cursor-label="Programme" onClick={() => sound.play('transition')}>
             {programme.title}
@@ -81,6 +95,7 @@ export function ProgrammeCard({ programme, reasons, compact }: { programme: Prog
           </Link>
         </h3>
         <p className="prog-card-meta">
+          {programme.original ? 'Monumental Original · ' : ''}
           {PROGRAMME_KIND_LABEL[programme.kind]}
           {parent ? ` · Part of ${cat.label(parent.id)}` : ''}
           {art?.provisional ? ' · Provisional art' : ''}
@@ -96,3 +111,4 @@ export function ProgrammeCard({ programme, reasons, compact }: { programme: Prog
     </article>
   );
 }
+
